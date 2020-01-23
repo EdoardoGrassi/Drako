@@ -1,0 +1,8 @@
+#pragma once
+#ifndef DRAKO_MACRO_UTILITY_HPP
+#define DRAKO_MACRO_UTILITY_HPP
+
+#define DRAKO_PP_COUNTER 0
+
+#endif // !DRAKO_MACRO_UTILITY_HPP
+

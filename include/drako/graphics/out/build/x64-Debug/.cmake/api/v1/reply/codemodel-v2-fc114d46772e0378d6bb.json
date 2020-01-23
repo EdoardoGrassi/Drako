@@ -1,0 +1,68 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "vulkan_forward_renderer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-vulkan_forward_renderer-Debug-fa3057b2fb35acc4f05a.json",
+					"name" : "vulkan_forward_renderer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "vulkan_gui_renderer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-vulkan_gui_renderer-Debug-57896a92d1e2865b14c6.json",
+					"name" : "vulkan_gui_renderer",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics/out/build/x64-Debug",
+		"source" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

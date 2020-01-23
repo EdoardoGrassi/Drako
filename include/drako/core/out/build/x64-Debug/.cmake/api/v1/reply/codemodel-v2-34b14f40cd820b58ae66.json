@@ -1,0 +1,92 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "system",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "system",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "native_hid_api::@addd07e476d8cfca0b24",
+					"jsonFile" : "target-native_hid_api-Debug-5429bde91923553b6f33.json",
+					"name" : "native_hid_api",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "native_keyboard_api::@addd07e476d8cfca0b24",
+					"jsonFile" : "target-native_keyboard_api-Debug-937f0bd87a6993d68f4a.json",
+					"name" : "native_keyboard_api",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "native_window_api::@addd07e476d8cfca0b24",
+					"jsonFile" : "target-native_window_api-Debug-5329551c669314369532.json",
+					"name" : "native_window_api",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug",
+		"source" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

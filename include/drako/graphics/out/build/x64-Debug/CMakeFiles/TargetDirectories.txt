@@ -1,0 +1,4 @@
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics/out/build/x64-Debug/CMakeFiles/vulkan_forward_renderer.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics/out/build/x64-Debug/CMakeFiles/vulkan_gui_renderer.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/graphics/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
