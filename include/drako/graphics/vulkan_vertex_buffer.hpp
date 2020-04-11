@@ -2,7 +2,6 @@
 #ifndef DRAKO_VULKAN_VERTEX_BUFFER_HPP
 #define DRAKO_VULKAN_VERTEX_BUFFER_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/logging.hpp"
 
 #include <vulkan/vulkan.hpp>
@@ -99,9 +98,9 @@ namespace drako::gpx
             _ldevice.destroyBuffer(_buffer);
         }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vk::DeviceSize count() const noexcept { return _size; }
+        [[nodiscard]] constexpr vk::DeviceSize count() const noexcept { return _size; }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const vk::Buffer& handle() const noexcept { return _buffer; }
+        [[nodiscard]] constexpr const vk::Buffer& handle() const noexcept { return _buffer; }
 
     private:
         const vk::DeviceSize _size;
@@ -119,10 +118,10 @@ namespace drako::gpx
 
         explicit vulkan_vertex_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept;
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vk::Buffer
+        [[nodiscard]] constexpr vk::Buffer
         buffer() const noexcept { return _buffer.get(); }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t
+        [[nodiscard]] constexpr vk::DeviceSize
         size() const noexcept { return _size; }
 
     private:
@@ -258,9 +257,9 @@ namespace drako::gpx
             _ldevice.destroyBuffer(_buffer);
         }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vk::DeviceSize count() const noexcept { return _size; }
+        [[nodiscard]] constexpr vk::DeviceSize count() const noexcept { return _size; }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const vk::Buffer& handle() const noexcept { return _buffer; }
+        [[nodiscard]] constexpr const vk::Buffer& handle() const noexcept { return _buffer; }
 
     private:
         const vk::DeviceSize _size;
@@ -277,10 +276,10 @@ namespace drako::gpx
 
         explicit vulkan_index_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept;
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vk::Buffer
+        [[nodiscard]] constexpr vk::Buffer
         buffer() const noexcept { return _buffer.get(); }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t
+        [[nodiscard]] constexpr size_t
         size() const noexcept { return _size; }
 
     private:

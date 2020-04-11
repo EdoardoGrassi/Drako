@@ -17,7 +17,6 @@
 #include "drako/audio/native_audio_api.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
-#include "drako/core/drako_api_win.hpp"
 #include <Audioclient.h>
 #include <combaseapi.h>
 #include <mmdeviceapi.h>
@@ -30,8 +29,7 @@ namespace drako::audio
     class input_device_guid
     {
     public:
-
-        #if defined(DRAKO_PLT_WIN32)
+#if defined(DRAKO_PLT_WIN32)
 
         explicit input_device_guid() noexcept
             : _win_guid_str(nullptr, CoTaskMemFree)
@@ -60,32 +58,31 @@ namespace drako::audio
             return *this;
         }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE const LPWSTR native_guid() const noexcept { return _win_guid_str.get(); }
+        [[nodiscard]] DRAKO_FORCE_INLINE const LPWSTR native_guid() const noexcept { return _win_guid_str.get(); }
 
     private:
-
         std::unique_ptr<WCHAR, decltype(&CoTaskMemFree)> _win_guid_str;
 
-        #else
-        #error Platform not supported
-        #endif
+#else
+#error Platform not supported
+#endif
     };
 
 
     // Gets the guid of the default device used for audio capture as configured in the system.
     //
-    DRAKO_NODISCARD std::tuple<std::error_code, input_device_guid>
-        default_input_device() noexcept;
+    [[nodiscard]] std::tuple<std::error_code, input_device_guid>
+    default_input_device() noexcept;
 
     // Lists all the active devices with an audio capture interface.
     //
-    DRAKO_NODISCARD std::tuple<std::error_code, std::vector<input_device_guid>>
-        query_input_devices() noexcept;
+    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_guid>>
+    query_input_devices() noexcept;
 
     // Lists the active devices with an audio capture interface that satisfies the requirements.
     //
-    DRAKO_NODISCARD std::tuple<std::error_code, std::vector<input_device_guid>>
-        query_input_devices(const stream_format& format) noexcept;
+    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_guid>>
+    query_input_devices(const stream_format& format) noexcept;
 
 
     // An input device that can provide audio data capture.
@@ -93,8 +90,7 @@ namespace drako::audio
     class input_device
     {
     public:
-
-        #if defined(DRAKO_PLT_WIN32)
+#if defined(DRAKO_PLT_WIN32)
 
         explicit input_device() noexcept
         {
@@ -102,7 +98,7 @@ namespace drako::audio
 
         explicit input_device(IMMDevice* dev_, IAudioClient* acl_, IAudioCaptureClient* acc_) noexcept;
 
-        #endif
+#endif
 
         ~input_device() noexcept;
 
@@ -115,47 +111,46 @@ namespace drako::audio
 
         // Starts recording data on the audio stream.
         //
-        DRAKO_NODISCARD std::error_code enable() noexcept;
+        [[nodiscard]] std::error_code enable() noexcept;
 
         // Stops recording data on the audio stream.
         //
-        DRAKO_NODISCARD std::error_code disable() noexcept;
+        [[nodiscard]] std::error_code disable() noexcept;
 
         // Flushes the backing buffer and resets the audio stream state.
         //
-        DRAKO_NODISCARD std::error_code reset() noexcept;
+        [[nodiscard]] std::error_code reset() noexcept;
 
         // Reads audio data from the backing buffer of the capture device.
         //
-        DRAKO_NODISCARD std::tuple<std::error_code, size_t> read(void* dst_, size_t frames_) noexcept;
+        [[nodiscard]] std::tuple<std::error_code, size_t> read(void* dst_, size_t frames_) noexcept;
 
         // Returns an invalid device handle.
         //
-        DRAKO_NODISCARD static input_device invalid_device() noexcept;
+        [[nodiscard]] static input_device invalid_device() noexcept;
 
     private:
+#if defined(DRAKO_PLT_WIN32)
 
-        #if defined(DRAKO_PLT_WIN32)
-
-        IMMDevice* _device                            = nullptr;
-        IAudioClient* _audio_client_interface         = nullptr;
+        IMMDevice*           _device                  = nullptr;
+        IAudioClient*        _audio_client_interface  = nullptr;
         IAudioCaptureClient* _audio_capture_interface = nullptr;
 
-        #else
-        #error Platform not supported
-        #endif
+#else
+#error Platform not supported
+#endif
     };
 
 
     // Creates an audio capture device with the device-specific default format.
     //
-    DRAKO_NODISCARD std::tuple<std::error_code, input_device>
-        open_device(input_device_guid device_, std::chrono::microseconds buffer_capacity_) noexcept;
+    [[nodiscard]] std::tuple<std::error_code, input_device>
+    open_device(input_device_guid device_, std::chrono::microseconds buffer_capacity_) noexcept;
 
     // Creates an audio capture device with the specified format.
     //
-    DRAKO_NODISCARD std::tuple<std::error_code, input_device>
-        open_device(input_device_guid device_, const stream_format& format_, std::chrono::microseconds buffer_capacity_) noexcept;
-}
+    [[nodiscard]] std::tuple<std::error_code, input_device>
+    open_device(input_device_guid device_, const stream_format& format_, std::chrono::microseconds buffer_capacity_) noexcept;
+} // namespace drako::audio
 
 #endif // !DRAKO_AUDIO_INPUT_DEVICE_HPP

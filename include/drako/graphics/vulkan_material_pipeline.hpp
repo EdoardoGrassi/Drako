@@ -6,14 +6,13 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 
-#include "drako/graphics/material.hpp"
+#include "drako/graphics/material_types.hpp"
 
 #include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_material_types.hpp"
@@ -51,25 +50,33 @@ namespace drako::gpx
     const vk::DescriptorSetLayoutBinding BASE_BINDINGS[] = { mpv_matrix_binding, albedo_map_binding, normal_map_binding };
     */
 
+    vk::DescriptorSetLayoutBinding make_vulkan_binding(const material_data_binding& b) noexcept
+    {
+        return vk::DescriptorSetLayoutBinding{
+            b.shader_binding_attribute,
+            vk::DescriptorType::eSampler,
+            b.shader_resource_count,
+            vk::ShaderStageFlagBits::eVertex,
+            nullptr
+        };
+    }
+
     class vulkan_material_pipeline
     {
     public:
-        explicit vulkan_material_pipeline(vk::Device d, vk::RenderPass rp, const material_template& mtl);
+        explicit vulkan_material_pipeline(const vk::Device d, const vk::RenderPass rp, const material_template& mtl);
 
-        DRAKO_NODISCARD
-        vk::Pipeline pipeline_handle() const noexcept
+        [[nodiscard]] vk::Pipeline pipeline_handle() const noexcept
         {
             return _pipeline.get();
         }
 
-        DRAKO_NODISCARD
-        vk::PipelineLayout pipeline_layout_handle() const noexcept
+        [[nodiscard]] vk::PipelineLayout pipeline_layout_handle() const noexcept
         {
             return _pipeline_layout.get();
         }
 
-        DRAKO_NODISCARD
-        const std::vector<vk::DescriptorSet>& descriptor_sets() const noexcept
+        [[nodiscard]] const std::vector<vk::DescriptorSet>& descriptor_sets() const noexcept
         {
             return _descriptor_sets;
         }
@@ -90,12 +97,15 @@ namespace drako::gpx
         void setup_pipeline(const vulkan_gpu_shader& vert, const vulkan_gpu_shader& frag) noexcept;
     };
 
-    vulkan_material_pipeline::vulkan_material_pipeline(vk::Device d, vk::RenderPass rp, const material_template& mtl)
+    vulkan_material_pipeline::vulkan_material_pipeline(
+        const vk::Device         d,
+        const vk::RenderPass     rp,
+        const material_template& mtl)
         : _device(d)
         , _renderpass(rp)
     {
-        DRAKO_ASSERT(d != vk::Device{}, "Handle must be valid");
-        DRAKO_ASSERT(rp != vk::RenderPass{}, "Handle must be valid");
+        DRAKO_ASSERT(d != vk::Device{}, "Invalid handle");
+        DRAKO_ASSERT(rp != vk::RenderPass{}, "Invalid handle");
 
         const vk::SamplerCreateInfo shared_sampler_info{
             vk::SamplerCreateFlags{},
@@ -116,8 +126,8 @@ namespace drako::gpx
             vk::BorderColor::eIntOpaqueBlack,
             vk::Bool32{ VK_FALSE } // disable unnormalized coordinates
         };
-        if (auto [result, sampler] = _device.createSamplerUnique(shared_sampler_info);
-            result == vk::Result::eSuccess)
+        if (auto [err, sampler] = _device.createSamplerUnique(shared_sampler_info);
+            err == vk::Result::eSuccess)
         {
             _shared_immutable_sampler = std::move(sampler);
         }
@@ -126,19 +136,21 @@ namespace drako::gpx
             std::exit(EXIT_FAILURE);
         }
 
-        std::vector<vk::DescriptorSetLayoutBinding> bindings{ std::size(mtl.bindings) };
+        // TODO: vvv review this vvv
+        std::vector<vk::DescriptorSetLayoutBinding> bindings(std::size(mtl.bindings));
         for (const auto& binding : mtl.bindings)
         {
-            bindings.emplace_back(bindings);
+            bindings.emplace_back(make_vulkan_binding(binding));
         }
+        // ^^^ end review ^^^
 
         const vk::DescriptorSetLayoutCreateInfo layout_info{
             vk::DescriptorSetLayoutCreateFlags{},
             static_cast<uint32_t>(std::size(bindings)), bindings.data()
         };
 
-        if (auto [result, layout] = _device.createDescriptorSetLayoutUnique(layout_info);
-            result == vk::Result::eSuccess)
+        if (auto [err, layout] = _device.createDescriptorSetLayoutUnique(layout_info);
+            err == vk::Result::eSuccess)
         {
             _descriptor_layout = std::move(layout);
         }
@@ -155,8 +167,8 @@ namespace drako::gpx
             100,
             static_cast<uint32_t>(std::size(pool_sizes)), pool_sizes
         };
-        if (auto [result, pool] = _device.createDescriptorPoolUnique(pool_info);
-            DRAKO_LIKELY(result == vk::Result::eSuccess))
+        if (auto [err, pool] = _device.createDescriptorPoolUnique(pool_info);
+            DRAKO_LIKELY(err == vk::Result::eSuccess))
         {
             _descriptor_pool = std::move(pool);
         }
@@ -169,15 +181,14 @@ namespace drako::gpx
             _descriptor_pool.get(),
             100,
         };
-        if (const auto result = _device.allocateDescriptorSets(&preallocation_info, _descriptor_sets.data());
-            result != vk::Result::eSuccess)
+        if (const auto err = _device.allocateDescriptorSets(&preallocation_info, _descriptor_sets.data());
+            err != vk::Result::eSuccess)
         {
             std::exit(EXIT_FAILURE);
         }
 
         const vk::WriteDescriptorSet inits[] = {};
     }
-
 
     void vulkan_material_pipeline::setup_pipeline(const vulkan_gpu_shader& vert, const vulkan_gpu_shader& frag) noexcept
     {
@@ -364,7 +375,7 @@ namespace drako::gpx
 
     void vulkan_material_pipeline::bind(uint32_t guid, vk::ImageView resource, uint32_t binding, uint32_t array_element) noexcept
     {
-        DRAKO_ASSERT(resource != vk::ImageView{}, "Handle must be valid");
+        DRAKO_ASSERT(resource != vk::ImageView{}, "Invalid handle");
 
         const vk::DescriptorImageInfo desc_image_info[] = {
             { vk::Sampler{},

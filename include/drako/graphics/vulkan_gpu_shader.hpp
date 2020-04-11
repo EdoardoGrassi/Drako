@@ -4,7 +4,7 @@
 
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
-#include "drako/graphics/shader.hpp"
+#include "drako/graphics/shader_types.hpp"
 
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -23,14 +23,13 @@ namespace drako::gpx
         vulkan_gpu_shader(vulkan_gpu_shader&&) = delete;
         vulkan_gpu_shader& operator=(vulkan_gpu_shader&&) = delete;
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE const vk::ShaderModule& shader_module() const noexcept
+        [[nodiscard]] const vk::ShaderModule& shader_module() const noexcept
         {
             return _module.get();
         }
 
         // Returns the identifier of the entry function of vertex stage.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE static constexpr auto
-        vk_vertex_function_name() noexcept
+        [[nodiscard]] static constexpr auto vk_vertex_function_name() noexcept
         {
             return "main";
         }

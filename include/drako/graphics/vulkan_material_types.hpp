@@ -3,7 +3,7 @@
 #define DRAKO_VULKAN_MATERIAL_TYPES_HPP
 
 #include "drako/devel/logging.hpp"
-#include "drako/graphics/material.hpp"
+#include "drako/graphics/material_types.hpp"
 #include "drako/graphics/vulkan_material_pipeline.hpp"
 
 #include <cstddef>
@@ -19,7 +19,10 @@ namespace drako::gpx
         vk::DescriptorSet material_descriptor_set[DRAKO_MAX_DESCRIPTOR_SETS];
     };
 
-    vulkan_material_instance compile_material(const material_template& mt, const material_instance& mi, const vulkan_material_pipeline& p) noexcept
+    vulkan_material_instance compile_material(
+        const material_template&        mt,
+        const material_instance&        mi,
+        const vulkan_material_pipeline& p) noexcept
     {
         vulkan_material_instance instance;
 
@@ -36,10 +39,9 @@ namespace drako::gpx
                     break;
                 }
                 default:
-                    DRAKO_LOG_ERROR("[Drako] Unrecognized resource type " + type);
+                    DRAKO_LOG_ERROR("[Drako] Unrecognized resource type");
             }
         }
-
         return instance;
     }
 } // namespace drako::gpx

@@ -1,11 +1,10 @@
 #pragma once
-#ifndef DRAKO_ASSERTION_HPP
-#define DRAKO_ASSERTION_HPP
+#ifndef DRAKO_ASSERTION_HPP_
+#define DRAKO_ASSERTION_HPP_
 
-//
-// \brief   Functions and macro definitions that implement runtime assertions.
-// \author  Grassi Edoardo
-//
+/// @file
+/// @brief   Functions and macro definitions that implement runtime assertions.
+/// @author  Grassi Edoardo
 
 #include <iostream>
 
@@ -13,20 +12,21 @@
 
 namespace drako
 {
-// Forces the cpu into the debugger
-#if defined(_MSC_VER)
-#define DRAKO_FORCE_DEBUG_BREAK() __debugbreak()
+    // Forces the cpu into the debugger
+    [[no_return]] DRAKO_FORCE_INLINE void _raise_debug_break()
+    {
+#if defined(DRAKO_CC_MSVC)
+        __debugbreak();
 #else
-#define DRAKO_FORCE_DEBUG_BREAK() asm { int 3 }
+        asm { int 3 }
 #endif
+    }
 
     DRAKO_FORCE_INLINE void debug_assert(bool condition)
     {
         if (DRAKO_LIKELY(condition)) {}
         else
-        {
-            DRAKO_FORCE_DEBUG_BREAK();
-        }
+            _raise_debug_break();
     }
 
     DRAKO_FORCE_INLINE void debug_assert(bool condition, const char* error_message_ptr)
@@ -35,11 +35,9 @@ namespace drako
         else
         {
             std::cerr << error_message_ptr << std::endl;
-            std::cerr.flush();
-            DRAKO_FORCE_DEBUG_BREAK();
+            _raise_debug_break();
         }
     }
-
 
     template <typename T>
     inline void assert_not_null(const T* ptr)
@@ -48,9 +46,9 @@ namespace drako
     }
 
     template <typename T>
-    inline void assert_not_null(const T* ptr, const char* error_message_ptr)
+    inline void assert_not_null(const T* ptr, const char* msg)
     {
-        debug_assert(ptr != nullptr, error_message_ptr);
+        debug_assert(ptr != nullptr, msg);
     }
 
 
@@ -59,49 +57,51 @@ namespace drako
         debug_assert(ptr != nullptr);
     }
 
-    inline void assert_not_null(const void* ptr, const char* error_message_ptr)
+    inline void assert_not_null(const void* ptr, const char* msg)
     {
-        debug_assert(ptr != nullptr, error_message_ptr);
+        debug_assert(ptr != nullptr, msg);
     }
 
 
     template <typename T>
-    inline void assert_inside_inclusive_bounds(T value, T min, T max, const char* pMessage)
+    inline void assert_inside_inclusive_bounds(T value, T min, T max, const char* msg)
     {
-        debug_assert((value >= min) && (value <= max), pMessage);
+        debug_assert((value >= min) && (value <= max), msg);
     }
 
     template <typename T>
-    inline void assert_inside_exclusive_bounds(T value, T min, T max, const char* pMessage)
+    inline void assert_inside_exclusive_bounds(T value, T min, T max, const char* msg)
     {
-        debug_assert((value > min) && (value < max), pMessage);
+        debug_assert((value > min) && (value < max), msg);
     }
+
+} // namespace drako
 
 
 #if !defined(DRAKO_API_ASSERTIONS)
 
 // Triggers if the expression evaluates to false
-#define DRAKO_ASSERT(...)                 \
-    do                                    \
-    {                                     \
-        drako::debug_assert(__VA_ARGS__); \
+#define DRAKO_ASSERT(...)                   \
+    do                                      \
+    {                                       \
+        ::drako::debug_assert(__VA_ARGS__); \
     } while (false)
 
 // Asserts that the pointer isn't null
-#define DRAKO_ASSERT_NOT_NULL(...)           \
-    do                                       \
-    {                                        \
-        drako::assert_not_null(__VA_ARGS__); \
+#define DRAKO_ASSERT_NOT_NULL(...)             \
+    do                                         \
+    {                                          \
+        ::drako::assert_not_null(__VA_ARGS__); \
     } while (false)
 
 
-#define DRAKO_ASSERT_INSIDE_INCLUSIVE_BOUNDS(value, min, max, error_message_ptr)           \
-    do                                                                                     \
-    {                                                                                      \
-        drako::assert_inside_inclusive_bounds((value), (min), (max), (error_message_ptr)); \
+#define DRAKO_ASSERT_INSIDE_INCLUSIVE_BOUNDS(value, min, max, error_message_ptr)             \
+    do                                                                                       \
+    {                                                                                        \
+        ::drako::assert_inside_inclusive_bounds((value), (min), (max), (error_message_ptr)); \
     } while (false)
 
-#else // Strip debug code
+#else // ^^^ actual definitions (debug) ^^^/vvv empty definitions (release) vvv
 #
 #define DRAKO_ASSERT(...)
 #define DRAKO_ASSERT_NOT_NULL(...)
@@ -116,6 +116,4 @@ namespace drako
 // \brief   Declares that an assertion is tested as part of a function postcondition invariant.
 #define DRAKO_POSTCON(condition) DRAKO_ASSERT(condition)
 
-} // namespace drako
-
-#endif // !DRAKO_ASSERTIONS_HPP
+#endif // !DRAKO_ASSERTIONS_HPP_

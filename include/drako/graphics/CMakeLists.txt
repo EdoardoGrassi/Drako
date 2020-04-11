@@ -39,21 +39,29 @@ if(NOT Vulkan_FOUND)
 endif()
 
 
-add_library(vulkan_forward_renderer STATIC "src/vulkan_forward_renderer.cpp")
-add_library(drako::forward_renderer ALIAS vulkan_forward_renderer)
+add_library(vulkan-forward-renderer STATIC "./src/vulkan_forward_renderer.cpp")
+add_library(drako::vulkan-forward-renderer ALIAS vulkan-forward-renderer)
 
 # set_property(TARGET vulkan_forward_renderer PROPERTY CXX_STANDARD 17)
-target_include_directories(vulkan_forward_renderer PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(vulkan_forward_renderer PUBLIC ${Vulkan_LIBRARIES})
+target_include_directories(vulkan-forward-renderer PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(vulkan-forward-renderer PUBLIC ${Vulkan_LIBRARIES})
 
-# Disable exceptions in vulkan headers.
-target_compile_definitions(vulkan_forward_renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
+# Disable exceptions in Vulkan headers.
+target_compile_definitions(vulkan-forward-renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
 
 
-add_library(vulkan_gui_renderer STATIC "src/vk_gui_renderer.cpp")
-add_library(drako::gui_renderer ALIAS vulkan_gui_renderer)
+add_library(vulkan-gui-renderer STATIC "./src/vk_gui_renderer.cpp")
+add_library(drako::vulkan-gui-renderer ALIAS vulkan-gui-renderer)
 
 # set_property(TARGET vulkan_gui_renderer PROPERTY CXX_STANDARD 17)
-target_include_directories(vulkan_gui_renderer PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(vulkan_gui_renderer PUBLIC ${Vulkan_LIBRARIES})
-target_compile_definitions(vulkan_gui_renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
+target_include_directories(vulkan-gui-renderer PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(vulkan-gui-renderer PUBLIC ${Vulkan_LIBRARIES})
+
+# Disable exceptions in Vulkan headers
+target_compile_definitions(vulkan-gui-renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
+
+
+add_library(render-system STATIC "./src/render_system.cpp")
+add_library(drako::render-system ALIAS render-system)
+
+target_link_libraries(render-system PRIVATE drako::vulkan-forward-renderer)

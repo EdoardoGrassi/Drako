@@ -7,7 +7,7 @@
 #include <tuple>
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/math/dk_line.hpp"
+#include "drako/math/line.hpp"
 #include "drako/math/vector3.hpp"
 
 namespace drako

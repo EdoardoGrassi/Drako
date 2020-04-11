@@ -2,7 +2,6 @@
 #ifndef DRAKO_VULKAN_FORWARD_RENDERER_HPP
 #define DRAKO_VULKAN_FORWARD_RENDERER_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/graphics/vulkan_material_pipeline.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/math/mat4x4.hpp"
@@ -30,13 +29,16 @@ namespace drako::gpx
         vulkan_forward_renderer(vulkan_forward_renderer&&) = delete;
         vulkan_forward_renderer& operator=(vulkan_forward_renderer&&) = delete;
 
-        DRAKO_NODISCARD
-        vk::RenderPass renderpass() const noexcept
+        [[nodiscard]] vk::RenderPass renderpass() const noexcept
         {
             return _renderpass.get();
         }
 
-        void render(const vulkan_material_pipeline&      pipeline,
+        void draw(const vulkan_material_pipeline& pipeline,
+            const std::vector<mat4x4>&              mvp,
+            const std::vector<vulkan_mesh_view>&    mesh) noexcept;
+
+        void draw(const vulkan_material_pipeline&      pipeline,
             const std::vector<mat4x4>&                   mvps,
             const std::vector<vulkan_mesh_view>&         meshes,
             const std::vector<vulkan_material_instance>& materials) noexcept;
@@ -71,7 +73,7 @@ namespace drako::gpx
 
         vk::UniqueRenderPass _renderpass;
 
-        vk::CommandBuffer _render_cmdbuffer;
+        vk::CommandBuffer _command_buffer;
 
         std::vector<frame_attachments> _frame_attachments;
     };

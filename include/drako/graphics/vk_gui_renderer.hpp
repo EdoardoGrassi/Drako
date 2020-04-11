@@ -8,7 +8,7 @@
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/logging.hpp"
-#include "drako/graphics/mesh.hpp"
+#include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_swapchain.hpp"
 

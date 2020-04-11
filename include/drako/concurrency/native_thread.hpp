@@ -7,7 +7,7 @@
 #include "drako/concurrency/thread_context.hpp"
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/core/preprocessor/platform_macros.hpp"
-#include "drako/core/system/system_info.hpp"
+#include "drako/system/system_info.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <processthreadsapi.h>
@@ -27,7 +27,7 @@ namespace drako::sys
         explicit native_thread(routine_type routine, size_t stack_size) noexcept
         {
 #if defined(DRAKO_PLT_WIN32)
-            _handle = CreateThread(NULL, // [In] security attributes
+            _handle = ::CreateThread(NULL, // [In] security attributes
                 stack_size,
                 routine,
                 nullptr,
@@ -47,7 +47,7 @@ namespace drako::sys
 #if defined(DRAKO_PLT_WIN32)
 
             if (_handle != INVALID_HANDLE_VALUE)
-                CloseHandle(_handle);
+                ::CloseHandle(_handle);
 
 #else
 #error Platform not supported
@@ -98,7 +98,7 @@ namespace drako::sys
             // PROCESSOR_NUMBER p;
             // memset(&p, 0, sizeof(p));
             // p.Number =
-            return SetThreadIdealProcessorEx(_handle, &(core.cpu_number), NULL);
+            return ::SetThreadIdealProcessorEx(_handle, &(core.cpu_number), NULL);
 
 #else
 #error Platform not supported

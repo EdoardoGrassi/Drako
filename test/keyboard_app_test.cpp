@@ -1,4 +1,4 @@
-#include "drako/core/system/native_keyboard_device.hpp"
+#include "drako/system/native_keyboard_device.hpp"
 
 #include <chrono>
 #include <ostream>

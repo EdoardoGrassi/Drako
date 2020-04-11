@@ -32,8 +32,3 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/core/system/cmake_install.cmake")
-endif()
-

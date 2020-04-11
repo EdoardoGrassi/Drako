@@ -2,10 +2,12 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#include "drako/devel/asset_register.hpp"
+#include "drako/devel/build_utils.hpp"
 
 namespace _fs = std::filesystem;
 
@@ -15,7 +17,12 @@ namespace drako
 {
     using _build_asset_path = _fs::path;
 
-    struct _build_item
+    struct project_info
+    {
+        _fs::file_time_type last_project_scan;
+    };
+
+    struct project_build_item
     {
         std::uint32_t uuid;
 
@@ -43,7 +50,7 @@ int main(int argc, char* argv[])
     //const std::vector<_fs::path> metadata_files;
     //for (const auto& metadata : metadata_files) {}
 
-    const std::vector<drako::_build_item> curr_build_items;
+    const std::vector<drako::project_build_item> curr_build_items;
     std::vector<drako::_build_asset_path> curr_build_inputs;
 
     // TODO: load cache

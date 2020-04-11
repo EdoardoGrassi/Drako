@@ -25,6 +25,11 @@
 // Drako version number.
 #define DRAKO_API_VERSION DRAKO_MAKE_VERSION(0, 1, 0)
 
+DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr uint32_t make_api_version() noexcept
+{
+    return DRAKO_MAKE_VERSION(0, 1, 0);
+}
+
 /* clang-format on */
 
 // Drako base namespace.

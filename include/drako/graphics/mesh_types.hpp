@@ -1,24 +1,53 @@
 #pragma once
-#ifndef DRAKO_MESH_TYPES_HPP
-#define DRAKO_MESH_TYPES_HPP
+#ifndef DRAKO_MESH_TYPES_HPP_
+#define DRAKO_MESH_TYPES_HPP_
 
+#include "drako/core/meta/encoding.hpp"
 #include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/system/memory_stream.hpp"
+#include "drako/system/memory_stream.hpp"
 
 #include <cstddef>
-#include <istream>
+#include <iostream>
 #include <type_traits>
 #include <vector>
 
 namespace drako
 {
     // Uniquely identifies a mesh resource.
-    enum class mesh_guid : std::uint32_t;
+    enum class mesh_id : std::uint32_t;
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE std::string to_string(mesh_guid id)
+    [[nodiscard]] DRAKO_FORCE_INLINE std::string to_string(mesh_id id)
     {
-        return std::to_string(static_cast<std::underlying_type_t<mesh_guid>>(id));
+        return std::to_string(static_cast<std::underlying_type_t<mesh_id>>(id));
     }
+
+
+    enum class vertex_attribute : std::uint8_t
+    {
+        position,
+        normal,
+        color,
+        index
+    };
+
+    // Metadata with memory and semantic information.
+    struct vertex_attribute_descriptor
+    { //^^^ template <const char* Name, meta::format Format, size_t Count>
+        meta::format     format;
+        vertex_attribute attribute;
+        std::uint8_t     dimension;
+
+        constexpr vertex_attribute_descriptor(
+            meta::format     format,
+            vertex_attribute attribute,
+            std::uint8_t     dimension) noexcept
+            : format(format)
+            , attribute(attribute)
+            , dimension(dimension)
+        {
+        }
+    };
+
 
     // Primitive topology of the mesh.
     enum class mesh_topology : std::uint8_t
@@ -48,44 +77,82 @@ namespace drako
         }
 
         // Number of vertices in the mesh vertex buffer.
-        std::uint32_t vertex_count;
+        std::uint32_t vertex_count = 0;
 
         // Number of indices in the mesh index buffer.
-        std::uint32_t index_count;
-
-        std::uint8_t vertex_size_bytes;
-
-        std::uint8_t index_size_bytes;
-
-        // Topology of the mesh.
-        mesh_topology topology;
-
-        // Byte size of a single index element.
-        DRAKO_NODISCARD size_t index_bytes() const noexcept { return index_size_bytes; }
-
-        // Elements in the index container.
-        DRAKO_NODISCARD size_t index_count() const noexcept { return index_count; }
+        std::uint32_t index_count = 0;
 
         // Byte size of a single vertex element.
-        DRAKO_NODISCARD size_t vertex_bytes() const noexcept { return vertex_size_bytes; }
+        std::uint8_t vertex_size_bytes = 0;
 
-        // Elements in the vertex container.
-        DRAKO_NODISCARD size_t vertex_count() const noexcept { return vertex_count; }
+        // Byte size of a single index element.
+        std::uint8_t index_size_bytes = 0;
+
+        // Topology of the mesh.
+        mesh_topology topology = mesh_topology::undefined;
     };
     static_assert(std::is_trivially_copy_constructible_v<mesh_desc_t>,
         "Required for direct serialization with memcpy");
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE size_t
+    [[nodiscard]] DRAKO_FORCE_INLINE size_t
     vertex_buffer_size_bytes(const mesh_desc_t& desc) noexcept
     {
-        return desc.vertex_count() * desc.vertex_bytes();
+        return desc.vertex_count * desc.vertex_size_bytes;
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE size_t
+    [[nodiscard]] DRAKO_FORCE_INLINE size_t
     index_buffer_size_bytes(const mesh_desc_t& desc) noexcept
     {
-        return desc.index_count() * desc.index_bytes();
+        return desc.index_count * desc.index_size_bytes;
     }
+
+
+    class mesh_view
+    {
+    public:
+        explicit constexpr mesh_view() noexcept
+            : _verts_data{ nullptr }
+            , _index_data{ nullptr }
+            , _verts_size{ 0 }
+            , _index_size{ 0 }
+        {
+        }
+
+        explicit mesh_view(const std::byte* verts_data, size_t verts_bytes,
+            const std::byte* index_data, size_t index_bytes) noexcept
+            : _verts_data{ verts_data }
+            , _index_data{ index_data }
+            , _verts_size{ verts_bytes }
+            , _index_size{ index_bytes }
+        {
+            DRAKO_ASSERT(verts_data != nullptr);
+            DRAKO_ASSERT(index_data != nullptr);
+            DRAKO_ASSERT(verts_bytes != 0);
+            DRAKO_ASSERT(index_bytes != 0);
+        }
+
+        mesh_view(const mesh_view&) noexcept = default;
+        mesh_view& operator=(const mesh_view&) noexcept = default;
+
+        [[nodiscard]] DRAKO_FORCE_INLINE const std::byte*
+        vertex_data() const noexcept { return _verts_data; }
+
+        [[nodiscard]] DRAKO_FORCE_INLINE const std::byte*
+        index_data() const noexcept { return _index_data; }
+
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr size_t
+        vertex_data_size() const noexcept { return _verts_size; }
+
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr size_t
+        index_data_size() const noexcept { return _index_size; }
+
+    private:
+        const std::byte* _verts_data;
+        const std::byte* _index_data;
+        const size_t     _verts_size;
+        const size_t     _index_size;
+    };
+
 
 
     // Mesh asset.
@@ -96,19 +163,23 @@ namespace drako
         explicit mesh(Alloc& al = Alloc()) noexcept
             : _meta{ 0, 0, 0, 0, mesh_topology::undefined }
             , _verts{ nullptr }
-            , _trias{ nullptr }
+            , _index{ nullptr }
         {
         }
 
-        /*
-        template <typename V, typename I>
-        explicit mesh(const std::vector<V>& vertices, const std::vector<I>& indexes, mesh_topology t, Alloc& al = Alloc())
-            : _desc{ vertices.size(), sizeof(V), indexes.size(), sizeof(I), t }
-            , _vertices(vertices, al)
-            , _indexes(indexes, al)
+        explicit mesh(
+            const std::vector<std::byte>& verts,
+            const std::vector<std::byte>& index,
+            Alloc&                        al = Alloc()) noexcept
+            : _meta{}
+            , _alloc{ al }
         {
+            _verts = std::allocator_traits<Alloc>::allocate(std::size(verts));
+            std::copy(std::cbegin(verts), std::cend(verts), _verts);
+
+            _index = std::allocator_traits<Alloc>::allocate(std::size(index));
+            std::copy(std::cbegin(index), std::cend(index), _index);
         }
-        */
 
         template <typename Allocator>
         explicit mesh(memory_stream<Allocator>& ms, Alloc& al = Alloc()) noexcept
@@ -119,96 +190,67 @@ namespace drako
         mesh(const mesh&) = delete;
         mesh& operator=(const mesh&) = delete;
 
-        constexpr mesh(mesh&& rhs) noexcept
-            : _meta(std::move(rhs._meta))
-            , _verts(std::move(rhs._verts))
-            , _trias(std::move(rhs._trias))
+        constexpr mesh(mesh&& other) noexcept
+            : _meta(std::move(other._meta))
+            , _alloc(std::move(other._alloc))
+            , _verts(std::move(other._verts))
+            , _index(std::move(other._index))
         {
         }
 
-        constexpr mesh& operator=(mesh&& rhs) noexcept
+        constexpr mesh& operator=(mesh&& other) noexcept
         {
-            if (this != std::addressof(rhs))
+            if (this != std::addressof(other))
             {
-                std::swap(_meta, rhs._meta);
-                std::swap(_verts, rhs._verts);
-                std::swap(_trias, rhs._trias);
+                std::swap(_meta, other._meta);
+                std::swap(_alloc, other._alloc);
+                std::swap(_verts, other._verts);
+                std::swap(_index, other._index);
             }
             return *this;
         }
 
-        DRAKO_NODISCARD explicit operator mesh_view() const noexcept
+        [[nodiscard]] explicit operator mesh_view() const noexcept
         {
-            return mesh_view(_verts, size(_vertices), _trias, size(_indexes));
+            return mesh_view{ _verts, _meta.vertex_count(), _index, _meta.index_count() };
         }
 
         // Returns the number of vertices stored in the vertex buffer.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t vertex_count() const noexcept;
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr size_t vertex_count() const noexcept;
 
         // Returns the number of indexes stored in the index buffer.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t index_count() const noexcept;
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr size_t index_count() const noexcept;
 
         // Returns a pointer to the vertex buffer.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE const std::byte*
+        [[nodiscard]] DRAKO_FORCE_INLINE const std::byte*
         vertex_data() const noexcept { return _verts; }
 
         // Returns a pointer to the index buffer.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE const std::byte*
-        index_data() const noexcept { return _trias; }
+        [[nodiscard]] DRAKO_FORCE_INLINE const std::byte*
+        index_data() const noexcept { return _index; }
+
+        friend std::istream& operator>>(std::istream&, mesh&);
+        friend std::ostream& operator<<(std::ostream&, const mesh&);
 
     private:
         mesh_desc_t      _meta;
+        Alloc            _alloc;
         const std::byte* _verts;
-        const std::byte* _trias;
+        const std::byte* _index;
     };
 
+    template <typename Allocator>
+    std::istream& operator>>(std::istream& is, mesh<Allocator>& m);
 
-    class mesh_view
+    template <typename Allocator>
+    std::ostream& operator<<(std::ostream& os, const mesh<Allocator>& m)
     {
-    public:
-        explicit constexpr mesh_view() noexcept
-            : _v_data{ nullptr }
-            , _i_data{ nullptr }
-            , _v_size{ 0 }
-            , _i_size{ 0 }
-        {
-        }
-
-        explicit constexpr mesh_view(const std::byte* vertex_data, size_t vertex_bytes,
-            const std::byte* index_data, size_t index_bytes) noexcept
-            : _v_data{ vertex_data }
-            , _i_data{ index_data }
-            , _v_size{ vertex_bytes }
-            , _i_size{ index_bytes }
-        {
-            DRAKO_ASSERT(vertex_data != nullptr);
-            DRAKO_ASSERT(index_data != nullptr);
-            DRAKO_ASSERT(vertex_bytes != 0);
-            DRAKO_ASSERT(index_bytes != 0);
-        }
-
-        mesh_view(const mesh_view&) noexcept = default;
-        mesh_view& operator=(const mesh_view&) noexcept = default;
-
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const std::byte*
-        vertex_data() const noexcept { return _v_data; }
-
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const std::byte*
-        index_data() const noexcept { return _i_data; }
-
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t
-        vertex_data_size() const noexcept { return _v_size; }
-
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t
-        index_data_size() const noexcept { return _i_size; }
-
-    private:
-        const std::byte* _v_data;
-        const std::byte* _i_data;
-        const size_t     _v_size;
-        const size_t     _i_size;
-    };
+        os.write(reinterpret_cast<const char*>(&m._meta), sizeof(decltype(m._meta)));
+        os.write(m._verts, m._meta.vertex_bytes() * m._meta.vertex_count());
+        os.write(m._index, m._meta.index_bytes() * m._meta.index_count());
+        return os;
+    }
 
 } // namespace drako
 
-#endif // !DRAKO_MESH_TYPES_HPP
+#endif // !DRAKO_MESH_TYPES_HPP_

@@ -2,7 +2,6 @@
 #ifndef DRAKO_VULKAN_MESH_TYPES_HPP
 #define DRAKO_VULKAN_MESH_TYPES_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/vulkan_resource_loader.hpp"
 #include "drako/graphics/vulkan_vertex_buffer.hpp"
@@ -14,7 +13,7 @@ namespace drako::gpx
     class vulkan_mesh_view
     {
     public:
-        explicit constexpr vulkan_mesh_view(vk::Buffer vertices, size_t vcount,
+        explicit vulkan_mesh_view(vk::Buffer vertices, size_t vcount,
             vk::Buffer indexes, size_t icount) noexcept
             : _v_buffer{ vertices }
             , _i_buffer{ indexes }
@@ -23,17 +22,13 @@ namespace drako::gpx
         {
         }
 
-        DRAKO_NODISCARD
-        vk::Buffer vertex_buffer_handle() const noexcept { return _v_buffer; }
+        [[nodiscard]] vk::Buffer vertex_buffer_handle() const noexcept { return _v_buffer; }
 
-        DRAKO_NODISCARD
-        vk::Buffer index_buffer_handle() const noexcept { return _i_buffer; }
+        [[nodiscard]] vk::Buffer index_buffer_handle() const noexcept { return _i_buffer; }
 
-        DRAKO_NODISCARD
-        size_t vertex_buffer_size() const noexcept { return _v_buffer_size; }
+        [[nodiscard]] size_t vertex_buffer_size() const noexcept { return _v_buffer_size; }
 
-        DRAKO_NODISCARD
-        size_t index_buffer_size() const noexcept { return _i_buffer_size; }
+        [[nodiscard]] size_t index_buffer_size() const noexcept { return _i_buffer_size; }
 
     private:
         vk::Buffer   _v_buffer;
@@ -81,21 +76,21 @@ namespace drako::gpx
         vulkan_mesh(vulkan_mesh&&) = delete;
         vulkan_mesh& operator=(vulkan_mesh&&) = delete;
 
-        DRAKO_NODISCARD explicit operator vulkan_mesh_view() const noexcept
+        [[nodiscard]] explicit operator vulkan_mesh_view() const noexcept
         {
             return vulkan_mesh_view{ _vertices.buffer(), _vertices.size(), _indexes.buffer(), _indexes.size() };
         }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const auto&
+        [[nodiscard]] constexpr const auto&
         index_buffer() const noexcept { return _vertex_buffer; }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const auto
+        [[nodiscard]] constexpr const auto
         index_buffer_size() const noexcept { return _index_buffer_size; }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const auto&
+        [[nodiscard]] constexpr const auto&
         vertex_buffer() const noexcept { return _index_buffer; }
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr auto
+        [[nodiscard]] constexpr auto
         vertex_buffer_size() const noexcept { return _vertex_buffer_size; }
 
     private:

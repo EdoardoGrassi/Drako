@@ -386,18 +386,6 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec3
-    max(const vec3& lhs, const vec3& rhs) noexcept
-    {
-#if !defined(DRAKO_API_SIMD)
-        return vec3{ std::max(lhs[0], rhs[0]), std::max(lhs[1], rhs[1]), std::max(lhs[2], rhs[2]) };
-#elif defined(DRAKO_ARCH_INTEL)
-        return _mm_max_ps(lhs, rhs);
-#else
-#error Missing implementation
-#endif
-    }
-
     DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr float
     dot(const vec3& lhs, const vec3& rhs) noexcept
     {

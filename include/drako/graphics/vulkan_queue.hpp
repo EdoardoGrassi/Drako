@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_VULKAN_QUEUE_HPP
-#define DRAKO_VULKAN_QUEUE_HPP
+#ifndef DRAKO_VULKAN_QUEUE_HPP_
+#define DRAKO_VULKAN_QUEUE_HPP_
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/assertion.hpp"
@@ -52,7 +52,7 @@ namespace drako::gpx
     };
 
 
-    DRAKO_NODISCARD vk::ResultValue<vk::PhysicalDevice>
+    [[nodiscard]] vk::ResultValue<vk::PhysicalDevice>
     make_vulkan_physical_device(vk::Instance i) noexcept
     {
         auto [err_pdevices, pdevices] = i.enumeratePhysicalDevices();
@@ -68,24 +68,24 @@ namespace drako::gpx
             }
             // select standalone gpu chip
             auto optimal_device_matcher = [](const vk::PhysicalDevice d) {
-                d.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu;
+                return d.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu;
             };
             if (auto device = std::find(std::begin(pdevices), std::end(pdevices), optimal_device_matcher);
                 device != std::end(pdevices))
             {
-                return {vk::Result::eSuccess, *device};
+                return { vk::Result::eSuccess, *device };
             }
             // select first device available
-            return {err_pdevices, pdevices[0]};
+            return { err_pdevices, pdevices[0] };
         }
         else
         {
-            return {err_pdevices, nullptr};
+            return { err_pdevices, nullptr };
         }
     }
 
 
-    DRAKO_NODISCARD vk::ResultValue<vk::UniqueDevice>
+    [[nodiscard]] vk::ResultValue<vk::UniqueDevice>
     make_vulkan_logical_device(vk::PhysicalDevice p) noexcept
     {
         const auto family_properties = p.getQueueFamilyProperties();
@@ -94,29 +94,31 @@ namespace drako::gpx
             DRAKO_LOG_INFO("[Vulkan]" + to_string(family.queueFlags));
         }
 
-        const float queue_prios[] = {1.0f};
+        const float queue_prios[] = { 1.0f };
         DRAKO_ASSERT(std::all_of(std::begin(queue_prios), std::end(queue_prios),
             [](float x) { return x <= 1.f && x >= 0.f; }));
 
         const vk::DeviceQueueCreateInfo graphic_queue_info{
             vk::DeviceQueueCreateFlags{},
             0,
-            static_cast<uint32_t>(std::size(queue_prios)), queue_prios};
+            static_cast<uint32_t>(std::size(queue_prios)), queue_prios
+        };
 
         const vk::DeviceQueueCreateInfo compute_queue_info{
             vk::DeviceQueueCreateFlags{},
             0,
-            static_cast<uint32_t>(std::size()),
+            static_cast<uint32_t>(std::size(queue_prios)), queue_prios
         };
 
         const vk::DeviceQueueCreateInfo transfer_queue_info{
             vk::DeviceQueueCreateFlags{},
             0,
-            static_cast<uint32_t>(0), queue_prios};
+            static_cast<uint32_t>(0), queue_prios
+        };
 
-        const vk::DeviceQueueCreateInfo enabled_queues[]     = {graphic_queue_info};
-        const char*                     enabled_layers[]     = {"VK_LAYER_KHRONOS_validation"};
-        const char*                     enabled_extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        const vk::DeviceQueueCreateInfo enabled_queues[]     = { graphic_queue_info };
+        const char*                     enabled_layers[]     = { "VK_LAYER_KHRONOS_validation" };
+        const char*                     enabled_extensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
         // const vk::PhysicalDeviceFeatures pdevice_features[]   = {};
 
         const vk::DeviceCreateInfo device_create_info{

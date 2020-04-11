@@ -6,10 +6,9 @@
 #include "drako/core/drako_api_win.hpp"
 #include "drako/core/memory/unsync_linear_allocator.hpp"
 #include "drako/core/system/native_window.hpp"
-
-#include "drako/graphics/shader_source.hpp"
+#include "drako/file_formats/wavefront_obj.hpp"
+#include "drako/graphics/shader.hpp"
 #include "drako/graphics/vk_gui_renderer.hpp"
-#include "drako/plugins/wavefront_mesh_loader.hpp"
 
 using namespace drako;
 
@@ -22,7 +21,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     //ShowWindow(main_window, nCmdShow);
 
     vk::Device ldevice;
-    const auto vk_instance = gpx::create_vk_instance();
+    const auto vk_instance                     = gpx::create_vk_instance();
     const auto [vk_surface_result, vk_surface] = gpx::make_vulkan_surface(vk_instance.get(), main_window);
     if (vk_surface_result != vk::Result::eSuccess)
     {

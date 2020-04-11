@@ -44,7 +44,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/plugins/cmake_install.cmake")
+  include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/devel/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -55,6 +60,11 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/physics/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/system/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)

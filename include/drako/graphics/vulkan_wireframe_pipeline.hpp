@@ -2,8 +2,6 @@
 #ifndef DRAKO_VULKAN_WIREFRAME_PIPELINE_HPP
 #define DRAKO_VULKAN_WIREFRAME_PIPELINE_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 
@@ -20,8 +18,7 @@ namespace drako::gpx
     };
 
 
-    DRAKO_NODISCARD
-    bool vulkan_check_required_features(vk::PhysicalDevice p) noexcept
+    [[nodiscard]] bool vulkan_check_required_features(vk::PhysicalDevice p) noexcept
     {
         const auto features = p.getFeatures();
 
@@ -40,8 +37,7 @@ namespace drako::gpx
         vulkan_graphics_pipeline result{};
 
         /*vvv create pipeline layout vvv*/
-        const vk::DescriptorSetLayout descriptor_set_layouts[] = {
-        };
+        const vk::DescriptorSetLayout descriptor_set_layouts[] = {};
 
         const vk::PushConstantRange push_constants[] = {
             // model-view-proj matrix

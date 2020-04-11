@@ -20,7 +20,7 @@ namespace drako
         {
             #if defined(DRAKO_PLT_WIN32)
             {
-                _address = CreateFiber(0/*default stack size*/, routine, nullptr);
+                _address = ::CreateFiber(0/*default stack size*/, routine, nullptr);
                 if (_address == nullptr)
                 {
                     std::exit(EXIT_FAILURE);
@@ -37,7 +37,7 @@ namespace drako
         {
             #if defined(DRAKO_PLT_WIN32)
             {
-                _address = CreateFiber(stack_size, start_routine, nullptr);
+                _address = ::CreateFiber(stack_size, start_routine, nullptr);
                 if (_address == nullptr)
                 {
                     std::exit(EXIT_FAILURE);
@@ -53,7 +53,7 @@ namespace drako
             #if defined(DRAKO_PLT_WIN32)
 
             if (_address != nullptr)
-                DeleteFiber(_address);
+                ::DeleteFiber(_address);
 
             #else
             #error Platform currently not supported
@@ -70,7 +70,7 @@ namespace drako
         {
             #if defined(DRAKO_PLT_WIN32)
 
-            SwitchToFiber(other._address);
+            ::SwitchToFiber(other._address);
 
             #else
             #error Platform currently not supported

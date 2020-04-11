@@ -1,7 +1,5 @@
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/CMakeFiles/edit_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/edit_cache.dir
-C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/native_window_api.dir
-C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/native_keyboard_api.dir
-C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/native_hid_api.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/drako-native-sys.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/core/out/build/x64-Debug/system/CMakeFiles/rebuild_cache.dir

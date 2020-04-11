@@ -296,13 +296,22 @@ namespace drako::gpx
     }
 
 
-    void vulkan_forward_renderer::render(
+    void vulkan_forward_renderer::draw(
+        const vulkan_material_pipeline&      pipeline,
+        const std::vector<mat4x4>&           mvp,
+        const std::vector<vulkan_mesh_view>& mesh) noexcept
+    {
+    }
+
+
+    void vulkan_forward_renderer::draw(
         const vulkan_material_pipeline&              pipeline,
         const std::vector<mat4x4>&                   mvps,
         const std::vector<vulkan_mesh_view>&         meshes,
         const std::vector<vulkan_material_instance>& materials) noexcept
     {
         DRAKO_ASSERT(std::size(mvps) == std::size(meshes));
+        DRAKO_ASSERT(std::size(mvps) == std::size(materials));
 
         // const uint64_t MAX_TIMEOUT_NS = 1000 * 1000 * 100; // max timeout in nanoseconds, we use 100ms
         const std::chrono::nanoseconds MAX_TIMEOUT             = std::chrono::microseconds{ 100 };
@@ -329,19 +338,26 @@ namespace drako::gpx
         }
 
         const vk::RenderPassBeginInfo begin_renderpass_info{
-            _renderpass,
+            _renderpass.get(),
             _frame_attachments[present_image_index].framebuffer,
             _render_area,
             0, nullptr
         };
-        _render_cmdbuffer.beginRenderPass(begin_renderpass_info, vk::SubpassContents::eInline);
+        _command_buffer.beginRenderPass(begin_renderpass_info, vk::SubpassContents::eInline);
 
 
-        _render_cmdbuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline.pipeline_handle());
+        _command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline.pipeline_handle());
+
+        // bind shared material data
+        _command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+            pipeline.pipeline_layout_handle(),
+            0,
+            std::size(pipeline.descriptor_sets()), pipeline.descriptor_sets().data(),
+            0, nullptr);
 
         for (auto i = 0; i < std::size(mvps); ++i)
         {
-            _render_cmdbuffer.pushConstants(pipeline.pipeline_layout_handle(),
+            _command_buffer.pushConstants(pipeline.pipeline_layout_handle(),
                 vk::ShaderStageFlagBits::eVertex,
                 0,
                 static_cast<uint32_t>(sizeof(mat4x4)),
@@ -349,22 +365,24 @@ namespace drako::gpx
 
             const vk::Buffer     buffers[] = { meshes[i].vertex_buffer_handle() };
             const vk::DeviceSize offsets[] = { 0 };
-            _render_cmdbuffer.bindVertexBuffers(0, static_cast<uint32_t>(std::size(buffers)), buffers, offsets);
+            DRAKO_ASSERT(std::size(buffers) == std::size(offsets), "Size must match");
 
-            _render_cmdbuffer.bindIndexBuffer(meshes[i].index_buffer_handle(), vk::DeviceSize{ 0 }, vk::IndexType::eUint16);
+            _command_buffer.bindVertexBuffers(0, static_cast<uint32_t>(std::size(buffers)), buffers, offsets);
+            _command_buffer.bindIndexBuffer(meshes[i].index_buffer_handle(), vk::DeviceSize{ 0 }, vk::IndexType::eUint16);
 
-            _render_cmdbuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+            // bind instance material data
+            _command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
                 pipeline.pipeline_layout_handle(),
                 0, 1, &pipeline.descriptor_sets()[i], 0, nullptr);
 
-            _render_cmdbuffer.drawIndexed(static_cast<uint32_t>(meshes[i].index_buffer_size()),
+            _command_buffer.drawIndexed(static_cast<uint32_t>(meshes[i].index_buffer_size()),
                 1,  // instances count
                 0,  // first index
                 0,  // vertex offset
                 0); // first instance
         }
 
-        _render_cmdbuffer.endRenderPass();
+        _command_buffer.endRenderPass();
 
         const vk::PipelineStageFlags pipeline_sync_stages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 
@@ -374,7 +392,7 @@ namespace drako::gpx
 
         const vk::SubmitInfo submit_info{
             static_cast<uint32_t>(std::size(acquire_sems)), acquire_sems, pipeline_sync_stages,
-            1, &_render_cmdbuffer,
+            1, &_command_buffer,
             static_cast<uint32_t>(std::size(acquire_sems)), release_sems
         };
 

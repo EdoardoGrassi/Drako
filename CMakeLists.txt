@@ -29,44 +29,57 @@ endif()
 
 add_subdirectory("include/drako/core")
 add_subdirectory("include/drako/concurrency")
-add_subdirectory("include/drako/plugins")
+add_subdirectory("include/drako/devel")
+add_subdirectory("include/drako/file_formats")
 add_subdirectory("include/drako/input")
 add_subdirectory("include/drako/physics")
-
-add_executable(${PROJECT_NAME}_threading_test "test/main_thread_test.cpp")
-
-add_executable(${PROJECT_NAME}_audio_test
-    "test/main_audio_test.cpp"
-    "include/drako/audio/audio_input_device_win.cpp")
-
-add_executable(drako_mouse_test WIN32 "test/main_mouse_test.cpp")
-target_link_libraries(drako_mouse_test PRIVATE drako::native_sys)
-
-add_executable(drako_keyboard_test WIN32 "test/keyboard_app_test.cpp")
-target_link_libraries(drako_keyboard_test PRIVATE drako::native_sys)
-
-add_executable(drako_hid_test WIN32 "test/hid_app_test.cpp")
-target_link_libraries(drako_hid_test PRIVATE drako::native_sys)
-
-
-
+add_subdirectory("include/drako/system")
 add_subdirectory("include/drako/graphics")
 
+add_executable(${PROJECT_NAME}_threading_test "./test/main_thread_test.cpp")
+
+add_executable(${PROJECT_NAME}_audio_test
+    "./test/main_audio_test.cpp"
+    "./include/drako/audio/audio_input_device_win.cpp")
+
+add_executable(drako_mouse_test WIN32 "./test/main_mouse_test.cpp")
+target_link_libraries(drako_mouse_test PRIVATE drako::native-sys)
+
+add_executable(drako_keyboard_test WIN32 "./test/keyboard_app_test.cpp")
+target_link_libraries(drako_keyboard_test PRIVATE drako::native-sys)
+
+
 # Experimental GUI render
-add_executable(vulkan_gui_render_test WIN32 "src/vulkan_gui_render_win32.cpp")
-target_link_libraries(vulkan_gui_render_test PRIVATE drako::gui_renderer)
+add_executable(vulkan_gui_render_test WIN32 "./src/vulkan_gui_render_win32.cpp")
+target_link_libraries(vulkan_gui_render_test PRIVATE drako::vulkan-gui-renderer)
+
+
 
 # Experimental Drako engine with forward renderer
-add_executable(vulkan_engine WIN32 "src/vulkan_engine_win32.cpp")
-target_link_libraries(vulkan_engine PRIVATE drako::forward_renderer)
+add_executable(drako-engine WIN32 "./src/vulkan_engine_win32.cpp")
+target_link_libraries(drako-engine PRIVATE drako::vulkan-forward-renderer)
+
+
+
+# Console interface for Drako projects
+add_executable(drako-cli-editor "./src/drako_cli_editor.cpp")
+set_target_properties(drako-cli-editor PROPERTIES OUTPUT_NAME "drako-cli-editor")
+
+target_link_libraries(drako-cli-editor PRIVATE drako::devel)
+
 
 
 # Compiler for runtime resources consumed by the Drako engine
-add_executable(drako_resource_compiler "src/drako_resource_compiler.cpp")
-set_target_properties(drako_resource_compiler PROPERTIES OUTPUT_NAME "drako-builder")
+add_executable(drako-builder "./src/drako_resource_compiler.cpp")
+set_target_properties(drako-builder PROPERTIES OUTPUT_NAME "drako-builder")
 
-add_executable(obj_importer "test/obj_to_mesh.cpp")
-target_link_libraries(obj_importer PRIVATE drako::obj)
+
+
+add_executable(drako-obj-importer "./src/drako_obj_importer.cpp")
+target_link_libraries(drako-obj-importer PRIVATE drako::obj)
+set_target_properties(drako-obj-importer
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone")
+# install(TARGETS drako-obj-importer DESTINATION "")
 
 # === TESTING ===
 # work in progress...
@@ -120,7 +133,7 @@ else()
     endforeach()
 
     add_custom_target(
-        TARGET format
+        format
         COMMAND clang-format -i -style=LLVM ${DRAKO_ALL_TARGETS_SOURCES}
     )
 endif()

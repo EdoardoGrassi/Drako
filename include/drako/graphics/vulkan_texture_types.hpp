@@ -24,7 +24,7 @@ namespace drako::gpx
                 vk::ImageCreateFlagBits{},
                 vk::ImageType::e2D,
                 vk::Format::eA8B8G8R8UintPack32,
-                vk::Extent3D{ tex.width, tex.height(), 1 },
+                vk::Extent3D{ width(tex), height(tex), 1 },
                 1,
                 1,
                 vk::SampleCountFlagBits::e1,
@@ -46,8 +46,8 @@ namespace drako::gpx
                 vk::ImageCreateFlagBits{},
                 vk::ImageType::e2D,
                 vk::Format::eA8B8G8R8UnormPack32,
-                vk::Extent3D{ tex.width(), tex.height(), 1 },
-                tex.mipmap_levels(),
+                vk::Extent3D{ width(tex), height(tex), 1 },
+                mipmap_levels(tex),
                 1,
                 vk::SampleCountFlagBits::e8,
                 vk::ImageTiling::eOptimal,
@@ -72,13 +72,13 @@ namespace drako::gpx
 
             const vk::ImageViewCreateInfo sample_view_info{
                 vk::ImageViewCreateFlags{},
-                _image,
+                _image.get(),
                 vk::ImageViewType::e2D,
                 vk::Format::eA8B8G8R8UintPack32,
                 vk::ComponentMapping{},
                 vk::ImageSubresourceRange{
                     vk::ImageAspectFlagBits::eColor,
-                    0, tex.mipmap_levels(),
+                    0, mipmap_levels(tex),
                     0, 1 }
             };
             auto [sample_view_result, sample_view] = _device.createImageView(sample_view_info);
