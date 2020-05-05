@@ -16,7 +16,6 @@
 
 #include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_material_types.hpp"
-#include "drako/graphics/vulkan_uniform_buffer.hpp"
 
 namespace drako::gpx
 {

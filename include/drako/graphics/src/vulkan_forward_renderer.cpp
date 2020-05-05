@@ -6,7 +6,6 @@
 #include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/graphics/vulkan_queue.hpp"
-#include "drako/graphics/vulkan_swapchain.hpp"
 
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
@@ -16,47 +15,29 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
-    vulkan_forward_renderer::vulkan_forward_renderer(
-        vk::PhysicalDevice pdevice,
-        vk::Device         device,
-        vk::SurfaceKHR     surface,
-        uint32_t           width,
-        uint32_t           height) noexcept
-        : _ldevice(device)
-        , _surface(surface)
+    forward_renderer::forward_renderer(
+        const context& ctx, uint32_t width, uint32_t height)
+        : _pdevice(ctx.physical_device)
+        , _ldevice(ctx.logical_device.get())
+        , _surface(ctx.surface.get())
     {
-        DRAKO_ASSERT(device != vk::Device{ nullptr });
-        vk::Result result;
+        DRAKO_ASSERT(width > 0);
+        DRAKO_ASSERT(height > 0);
 
         // TODO: from Vulkan 1.0.129 semaphore should have VK_SEMAPHORE_TYPE_BINARY_KHR flag added
         const vk::SemaphoreCreateInfo semaphore_create_info{ vk::SemaphoreCreateFlags{} };
-        std::tie(result, _command_complete_sem) = _ldevice.createSemaphore(semaphore_create_info);
-        if (result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Semaphore creation failed - " + to_string(result));
-            std::exit(EXIT_FAILURE);
-        }
+        _command_complete_sem = _ldevice.createSemaphore(semaphore_create_info);
 
         // TODO: from Vulkan 1.0.129 semaphore should have VK_SEMAPHORE_TYPE_BINARY_KHR flag added
-        std::tie(result, _present_complete_sem) = _ldevice.createSemaphore(semaphore_create_info);
-        if (result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Semaphore creation failed - " + to_string(result));
-            std::exit(EXIT_FAILURE);
-        }
+        _present_complete_sem = _ldevice.createSemaphore(semaphore_create_info);
 
-        setup_renderpass();
-        setup_swapchain(pdevice);
-        const auto [swapchain_images_result, swapchain_images] = _ldevice.getSwapchainImagesKHR(_swapchain.get());
-        if (DRAKO_UNLIKELY(swapchain_images_result != vk::Result::eSuccess))
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to retrieve swapchain images - " + to_string(swapchain_images_result));
-            std::exit(EXIT_FAILURE);
-        }
+        _setup_renderpass();
+        _setup_swapchain(_pdevice);
+        const auto swapchain_images = _ldevice.getSwapchainImagesKHR(_swapchain.get());
 
-        _frame_attachments = std::vector<frame_attachments>(std::size(swapchain_images));
+        _frame_attachments.resize(std::size(swapchain_images));
         for (auto i = 0; i < std::size(swapchain_images); ++i)
         {
             const vk::ImageViewCreateInfo color_buffer_info{
@@ -73,12 +54,7 @@ namespace drako::gpx
                     1  // layer count
                 }
             };
-            if (std::tie(result, _frame_attachments[i].color_buffer_view) = _ldevice.createImageView(color_buffer_info);
-                DRAKO_UNLIKELY(result != vk::Result::eSuccess))
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(result));
-                std::exit(EXIT_FAILURE);
-            }
+            _frame_attachments[i].color_buffer_view = _ldevice.createImageView(color_buffer_info);
 
             const vk::ImageCreateInfo depth_buffer_info{
                 vk::ImageCreateFlags{},
@@ -94,12 +70,7 @@ namespace drako::gpx
                 0, nullptr,
                 vk::ImageLayout::eDepthStencilAttachmentOptimal
             };
-            if (std::tie(result, _frame_attachments[i].depth_buffer) = _ldevice.createImage(depth_buffer_info);
-                DRAKO_UNLIKELY(result != vk::Result::eSuccess))
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(result));
-                std::exit(EXIT_FAILURE);
-            }
+            _frame_attachments[i].depth_buffer = _ldevice.createImage(depth_buffer_info);
 
             const vk::ImageViewCreateInfo depth_buffer_view_info{
                 vk::ImageViewCreateFlags{},
@@ -115,12 +86,7 @@ namespace drako::gpx
                     1  // layer count
                 }
             };
-            if (std::tie(result, _frame_attachments[i].depth_buffer_view) = _ldevice.createImageView(depth_buffer_view_info);
-                DRAKO_UNLIKELY(result != vk::Result::eSuccess))
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(result));
-                std::exit(EXIT_FAILURE);
-            }
+            _frame_attachments[i].depth_buffer_view = _ldevice.createImageView(depth_buffer_view_info);
 
             const vk::ImageView attachments[] = {
                 _frame_attachments[i].color_buffer_view,
@@ -136,18 +102,13 @@ namespace drako::gpx
                 height,
                 1
             };
-            if (std::tie(result, _frame_attachments[i].framebuffer) = _ldevice.createFramebuffer(framebuffer_info);
-                DRAKO_UNLIKELY(result != vk::Result::eSuccess))
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] Framebuffer creation failed - " + to_string(result));
-                std::exit(EXIT_FAILURE);
-            }
+            _frame_attachments[i].framebuffer = _ldevice.createFramebuffer(framebuffer_info);
         }
     }
 
 
 
-    vulkan_forward_renderer::~vulkan_forward_renderer() noexcept
+    forward_renderer::~forward_renderer() noexcept
     {
         for (auto& frame : _frame_attachments)
         {
@@ -159,7 +120,7 @@ namespace drako::gpx
     }
 
 
-    void vulkan_forward_renderer::setup_renderpass() noexcept
+    void forward_renderer::_setup_renderpass() noexcept
     {
         const vk::AttachmentReference color_buffer_ref{ 0, vk::ImageLayout::eColorAttachmentOptimal };
         const vk::AttachmentReference depth_buffer_ref{ 1, vk::ImageLayout::eDepthStencilAttachmentOptimal };
@@ -200,30 +161,15 @@ namespace drako::gpx
             static_cast<uint32_t>(std::size(subpasses)), subpasses,
             0, nullptr
         };
-
-        if (auto [err, renderpass] = _ldevice.createRenderPassUnique(renderpass_create_info);
-            DRAKO_LIKELY(err == vk::Result::eSuccess))
-        {
-            _renderpass = std::move(renderpass);
-        }
-        else
-        {
-            DRAKO_LOG_ERROR("[Vulkan] Renderpass creation failed with error - " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        _renderpass = _ldevice.createRenderPassUnique(renderpass_create_info);
     }
 
 
 
-    void vulkan_forward_renderer::setup_swapchain(vk::PhysicalDevice pdevice) noexcept
+    void forward_renderer::_setup_swapchain(vk::PhysicalDevice pdevice) noexcept
     {
         // query and select the presentation surface configuration
-        const auto [capabs_result, capabs] = pdevice.getSurfaceCapabilitiesKHR(_surface);
-        if (capabs_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface capabilities -" + to_string(capabs_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto capabs = pdevice.getSurfaceCapabilitiesKHR(_surface);
 
         const auto SWAPCHAIN_UNLIMITED_COUNT = 0; // vulkan magic value
         const auto swapchain_image_count     = (capabs.maxImageCount == SWAPCHAIN_UNLIMITED_COUNT)
@@ -237,12 +183,7 @@ namespace drako::gpx
 
 
         // query and select the presentation format for the swapchain
-        const auto [formats_result, formats] = pdevice.getSurfaceFormatsKHR(_surface);
-        if (formats_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface formats - " + to_string(formats_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto formats = pdevice.getSurfaceFormatsKHR(_surface);
 
         const auto selector = [](auto x) {
             return x.format == vk::Format::eB8G8R8A8Unorm && x.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;
@@ -253,12 +194,7 @@ namespace drako::gpx
 
 
         // query and select the presentation mode for the swapchain
-        const auto [modes_result, modes] = pdevice.getSurfacePresentModesKHR(_surface);
-        if (modes_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface presentation modes -" + to_string(modes_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto modes = pdevice.getSurfacePresentModesKHR(_surface);
 
         const auto swapchain_present_mode = (std::any_of(modes.cbegin(), modes.cend(),
                                                 [](auto x) { return x == vk::PresentModeKHR::eMailbox; }))
@@ -283,20 +219,11 @@ namespace drako::gpx
             vk::SwapchainKHR{ nullptr }
         };
 
-        if (auto [err, swapchain] = _ldevice.createSwapchainKHRUnique(swapchain_create_info);
-            err == vk::Result::eSuccess)
-        {
-            _swapchain = std::move(swapchain);
-        }
-        else
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Swapchain creation failed - " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        _swapchain = _ldevice.createSwapchainKHRUnique(swapchain_create_info);
     }
 
 
-    void vulkan_forward_renderer::draw(
+    void forward_renderer::draw(
         const vulkan_material_pipeline&      pipeline,
         const std::vector<mat4x4>&           mvp,
         const std::vector<vulkan_mesh_view>& mesh) noexcept
@@ -304,7 +231,7 @@ namespace drako::gpx
     }
 
 
-    void vulkan_forward_renderer::draw(
+    void forward_renderer::draw(
         const vulkan_material_pipeline&              pipeline,
         const std::vector<mat4x4>&                   mvps,
         const std::vector<vulkan_mesh_view>&         meshes,
@@ -426,4 +353,4 @@ namespace drako::gpx
         }
         _present_queue.waitIdle();
     }
-} // namespace drako::gpx
+} // namespace drako::gpx::vulkan

@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "include/drako/graphics/vulkan-gui-renderer.lib"
+			"path" : "include/drako/input/drako_input.lib"
 		}
 	],
 	"backtrace" : 1,
@@ -22,14 +22,13 @@
 		[
 			"add_library",
 			"add_compile_options",
-			"add_compile_definitions",
 			"target_compile_definitions",
 			"include_directories",
-			"target_include_directories"
+			"target_sources"
 		],
 		"files" : 
 		[
-			"include/drako/graphics/CMakeLists.txt",
+			"include/drako/input/CMakeLists.txt",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -40,7 +39,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 53,
+				"line" : 7,
 				"parent" : 0
 			},
 			{
@@ -54,32 +53,20 @@
 			},
 			{
 				"command" : 2,
-				"file" : 1,
-				"line" : 27,
-				"parent" : 2
-			},
-			{
-				"command" : 2,
 				"file" : 0,
-				"line" : 18,
+				"line" : 13,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
-				"file" : 0,
-				"line" : 61,
-				"parent" : 0
-			},
-			{
-				"command" : 4,
 				"file" : 1,
 				"line" : 24,
 				"parent" : 2
 			},
 			{
-				"command" : 5,
+				"command" : 4,
 				"file" : 0,
-				"line" : 57,
+				"line" : 14,
 				"parent" : 0
 			}
 		]
@@ -107,39 +94,32 @@
 					"define" : "NOMINMAX"
 				},
 				{
-					"backtrace" : 5,
-					"define" : "VK_USE_PLATFORM_WIN32_KHR"
-				},
-				{
-					"backtrace" : 6,
-					"define" : "VULKAN_HPP_NO_EXCEPTIONS"
+					"backtrace" : 4,
+					"define" : "WIN32_LEAN_AND_MEAN"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 7,
+					"backtrace" : 5,
 					"path" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include"
-				},
-				{
-					"backtrace" : 8,
-					"path" : "C:/VulkanSDK/1.1.130.0/Include"
 				}
 			],
 			"language" : "CXX",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
-	"id" : "vulkan-gui-renderer::@851974be3d61c848a7e4",
-	"name" : "vulkan-gui-renderer",
-	"nameOnDisk" : "vulkan-gui-renderer.lib",
+	"id" : "drako_input::@cf81bd0203eac15e1d91",
+	"name" : "drako_input",
+	"nameOnDisk" : "drako_input.lib",
 	"paths" : 
 	{
-		"build" : "include/drako/graphics",
-		"source" : "include/drako/graphics"
+		"build" : "include/drako/input",
+		"source" : "include/drako/input"
 	},
 	"sourceGroups" : 
 	[
@@ -147,7 +127,8 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -156,7 +137,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "include/drako/graphics/src/vk_gui_renderer.cpp",
+			"path" : "include/drako/input/src/input_system.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 6,
+			"compileGroupIndex" : 0,
+			"path" : "include/drako/input/src/xinput_device_interface_win32.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

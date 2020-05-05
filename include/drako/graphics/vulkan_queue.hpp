@@ -1,10 +1,11 @@
 #pragma once
-#ifndef DRAKO_VULKAN_QUEUE_HPP_
-#define DRAKO_VULKAN_QUEUE_HPP_
+#ifndef DRAKO_VULKAN_QUEUE_HPP
+#define DRAKO_VULKAN_QUEUE_HPP
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
+#include "drako/graphics/vulkan_runtime_context.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -13,13 +14,13 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
     using vulkan_queue_index  = std::uint32_t;
     using vulkan_queue_family = std::uint32_t;
     using vulkan_queue_prio   = float;
 
-    struct _vulkan_basic_queue
+    struct _basic_queue
     {
         vk::Queue           queue;
         vulkan_queue_index  index;
@@ -27,67 +28,63 @@ namespace drako::gpx
         vulkan_queue_prio   prio;
     };
 
-    struct vulkan_transfer_queue : _vulkan_basic_queue
+    struct transfer_queue : _basic_queue
     {
     };
 
-    struct vulkan_graphic_queue : vulkan_transfer_queue
+    struct graphic_queue : transfer_queue
     {
     };
 
-    struct vulkan_compute_queue : vulkan_transfer_queue
+    struct compute_queue : transfer_queue
     {
     };
 
-    struct vulkan_generic_queue : vulkan_graphic_queue, vulkan_compute_queue
+    struct generic_queue : graphic_queue, compute_queue
     {
     };
 
     struct device_queue_report
     {
-        std::vector<vulkan_graphic_queue>  optimal_graphic_queues;
-        std::vector<vulkan_compute_queue>  optimal_compute_queues;
-        std::vector<vulkan_transfer_queue> optimal_transfer_queues;
-        std::vector<vulkan_generic_queue>  generic_queues;
+        std::vector<graphic_queue>  optimal_graphic_queues;
+        std::vector<compute_queue>  optimal_compute_queues;
+        std::vector<transfer_queue> optimal_transfer_queues;
+        std::vector<generic_queue>  generic_queues;
     };
 
 
-    [[nodiscard]] vk::ResultValue<vk::PhysicalDevice>
-    make_vulkan_physical_device(vk::Instance i) noexcept
+    [[nodiscard]] vk::PhysicalDevice make_physical_device(vk::Instance i) noexcept
     {
-        auto [err_pdevices, pdevices] = i.enumeratePhysicalDevices();
-        if (err_pdevices == vk::Result::eSuccess)
-        {
-            for (const auto& pdevice : pdevices)
-            {
-                const auto properties = pdevice.getProperties();
-                DRAKO_LOG_INFO("[Vulkan] device name" + std::string(properties.deviceName));
+        DRAKO_ASSERT(i != VK_NULL_HANDLE);
 
-                const auto features = pdevice.getFeatures();
-                // DRAKO_LOG_INFO("[Vulkan] " + to_string(features));
-            }
-            // select standalone gpu chip
-            auto optimal_device_matcher = [](const vk::PhysicalDevice d) {
-                return d.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu;
-            };
-            if (auto device = std::find(std::begin(pdevices), std::end(pdevices), optimal_device_matcher);
-                device != std::end(pdevices))
-            {
-                return { vk::Result::eSuccess, *device };
-            }
-            // select first device available
-            return { err_pdevices, pdevices[0] };
-        }
-        else
+        const auto pdevices = i.enumeratePhysicalDevices();
+        for (const auto& pdevice : pdevices)
         {
-            return { err_pdevices, nullptr };
+            const auto properties = pdevice.getProperties();
+            DRAKO_LOG_INFO("[Vulkan] device name" + std::string(properties.deviceName));
+
+            const auto features = pdevice.getFeatures();
+            // DRAKO_LOG_INFO("[Vulkan] " + to_string(features));
         }
+        // select standalone gpu chip
+        auto optimal_device_matcher = [](const vk::PhysicalDevice d) {
+            return d.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu;
+        };
+        if (auto device = std::find(
+                std::begin(pdevices), std::end(pdevices), optimal_device_matcher);
+            device != std::end(pdevices))
+        {
+            return *device;
+        }
+        // select first device available
+        return pdevices[0];
     }
 
 
-    [[nodiscard]] vk::ResultValue<vk::UniqueDevice>
-    make_vulkan_logical_device(vk::PhysicalDevice p) noexcept
+    [[nodiscard]] vk::UniqueDevice make_logical_device(vk::PhysicalDevice p) noexcept
     {
+        DRAKO_ASSERT(p != VK_NULL_HANDLE);
+
         const auto family_properties = p.getQueueFamilyProperties();
         for (const auto& family : family_properties)
         {
@@ -131,6 +128,22 @@ namespace drako::gpx
         return p.createDeviceUnique(device_create_info);
     }
 
-} // namespace drako::gpx
+    void debug_print_all_queue_families(const context& ctx)
+    {
+        const auto properties = ctx.physical_device.getQueueFamilyProperties();
+        std::cout << "[Vulkan] Available queue families:\n";
+        for (const auto& family : properties)
+        {
+            std::cout << "\tQueue family:\n"
+                      << "\tcount: " << family.queueCount << '\n'
+                      << "\tflags: " << to_string(family.queueFlags) << '\n'
+                      << "\tmin transfer granularity:\n"
+                      << "\t\t- width:  " << family.minImageTransferGranularity.width << '\n'
+                      << "\t\t- height: " << family.minImageTransferGranularity.height << '\n'
+                      << "\t\t- depth:  " << family.minImageTransferGranularity.depth << '\n';
+        }
+    }
+
+} // namespace drako::gpx::vulkan
 
 #endif // !DRAKO_VULKAN_QUEUE_HPP

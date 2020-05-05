@@ -1,8 +1,9 @@
 #pragma once
-#ifndef DRAKO_VULKAN_RUNTIME_CONTEXT_HPP_
-#define DRAKO_VULKAN_RUNTIME_CONTEXT_HPP_
+#ifndef DRAKO_VULKAN_RUNTIME_CONTEXT_HPP
+#define DRAKO_VULKAN_RUNTIME_CONTEXT_HPP
 
 #include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/graphics/vulkan_queue.hpp"
 #include "drako/system/native_window.hpp"
 
 #include <iostream>
@@ -13,9 +14,9 @@
 #include <vulkan/vulkan_win32.h> // enables VK_KHR_win32_surface extension
 #endif
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
-    VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_callback(
+    VKAPI_ATTR VkBool32 VKAPI_CALL _debug_message_callback(
         VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT             messageType,
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -26,7 +27,7 @@ namespace drako::gpx
     }
 
 
-    [[nodiscard]] vk::UniqueInstance make_vulkan_instance() noexcept
+    [[nodiscard]] vk::UniqueInstance make_instance()
     {
         DRAKO_LOG_INFO("[Vulkan] Instance creation started...");
 
@@ -38,32 +39,14 @@ namespace drako::gpx
             VK_API_VERSION_1_1
         };
 
-        if (const auto [err, layer_properties] = vk::enumerateInstanceLayerProperties();
-            err == vk::Result::eSuccess)
-        {
-            for (const auto& p : layer_properties)
-                std::cout << "Name:\t" << p.layerName << '\n'
-                          << "Impl:\t" << p.implementationVersion << '\n'
-                          << "Desc:\t" << p.description << '\n';
-        }
-        else
-        {
-            DRAKO_LOG_ERROR("[Vulkan] " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        for (const auto& p : vk::enumerateInstanceLayerProperties())
+            std::cout << "Name:\t" << p.layerName << '\n'
+                      << "Impl:\t" << p.implementationVersion << '\n'
+                      << "Desc:\t" << p.description << '\n';
 
-        if (const auto [err, extensions] = vk::enumerateInstanceExtensionProperties();
-            err == vk::Result::eSuccess)
-        {
-            for (const auto& e : extensions)
-                std::cout << "Name:\t" << e.extensionName << '\n'
-                          << "Spec:\t" << e.specVersion << '\n';
-        }
-        else
-        {
-            DRAKO_LOG_ERROR("[Vulkan] " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        for (const auto& e : vk::enumerateInstanceExtensionProperties())
+            std::cout << "Name:\t" << e.extensionName << '\n'
+                      << "Spec:\t" << e.specVersion << '\n';
 
         // Enabled layers names
         const char* enabled_layers[] = { "VK_LAYER_KHRONOS_validation" };
@@ -96,28 +79,19 @@ namespace drako::gpx
             vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
                 vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
                 vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
-            vulkan_debug_callback,
+            _debug_message_callback,
             nullptr
         };
-
         vk::StructureChain<decltype(instance_info), decltype(debug_callback_info)> instance_info_chain{
             instance_info,
             debug_callback_info
         };
-
-        auto [result, instance] = vk::createInstanceUnique(instance_info_chain.get<decltype(instance_info)>());
-        if (result != vk::Result::eSuccess)
-        {
-            std::exit(EXIT_FAILURE);
-        }
-
-        DRAKO_LOG_INFO("[Vulkan] Instance created");
-        return instance;
+        return vk::createInstanceUnique(instance_info_chain.get<decltype(instance_info)>());
     }
 
 
-    [[nodiscard]] vk::ResultValue<vk::UniqueSurfaceKHR>
-    make_vulkan_surface(vk::Instance instance, const sys::native_window& w) noexcept
+    [[nodiscard]] vk::UniqueSurfaceKHR
+    make_surface(vk::Instance instance, const sys::native_window& w) noexcept
     {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
         const vk::Win32SurfaceCreateInfoKHR surface_create_info{
@@ -125,7 +99,6 @@ namespace drako::gpx
             w.instance_handle_win32(),
             w.window_handle_win32()
         };
-
         return instance.createWin32SurfaceKHRUnique(surface_create_info);
 
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
@@ -154,78 +127,66 @@ namespace drako::gpx
         {
             return true;
         }
+#else
+
+#error Platform not supported!
 #endif
     }
 
 
 
-    [[nodiscard]] vk::ResultValue<vk::UniqueSwapchainKHR>
-    make_vulkan_swapchain(vk::PhysicalDevice p, vk::Device l, vk::SurfaceKHR s) noexcept
+    [[nodiscard]] vk::UniqueSwapchainKHR
+    make_swapchain(vk::PhysicalDevice p, vk::Device l, vk::SurfaceKHR s) noexcept
     {
         // query and select the presentation surface configuration
-        const auto [capabs_result, capabs] = p.getSurfaceCapabilitiesKHR(s);
-        if (capabs_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface capabilities: " + to_string(capabs_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto capabs = p.getSurfaceCapabilitiesKHR(s);
 
         const auto SWAPCHAIN_UNLIMITED_COUNT = 0; // vulkan magic value
-        const auto swapchain_image_count     = (capabs.maxImageCount == SWAPCHAIN_UNLIMITED_COUNT)
-                                               ? capabs.minImageCount + 1
-                                               : capabs.minImageCount + 1;
+        const auto sc_image_count            = (capabs.maxImageCount == SWAPCHAIN_UNLIMITED_COUNT)
+                                        ? capabs.minImageCount + 1
+                                        : capabs.minImageCount + 1;
 
         const auto SWAPCHAIN_DRIVEN_SIZE = vk::Extent2D(UINT32_MAX, UINT32_MAX); // vulkan magic value
-        const auto swapchain_extent      = (capabs.currentExtent == SWAPCHAIN_DRIVEN_SIZE)
-                                          ? capabs.maxImageExtent // use max extent available
-                                          : capabs.currentExtent;
+        const auto sc_extent             = (capabs.currentExtent == SWAPCHAIN_DRIVEN_SIZE)
+                                   ? capabs.maxImageExtent // use max extent available
+                                   : capabs.currentExtent;
 
 
         // query and select the presentation format for the swapchain
-        const auto [formats_result, formats] = p.getSurfaceFormatsKHR(s);
-        if (formats_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface formats: " + to_string(formats_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto formats = p.getSurfaceFormatsKHR(s);
 
         const auto selector = [](auto x) {
             return x.format == vk::Format::eB8G8R8A8Unorm && x.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;
         };
-        const auto [swapchain_format, swapchain_colorspace] = (std::any_of(formats.cbegin(), formats.cend(), selector))
-                                                                  ? std::tuple(vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear)
-                                                                  : std::tuple(vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear);
+        const auto [sc_format, sc_colorspace] = (std::any_of(formats.cbegin(), formats.cend(), selector))
+                                                    ? std::tuple(vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear)
+                                                    : std::tuple(vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear);
 
 
         // query and select the presentation mode for the swapchain
-        const auto [modes_result, modes] = p.getSurfacePresentModesKHR(s);
-        if (modes_result != vk::Result::eSuccess)
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Failed to query surface presentation modes: " + to_string(modes_result));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto modes = p.getSurfacePresentModesKHR(s);
 
-        const auto swapchain_present_mode = (std::any_of(modes.cbegin(), modes.cend(),
-                                                [](auto x) { return x == vk::PresentModeKHR::eMailbox; }))
-                                                ? vk::PresentModeKHR::eMailbox
-                                                : vk::PresentModeKHR::eFifo;
+        const auto sc_present_mode = (std::any_of(modes.cbegin(), modes.cend(),
+                                         [](auto x) { return x == vk::PresentModeKHR::eMailbox; }))
+                                         ? vk::PresentModeKHR::eMailbox
+                                         : vk::PresentModeKHR::eFifo;
 
         const uint32_t queue_family_indexes[] = { 0 };
 
         const vk::SwapchainCreateInfoKHR swapchain_create_info{
             {},
             s,
-            swapchain_image_count,
-            swapchain_format,
-            swapchain_colorspace,
-            swapchain_extent,
+            sc_image_count,
+            sc_format,
+            sc_colorspace,
+            sc_extent,
             1,
             vk::ImageUsageFlagBits::eColorAttachment,
             vk::SharingMode::eExclusive,
             static_cast<uint32_t>(std::size(queue_family_indexes)), queue_family_indexes,
             capabs.currentTransform,
             vk::CompositeAlphaFlagBitsKHR::eOpaque,
-            swapchain_present_mode,
+            sc_present_mode,
             vk::Bool32{ VK_TRUE },
             vk::SwapchainKHR{ nullptr }
         };
@@ -233,71 +194,15 @@ namespace drako::gpx
     }
 
 
-    struct vulkan_runtime_context
+    struct context
     {
-        explicit vulkan_runtime_context(const sys::native_window& w)
-        {
-            instance = make_vulkan_instance();
+        explicit context(const sys::native_window& w) noexcept;
 
-            if (const auto [err, pdevice] = make_vulkan_physical_device(instance.get());
-                err == vk::Result::eSuccess)
-            {
-                physical_device = std::move(pdevice);
-            }
-            else
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(err));
-                std::exit(EXIT_FAILURE);
-            }
+        context(const context&) = delete;
+        context& operator=(const context&) = delete;
 
-            if (auto [err, surface] = make_vulkan_surface(instance.get(), w);
-                err == vk::Result::eSuccess)
-            {
-                surface = std::move(surface);
-            }
-            else
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(err));
-                std::exit(EXIT_FAILURE);
-            }
-
-            if (auto [err, device] = make_vulkan_logical_device(physical_device);
-                err == vk::Result::eSuccess)
-            {
-                logical_device = std::move(device);
-            }
-            else
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(err));
-                std::exit(EXIT_FAILURE);
-            }
-
-            dld = { instance.get(), logical_device.get() };
-
-            const vk::DebugUtilsMessengerCreateInfoEXT debug_messenger_info{
-                {},
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
-                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
-                vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-                    vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
-                    vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
-                vulkan_debug_callback,
-                nullptr
-            };
-
-            if (auto [err, ris] = instance.get().createDebugUtilsMessengerEXTUnique(debug_messenger_info, nullptr);
-                err == vk::Result::eSuccess)
-            {
-                debug = std::move(ris);
-            }
-            else
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] " + to_string(err));
-                std::exit(EXIT_FAILURE);
-            }
-        }
+        context(context&&) = delete;
+        context& operator=(context&&) = delete;
 
         vk::UniqueInstance               instance;
         vk::PhysicalDevice               physical_device;
@@ -307,6 +212,30 @@ namespace drako::gpx
         vk::UniqueDebugUtilsMessengerEXT debug;
     };
 
-} // namespace drako::gpx
+    context::context(const sys::native_window& w) noexcept
+        : instance(make_instance())
+    {
+        physical_device = make_physical_device(instance.get());
+        surface         = make_surface(instance.get(), w);
+        logical_device  = make_logical_device(physical_device);
 
-#endif // !DRAKO_VULKAN_RUNTIME_CONTEXT_HPP_
+        dld = { instance.get(), logical_device.get() };
+
+        const vk::DebugUtilsMessengerCreateInfoEXT debug_messenger_info{
+            {},
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
+            _debug_message_callback,
+            nullptr
+        };
+        debug = instance.get().createDebugUtilsMessengerEXTUnique(debug_messenger_info);
+    }
+
+} // namespace drako::gpx::vulkan
+
+#endif // !DRAKO_VULKAN_RUNTIME_CONTEXT_HPP

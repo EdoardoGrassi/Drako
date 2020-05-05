@@ -49,10 +49,10 @@ namespace drako
 
 
     // Metadata descriptor related to storage settings.
-    class asset_file_info
+    class asset_load_info
     {
     public:
-        explicit asset_file_info(asset_bundle_id bundle, std::uint32_t bytes) noexcept
+        explicit asset_load_info(asset_bundle_id bundle, std::uint32_t bytes) noexcept
             : _bundle_guid(bundle)
             , _packed_size_bytes(bytes)
             , _unpacked_size_bytes(bytes)

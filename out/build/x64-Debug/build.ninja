@@ -124,7 +124,7 @@ build ..\..\..\build\drako_audio_test.exe: CXX_EXECUTABLE_LINKER__drako_audio_te
 build cmake_object_order_depends_target_drako-engine: phony || cmake_object_order_depends_target_vulkan-forward-renderer
 
 build CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj: CXX_COMPILER__drako-engine ..\..\..\src\vulkan_engine_win32.cpp || cmake_object_order_depends_target_drako-engine
-  DEFINES = -DNOMINMAX -DVULKAN_HPP_NO_EXCEPTIONS
+  DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = CMakeFiles\drako-engine.dir
@@ -238,7 +238,7 @@ build ..\..\..\build\drako_mouse_test.exe: CXX_EXECUTABLE_LINKER__drako_mouse_te
 build cmake_object_order_depends_target_vulkan_gui_render_test: phony || cmake_object_order_depends_target_vulkan-gui-renderer
 
 build CMakeFiles\vulkan_gui_render_test.dir\src\vulkan_gui_render_win32.cpp.obj: CXX_COMPILER__vulkan_gui_render_test ..\..\..\src\vulkan_gui_render_win32.cpp || cmake_object_order_depends_target_vulkan_gui_render_test
-  DEFINES = -DNOMINMAX -DVULKAN_HPP_NO_EXCEPTIONS
+  DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = CMakeFiles\vulkan_gui_render_test.dir
@@ -894,10 +894,19 @@ build include\drako\file_formats\edit_cache: phony include\drako\file_formats\CM
 #############################################
 # Order-only phony target for drako_input
 
-build cmake_object_order_depends_target_drako_input: phony || cmake_object_order_depends_target_drako-native-sys
+build cmake_object_order_depends_target_drako_input: phony || include\drako\input\CMakeFiles\drako_input.dir
 
 build include\drako\input\CMakeFiles\drako_input.dir\src\input_system.cpp.obj: CXX_COMPILER__drako_input ..\..\..\include\drako\input\src\input_system.cpp || cmake_object_order_depends_target_drako_input
-  DEFINES = -DNOMINMAX
+  DEFINES = -DNOMINMAX -DWIN32_LEAN_AND_MEAN
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\input\CMakeFiles\drako_input.dir
+  OBJECT_FILE_DIR = include\drako\input\CMakeFiles\drako_input.dir\src
+  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\drako_input.dir\drako_input.pdb
+  TARGET_PDB = include\drako\input\drako_input.pdb
+
+build include\drako\input\CMakeFiles\drako_input.dir\src\xinput_device_interface_win32.cpp.obj: CXX_COMPILER__drako_input ..\..\..\include\drako\input\src\xinput_device_interface_win32.cpp || cmake_object_order_depends_target_drako_input
+  DEFINES = -DNOMINMAX -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include
   OBJECT_DIR = include\drako\input\CMakeFiles\drako_input.dir
@@ -913,7 +922,7 @@ build include\drako\input\CMakeFiles\drako_input.dir\src\input_system.cpp.obj: C
 #############################################
 # Link the static library include\drako\input\drako_input.lib
 
-build include\drako\input\drako_input.lib: CXX_STATIC_LIBRARY_LINKER__drako_input include\drako\input\CMakeFiles\drako_input.dir\src\input_system.cpp.obj || include\drako\system\drako-native-sys.lib
+build include\drako\input\drako_input.lib: CXX_STATIC_LIBRARY_LINKER__drako_input include\drako\input\CMakeFiles\drako_input.dir\src\input_system.cpp.obj include\drako\input\CMakeFiles\drako_input.dir\src\xinput_device_interface_win32.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\input\CMakeFiles\drako_input.dir
@@ -922,44 +931,6 @@ build include\drako\input\drako_input.lib: CXX_STATIC_LIBRARY_LINKER__drako_inpu
   TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\drako_input.dir\drako_input.pdb
   TARGET_FILE = include\drako\input\drako_input.lib
   TARGET_PDB = include\drako\input\drako_input.pdb
-
-# =============================================================================
-# Object build statements for EXECUTABLE target input-test-app
-
-
-#############################################
-# Order-only phony target for input-test-app
-
-build cmake_object_order_depends_target_input-test-app: phony || cmake_object_order_depends_target_drako-native-sys cmake_object_order_depends_target_drako_input
-
-build include\drako\input\CMakeFiles\input-test-app.dir\test\input_gesture_app.cpp.obj: CXX_COMPILER__input-test-app ..\..\..\include\drako\input\test\input_gesture_app.cpp || cmake_object_order_depends_target_input-test-app
-  DEFINES = -DNOMINMAX
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\input\CMakeFiles\input-test-app.dir
-  OBJECT_FILE_DIR = include\drako\input\CMakeFiles\input-test-app.dir\test
-  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-test-app.dir\
-  TARGET_PDB = ..\..\..\build\input-test-app.pdb
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target input-test-app
-
-
-#############################################
-# Link the executable ..\..\..\build\input-test-app.exe
-
-build ..\..\..\build\input-test-app.exe: CXX_EXECUTABLE_LINKER__input-test-app include\drako\input\CMakeFiles\input-test-app.dir\test\input_gesture_app.cpp.obj | include\drako\input\drako_input.lib include\drako\system\drako-native-sys.lib || include\drako\input\drako_input.lib include\drako\system\drako-native-sys.lib
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\input\drako_input.lib  include\drako\system\drako-native-sys.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = include\drako\input\CMakeFiles\input-test-app.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-test-app.dir\
-  TARGET_FILE = ..\..\..\build\input-test-app.exe
-  TARGET_IMPLIB = include\drako\input\input-test-app.lib
-  TARGET_PDB = ..\..\..\build\input-test-app.pdb
 
 
 #############################################
@@ -984,6 +955,80 @@ build include\drako\input\CMakeFiles\test.util: CUSTOM_COMMAND
   restat = 1
 
 build include\drako\input\test: phony include\drako\input\CMakeFiles\test.util
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target drako_gestures
+
+
+#############################################
+# Order-only phony target for drako_gestures
+
+build cmake_object_order_depends_target_drako_gestures: phony || cmake_object_order_depends_target_drako_input
+
+build include\drako\input\CMakeFiles\drako_gestures.dir\src\gesture_system.cpp.obj: CXX_COMPILER__drako_gestures ..\..\..\include\drako\input\src\gesture_system.cpp || cmake_object_order_depends_target_drako_gestures
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\input\CMakeFiles\drako_gestures.dir
+  OBJECT_FILE_DIR = include\drako\input\CMakeFiles\drako_gestures.dir\src
+  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\drako_gestures.dir\drako_gestures.pdb
+  TARGET_PDB = include\drako\input\drako_gestures.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target drako_gestures
+
+
+#############################################
+# Link the static library include\drako\input\drako_gestures.lib
+
+build include\drako\input\drako_gestures.lib: CXX_STATIC_LIBRARY_LINKER__drako_gestures include\drako\input\CMakeFiles\drako_gestures.dir\src\gesture_system.cpp.obj || include\drako\input\drako_input.lib
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\input\CMakeFiles\drako_gestures.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\drako_gestures.dir\drako_gestures.pdb
+  TARGET_FILE = include\drako\input\drako_gestures.lib
+  TARGET_PDB = include\drako\input\drako_gestures.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target input-test-app
+
+
+#############################################
+# Order-only phony target for input-test-app
+
+build cmake_object_order_depends_target_input-test-app: phony || cmake_object_order_depends_target_drako_input
+
+build include\drako\input\CMakeFiles\input-test-app.dir\test\input_gesture_app.cpp.obj: CXX_COMPILER__input-test-app ..\..\..\include\drako\input\test\input_gesture_app.cpp || cmake_object_order_depends_target_input-test-app
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\input\CMakeFiles\input-test-app.dir
+  OBJECT_FILE_DIR = include\drako\input\CMakeFiles\input-test-app.dir\test
+  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-test-app.dir\
+  TARGET_PDB = ..\..\..\build\input-test-app.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target input-test-app
+
+
+#############################################
+# Link the executable ..\..\..\build\input-test-app.exe
+
+build ..\..\..\build\input-test-app.exe: CXX_EXECUTABLE_LINKER__input-test-app include\drako\input\CMakeFiles\input-test-app.dir\test\input_gesture_app.cpp.obj | include\drako\input\drako_input.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib || include\drako\input\drako_input.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\input\drako_input.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\input\CMakeFiles\input-test-app.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-test-app.dir\
+  TARGET_FILE = ..\..\..\build\input-test-app.exe
+  TARGET_IMPLIB = include\drako\input\input-test-app.lib
+  TARGET_PDB = ..\..\..\build\input-test-app.pdb
 
 
 #############################################
@@ -1255,7 +1300,7 @@ build include\drako\system\test: phony include\drako\system\CMakeFiles\test.util
 build cmake_object_order_depends_target_vulkan-forward-renderer: phony || include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
 
 build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_forward_renderer.cpp.obj: CXX_COMPILER__vulkan-forward-renderer ..\..\..\include\drako\graphics\src\vulkan_forward_renderer.cpp || cmake_object_order_depends_target_vulkan-forward-renderer
-  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR -DVULKAN_HPP_NO_EXCEPTIONS
+  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
@@ -1302,7 +1347,7 @@ build include\drako\graphics\edit_cache: phony include\drako\graphics\CMakeFiles
 build cmake_object_order_depends_target_vulkan-gui-renderer: phony || include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir
 
 build include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\src\vk_gui_renderer.cpp.obj: CXX_COMPILER__vulkan-gui-renderer ..\..\..\include\drako\graphics\src\vk_gui_renderer.cpp || cmake_object_order_depends_target_vulkan-gui-renderer
-  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR -DVULKAN_HPP_NO_EXCEPTIONS
+  DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir
@@ -1338,7 +1383,7 @@ build include\drako\graphics\vulkan-gui-renderer.lib: CXX_STATIC_LIBRARY_LINKER_
 build cmake_object_order_depends_target_render-system: phony || cmake_object_order_depends_target_vulkan-forward-renderer
 
 build include\drako\graphics\CMakeFiles\render-system.dir\src\render_system.cpp.obj: CXX_COMPILER__render-system ..\..\..\include\drako\graphics\src\render_system.cpp || cmake_object_order_depends_target_render-system
-  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR -DVULKAN_HPP_NO_EXCEPTIONS
+  DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = include\drako\graphics\CMakeFiles\render-system.dir
@@ -1443,6 +1488,10 @@ build drako_audio_test: phony ..\..\..\build\drako_audio_test.exe
 
 build drako_audio_test.exe: phony ..\..\..\build\drako_audio_test.exe
 
+build drako_gestures: phony include\drako\input\drako_gestures.lib
+
+build drako_gestures.lib: phony include\drako\input\drako_gestures.lib
+
 build drako_input: phony include\drako\input\drako_input.lib
 
 build drako_input.lib: phony include\drako\input\drako_input.lib
@@ -1537,7 +1586,7 @@ build include\drako\graphics\all: phony include\drako\graphics\vulkan-forward-re
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input
 
-build include\drako\input\all: phony include\drako\input\drako_input.lib ..\..\..\build\input-test-app.exe
+build include\drako\input\all: phony include\drako\input\drako_input.lib include\drako\input\drako_gestures.lib ..\..\..\build\input-test-app.exe
 
 # =============================================================================
 

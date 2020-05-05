@@ -2,67 +2,38 @@
 #ifndef DRAKO_INPUT_SYSTEM_HPP_
 #define DRAKO_INPUT_SYSTEM_HPP_
 
+#include "drako/devel/logging.hpp"
+#include "drako/input/input_system_types.hpp"
+
 #include <cstdint>
 #include <vector>
 
-#include "drako/devel/logging.hpp"
-#include "drako/input/input_device.hpp"
-#include "drako/system/native_mouse_device.hpp"
-
-namespace drako::engine
+namespace drako::engine::input
 {
-    // TYPEDEF
-    // Uniquely identifies an input device.
-    using device_id = const std::uint32_t;
-
-
-    struct _native_input_event;
-
-    struct input_event
+    struct _native_input_event
     {
     };
 
 
-    class input_device_interface
+    // Metadata for an input device.
+    struct input_device_info
     {
-    public:
-        virtual std::vector<float> axis_states() noexcept;
-
-        virtual std::vector<bool> button_states() noexcept;
-
-        virtual std::vector<_native_input_event> poll_events() noexcept;
+        std::string native_interface;
+        size_t      native_device_id;
     };
-
-
-    struct binding_set
-    {
-        using physical_key_id = std::uint16_t;
-        using virtual_key_id  = std::uint16_t;
-
-        //std::vector<std::tuple<physical_key_id, virtual_key_id>> bindings;
-
-        std::vector<std::uint16_t> axis_control_id;
-        std::vector<std::uint16_t> axis_action_id;
-        std::vector<std::uint16_t> axis_action_group_id;
-
-        std::vector<std::uint16_t> btn_control_id;
-        std::vector<std::uint16_t> btn_action_id;
-        std::vector<std::uint16_t> btn_action_group_id;
-    };
-
-
-
-    struct input_device_state
-    {
-        float         axis[10];
-        std::uint64_t btns;
-    };
+    [[nodiscard]] std::vector<input_device_info> query_input_devices() noexcept;
 
 
     // Provides a uniform control interface over physical input devices.
     class input_system
     {
     public:
+        using device_id            = std::uint32_t;
+        using callback_listener_id = std::uint32_t;
+
+        using device_state_callback = void (*)(const input_device_state&) noexcept;
+        using device_event_callback = void (*)(const input_device_event&) noexcept;
+
         explicit input_system() = default;
 
         input_system(const input_system&) = delete;
@@ -72,93 +43,65 @@ namespace drako::engine
         input_system& operator=(input_system&&) = delete;
 
 
-        device_id create_device(const binding_set& bindings) noexcept;
+        // Create a new device instance.
+        [[nodiscard]] device_id create_device(const input_device_info& info) noexcept;
 
-        void create_device_layout(const input_device_layout& layout) noexcept;
 
+        [[nodiscard]] callback_listener_id
+        insert_state_callback(device_id d, device_state_callback cb) noexcept;
+
+
+        void remove_state_callback(device_id d, callback_listener_id cl) noexcept;
+
+
+        // Destroy a device instance.
         void destroy_device(device_id device) noexcept;
 
-        // Enables the selected device.
-        // Enabled devices produces events and responds to commands.
-        void enable_device(device_id device) noexcept;
 
-        // Disables the selected device.
-        // Disabled devices don't produce events and don't responds to commands.
-        void disable_device(device_id device) noexcept;
-
-        void enable_bindings_group() noexcept;
-
-        void disable_bindings_group() noexcept;
-
+        // Run a single update cycle of all active devices.
         void update() noexcept;
 
-        void update(device_id id) noexcept;
+#if defined(DRAKO_DEBUG)
+        // Prints list of registered listeners.
+        void dbg_print_listeners() const;
+#endif
 
     private:
-        struct _input_device_context
+        // event produced by state changes of the controls
+        struct _device_state_event
         {
-            std::vector<action_callback> actions;
+            std::vector<callback_listener_id>  listeners;
+            std::vector<device_state_callback> callbacks;
         };
 
-        static std::remove_const_t<device_id> _last_device;
+        // event produced by configuration changes of the device
+        struct _device_config_event
+        {
+        };
 
-        std::vector<device_id>              _device_ids;
-        std::vector<input_device_interface> _device_handles;
-        std::vector<binding_set>            _device_mapping_tables;
+        std::vector<device_id>                               _device_ids;
+        std::vector<std::unique_ptr<input_device_interface>> _device_interfaces;
+        std::vector<input_device_layout>                     _device_layouts;
 
-        std::vector<_input_device_context> _devices;
+        std::vector<callback_listener_id>  _state_listeners;
+        std::vector<device_state_callback> _state_callbacks;
 
-        //std::vector<action_id>       _actions_id;
-        //std::vector<action_callback> _actions_callbacks;
+        std::vector<callback_listener_id>  _event_listeners;
+        std::vector<device_event_callback> _event_callbacks;
 
+        [[nodiscard]] static device_id _new_device_id() noexcept
+        {
+            static device_id last_generated = 0;
+            return ++last_generated;
+        }
 
-        [[nodiscard]] device_id _new_device_id() { return ++_last_device; }
+        [[nodiscard]] callback_listener_id _new_listener_id() noexcept
+        {
+            static callback_listener_id last_generated = 0;
+            return ++last_generated;
+        }
     };
 
-    device_id input_system::create_device(const binding_set& bindings) noexcept
-    {
-        const auto id = _new_device_id();
-        _device_ids.emplace_back(id);
-    }
-
-    void input_system::create_device_layout(const input_device_layout& layout) noexcept
-    {
-    }
-
-    void input_system::update() noexcept
-    {
-        // foreach device process event queue
-        for (auto& device : _device_handles)
-        {
-            const auto events = device.poll_events();
-            for (const auto& e : events)
-            {
-            }
-        }
-    }
-
-    void input_system::update(device_id id) noexcept
-    {
-        const auto it = std::find(std::cbegin(_device_ids), std::cend(_device_ids), id);
-        if (it == std::cend(_device_ids))
-        {
-            DRAKO_LOG_ERROR("[Drako] Can't locate device with specified id");
-            return;
-        }
-
-        const auto index  = std::distance(std::cbegin(_device_ids), it);
-        auto       device = _device_handles[index];
-        const auto events = device.poll_events();
-
-        if (std::empty(events))
-            return;
-
-        const auto translation_table = _device_mapping_tables[index];
-        for (const auto& event : events)
-        {
-        }
-    }
-
-} // namespace drako::engine
+} // namespace drako::engine::input
 
 #endif // !DRAKO_INPUT_SYSTEM_HPP_

@@ -51,8 +51,6 @@ std::vector<gpx::material_instance>       g_mtl_instance_assets;
 std::vector<guid<gpx::shader_source>> g_shader_guids;
 std::vector<gpx::shader_source>       g_shader_assets;
 
-asset_loader<_g_alloc> g_loader{ 100'000, g_allocator };
-
 
 const std::vector<guid<asset_bundle>> bundles_guids = { 1 };
 const std::vector<std::string>        bundles_names = { "main" };
@@ -62,7 +60,7 @@ drako::engine::runtime_asset_manager  g_asset_manager{ bundles_guids, bundles_na
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-    g_asset_manager.load_asset_bundle("main");
+    g_asset_manager.load_bundle("main");
 
     sys::native_window render_window(L"Drako engine");
     render_window.show();
@@ -75,8 +73,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     const auto frag_source = gpx::make_from_stream(std::ifstream(FRAG_SOURCE, std::ios::binary));
 
 
-    const gpx::vulkan_runtime_context context{ render_window };
-    gpx::render_system                render_system{ context };
+    const gpx::vulkan::context context{ render_window };
+    gpx::vulkan::debug_print_all_queue_families(context);
+
+    gpx::render_system render_system{ context };
 
     const auto wireframe_pipeline = gpx::make_vulkan_wireframe_pipeline(context.logical_device.get(), vert, renderer.renderpass());
     render_system.create(1, wireframe_pipeline);
@@ -96,6 +96,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         for (auto i = 0; i < std::size(models); ++i)
             mvps[i] = models[i] * vp;
 
-        render_system.render();
+        render_system.update();
     }
 }

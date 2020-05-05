@@ -3,7 +3,6 @@
 #define DRAKO_VULKAN_MESH_TYPES_HPP
 
 #include "drako/graphics/mesh_types.hpp"
-#include "drako/graphics/vulkan_resource_loader.hpp"
 #include "drako/graphics/vulkan_vertex_buffer.hpp"
 
 #include <vulkan/vulkan.hpp>
@@ -13,8 +12,8 @@ namespace drako::gpx
     class vulkan_mesh_view
     {
     public:
-        explicit vulkan_mesh_view(vk::Buffer vertices, size_t vcount,
-            vk::Buffer indexes, size_t icount) noexcept
+        explicit vulkan_mesh_view(
+            vk::Buffer vertices, size_t vcount, vk::Buffer indexes, size_t icount) noexcept
             : _v_buffer{ vertices }
             , _i_buffer{ indexes }
             , _v_buffer_size{ vcount }

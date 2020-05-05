@@ -4,30 +4,28 @@
 
 #include "drako/graphics/vulkan_material_pipeline.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
+#include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/math/mat4x4.hpp"
 
 #include <vector>
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
-    class vulkan_forward_renderer
+    class forward_renderer
     {
     public:
-        explicit vulkan_forward_renderer(
-            vk::PhysicalDevice pdevice,
-            vk::Device         device,
-            vk::SurfaceKHR     surface,
-            uint32_t           width,
-            uint32_t           height) noexcept;
-        ~vulkan_forward_renderer() noexcept;
+        explicit forward_renderer(
+            const context& ctx, uint32_t width, uint32_t height);
 
-        vulkan_forward_renderer(const vulkan_forward_renderer&) = delete;
-        vulkan_forward_renderer& operator=(const vulkan_forward_renderer&) = delete;
+        ~forward_renderer() noexcept;
 
-        vulkan_forward_renderer(vulkan_forward_renderer&&) = delete;
-        vulkan_forward_renderer& operator=(vulkan_forward_renderer&&) = delete;
+        forward_renderer(const forward_renderer&) = delete;
+        forward_renderer& operator=(const forward_renderer&) = delete;
+
+        forward_renderer(forward_renderer&&) = delete;
+        forward_renderer& operator=(forward_renderer&&) = delete;
 
         [[nodiscard]] vk::RenderPass renderpass() const noexcept
         {
@@ -35,10 +33,10 @@ namespace drako::gpx
         }
 
         void draw(const vulkan_material_pipeline& pipeline,
-            const std::vector<mat4x4>&              mvp,
-            const std::vector<vulkan_mesh_view>&    mesh) noexcept;
+            const std::vector<mat4x4>&            mvp,
+            const std::vector<vulkan_mesh_view>&  mesh) noexcept;
 
-        void draw(const vulkan_material_pipeline&      pipeline,
+        void draw(const vulkan_material_pipeline&        pipeline,
             const std::vector<mat4x4>&                   mvps,
             const std::vector<vulkan_mesh_view>&         meshes,
             const std::vector<vulkan_material_instance>& materials) noexcept;
@@ -53,16 +51,17 @@ namespace drako::gpx
             vk::ImageView depth_buffer_view;
         };
 
-        void setup_descriptors() noexcept;
+        void _setup_descriptors() noexcept;
 
-        void setup_renderpass() noexcept;
+        void _setup_renderpass() noexcept;
 
-        void setup_swapchain(vk::PhysicalDevice pdevice) noexcept;
+        void _setup_swapchain(vk::PhysicalDevice pdevice) noexcept;
 
-        vk::Device _ldevice;
+        const vk::PhysicalDevice _pdevice;
+        const vk::Device         _ldevice;
+        const vk::SurfaceKHR     _surface;
 
         vk::Rect2D             _render_area;
-        vk::SurfaceKHR         _surface;
         vk::UniqueSwapchainKHR _swapchain;
         std::vector<vk::Image> _swapchain_images;
 
@@ -78,6 +77,6 @@ namespace drako::gpx
         std::vector<frame_attachments> _frame_attachments;
     };
 
-} // namespace drako::gpx
+} // namespace drako::gpx::vulkan
 
 #endif // !DRAKO_VULKAN_FORWARD_RENDERER_HPP

@@ -9,16 +9,16 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
-    struct vulkan_graphics_pipeline
+    struct graphics_pipeline
     {
         vk::UniquePipeline       pipeline;
         vk::UniquePipelineLayout pipeline_layout;
     };
 
 
-    [[nodiscard]] bool vulkan_check_required_features(vk::PhysicalDevice p) noexcept
+    [[nodiscard]] bool check_required_features(vk::PhysicalDevice p) noexcept
     {
         const auto features = p.getFeatures();
 
@@ -29,13 +29,11 @@ namespace drako::gpx
         return validation;
     }
 
-    vulkan_graphics_pipeline make_vulkan_wireframe_pipeline(
+    graphics_pipeline make_vulkan_wireframe_pipeline(
         const vk::Device&        device,
         const vulkan_gpu_shader& vert,
         const vk::RenderPass&    renderpass) noexcept
     {
-        vulkan_graphics_pipeline result{};
-
         /*vvv create pipeline layout vvv*/
         const vk::DescriptorSetLayout descriptor_set_layouts[] = {};
 
@@ -54,16 +52,7 @@ namespace drako::gpx
             static_cast<uint32_t>(std::size(push_constants)), push_constants
         };
 
-        if (auto [err, layout] = device.createPipelineLayoutUnique(pipeline_layout_info);
-            err == vk::Result::eSuccess)
-        {
-            result.pipeline_layout = std::move(layout);
-        }
-        else
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Pipeline layout creation failed - " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        const auto layout = device.createPipelineLayoutUnique(pipeline_layout_info);
 
         /*vvv create pipeline vvv*/
 
@@ -203,27 +192,16 @@ namespace drako::gpx
             &depth_stencil_state,
             &color_blend_state,
             &dynamic_state,
-            result.pipeline_layout.get(),
+            pipeline_layout.get(),
             renderpass,
             0,                       // subpass
             vk::Pipeline{ nullptr }, // base pipeline
             0                        // base pipeline index
         };
 
-        if (auto [err, pipeline] = device.createGraphicsPipelineUnique(vk::PipelineCache{ nullptr }, pipeline_info);
-            err == vk::Result::eSuccess)
-        {
-            result.pipeline = std::move(pipeline);
-        }
-        else
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Pipeline creation failed - " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
-
-        return result;
+        return device.createGraphicsPipelineUnique(vk::PipelineCache{ nullptr }, pipeline_info);
     }
 
-} // namespace drako::gpx
+} // namespace drako::gpx::vulkan
 
 #endif // !DRAKO_VULKAN_WIREFRAME_PIPELINE_HPP

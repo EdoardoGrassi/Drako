@@ -196,6 +196,12 @@ Vulkan_INCLUDE_DIR:PATH=C:/VulkanSDK/1.1.130.0/Include
 //Path to a library.
 Vulkan_LIBRARY:FILEPATH=C:/VulkanSDK/1.1.130.0/Lib/vulkan-1.lib
 
+//Path to a library.
+XINPUT_FOUND:FILEPATH=C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/um/x64/xinput.lib
+
+//The directory containing a CMake configuration file for XInput.
+XInput_DIR:PATH=XInput_DIR-NOTFOUND
+
 //Value Computed by CMake
 drako_BINARY_DIR:STATIC=C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug
 

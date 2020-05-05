@@ -10,16 +10,16 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
     inline const std::size_t DRAKO_MAX_DESCRIPTOR_SETS = 4;
 
-    struct vulkan_material_instance
+    struct vulkan::material_instance
     {
         vk::DescriptorSet material_descriptor_set[DRAKO_MAX_DESCRIPTOR_SETS];
     };
 
-    vulkan_material_instance compile_material(
+    vulkan::material_instance compile_material(
         const material_template&        mt,
         const material_instance&        mi,
         const vulkan_material_pipeline& p) noexcept

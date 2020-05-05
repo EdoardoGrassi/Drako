@@ -1,0 +1,73 @@
+# ninja log v5
+6	111	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+163	2531	608995356	include/drako/system/CMakeFiles/drako-native-sys.dir/src/native_window_win32.cpp.obj	46f3d233bc0245b5
+193	2564	608995356	include/drako/system/CMakeFiles/drako-native-sys.dir/src/native_keyboard_device_win32.cpp.obj	d6c6a07b30aae9c5
+177	2994	608995357	include/drako/system/CMakeFiles/drako-native-sys.dir/src/native_mouse_device_win32.cpp.obj	deab2bc35ff15568
+149	3331	608995357	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+3	62	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+68	2190	608996258	include/drako/system/CMakeFiles/drako-native-sys.dir/src/system_info_win32.cpp.obj	11fde3c8e58e0a13
+28	2747	608996259	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+41	3482	608996259	include/drako/system/CMakeFiles/drako-native-sys.dir/src/native_io_file_win32.cpp.obj	ee8bd9d1f07e8e
+3	54	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+30	2812	609006226	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+2	54	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+26	2258	609006299	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+2	57	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+28	2498	609006605	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+3	67	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	50	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+28	2563	609008387	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+2	60	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	60	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	71	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+4	61	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+34	2293	609011975	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+3	62	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	1955	609031032	include/drako/input/CMakeFiles/drako_input.dir/src/input_system.cpp.obj	aafaad9f90f32d29
+2	67	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	1689	609031771	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+15	1733	609031771	include/drako/input/CMakeFiles/drako_input.dir/src/input_system.cpp.obj	30197e230150779c
+1733	2352	609031772	include/drako/input/drako_input.lib	ba64127caae01fcc
+2	68	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	55	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	63	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	64	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	114	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+21	2244	609075066	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+197	2715	609075067	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+2	67	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+4	1531	609075184	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+2	58	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+3	1497	609075690	include/drako/input/CMakeFiles/drako_input.dir/src/input_system.cpp.obj	30197e230150779c
+28	1835	609075690	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+5	63	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+3	1021	609076034	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+1022	1689	609076035	include/drako/input/drako_input.lib	ba64127caae01fcc
+1	69	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+4	1246	609076528	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+18	1415	609076528	include/drako/input/CMakeFiles/drako_input.dir/src/input_system.cpp.obj	30197e230150779c
+1416	1505	609076528	include/drako/input/drako_input.lib	ba64127caae01fcc
+2	55	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+19	1376	609077379	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+6	1510	609077379	include/drako/input/CMakeFiles/drako_input.dir/src/input_system.cpp.obj	30197e230150779c
+1510	1582	609077379	include/drako/input/drako_input.lib	ba64127caae01fcc
+1582	2645	609077380	../../../build/input-test-app.exe	aff3b18c6a57796a
+1	54	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	55	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+4	1238	609077879	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+1239	1673	609077880	../../../build/input-test-app.exe	aff3b18c6a57796a
+2	55	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	60	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+3	1178	609078009	include/drako/input/CMakeFiles/input-test-app.dir/test/input_gesture_app.cpp.obj	8f35928c5cd314d9
+1178	1527	609078009	../../../build/input-test-app.exe	aff3b18c6a57796a
+2	55	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	52	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	53	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	1207	609078956	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b
+1207	1295	609078956	include/drako/input/drako_input.lib	ba64127caae01fcc
+1295	1561	609078956	../../../build/input-test-app.exe	aff3b18c6a57796a
+2	54	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	54	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	53	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+57	150	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+35	1800	609124091	include/drako/input/CMakeFiles/drako_input.dir/src/xinput_device_interface_win32.cpp.obj	edcd34e84abb56b

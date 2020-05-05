@@ -1,13 +1,13 @@
 #pragma once
-#ifndef DRAKO_NATIVE_IO_API_HPP
-#define DRAKO_NATIVE_IO_API_HPP
+#ifndef DRAKO_NATIVE_IO_API_HPP_
+#define DRAKO_NATIVE_IO_API_HPP_
+
+#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/system/native_io_file.hpp"
 
 #include <future>
 #include <system_error>
 #include <tuple>
-
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/system/native_io_file.hpp"
 
 namespace drako::sys
 {
@@ -17,33 +17,67 @@ namespace drako::sys
         std::size_t alignment;
     };
 
-    DRAKO_NODISCARD vio_buffer_requirements native_vio_requirements() noexcept;
+    [[nodiscard]] vio_buffer_requirements native_vio_requirements() noexcept;
+
+    struct aio_control_block
+    {
+        aio_control_block(const aio_control_block&) = delete;
+        aio_control_block& operator=(const aio_control_block&) = delete;
+
+        aio_control_block(aio_control_block&&) = delete;
+        aio_control_block& operator=(aio_control_block&&) = delete;
+
+#if defined(DRAKO_PLT_WIN32)
+        HANDLE     handle;
+        OVERLAPPED overlapped;
+#endif
+    };
+
+    struct aio_result
+    {
+        size_t bytes;
+    };
 
 
     // Reads data from file to memory buffer.
-    DRAKO_NODISCARD std::error_code
-    read(native_file& src, void* dst, size_t bytes, size_t offset) noexcept;
+    [[nodiscard]] std::error_code
+    read(native_file& src, std::byte* dst, size_t bytes, size_t offset) noexcept;
 
     // Reads data from file to multiple memory buffers.
-    DRAKO_NODISCARD std::error_code
+    [[nodiscard]] std::error_code
     read_scatter(native_file& src, const scatter_list& dst, size_t bytes, size_t offset) noexcept;
 
+    [[nodiscard]] std::tuple<std::error_code, std::future<void>>
+    async_read(aio_control_block& cb, native_file& src, std::byte* dst, size_t bytes, size_t offset) noexcept;
+
     // Asynchronously reads data from file to multiple memory buffers.
-    DRAKO_NODISCARD std::tuple<std::error_code, std::future<void>>
-    read_scatter_async(native_file& src, const scatter_list& dst, size_t bytes, size_t offset) noexcept;
+    [[nodiscard]] std::tuple<std::error_code, std::future<void>>
+    async_read_scatter(native_file& src, const scatter_list& dst, size_t bytes, size_t offset) noexcept;
 
     // Writes data from memory buffer to file.
-    DRAKO_NODISCARD std::error_code
-    write(void* src, native_file& dst, size_t bytes, size_t offset) noexcept;
+    [[nodiscard]] std::error_code
+    write(std::byte* src, native_file& dst, size_t bytes, size_t offset) noexcept;
 
     // Writes data from multiple memory buffers to file.
-    DRAKO_NODISCARD std::error_code
+    [[nodiscard]] std::error_code
     write_gather(const gather_list& src, native_file& dst, size_t bytes, size_t offset) noexcept;
 
+    [[nodiscard]] std::tuple<std::error_code, std::future<void>>
+    async_write(std::byte* src, native_file& dst, size_t bytes, size_t offset) noexcept;
+
     // Asynchronously writes data from multiple memory buffers to file.
-    DRAKO_NODISCARD std::tuple<std::error_code, std::future<void>>
-    write_gather_async(const gather_list& src, native_file& dst, size_t bytes, size_t offset) noexcept;
+    [[nodiscard]] std::tuple<std::error_code, std::future<void>>
+    async_write_gather(aio_control_block& cb, const gather_list& src, size_t bytes, size_t offset) noexcept;
+
+    // blocks until async operation completes
+    [[nodiscard]] std::tuple<std::error_code, aio_result> wait(aio_control_block& cb) noexcept;
+
+    // checks if async operation has completed
+    [[nodiscard]] std::tuple<std::error_code, aio_result> try_wait(aio_control_block& cb) noexcept;
+
+    // blocks until async operation completes or timeout ends
+    [[nodiscard]] std::tuple<std::error_code, aio_result> wait_for(aio_control_block& cb) noexcept;
 
 } // namespace drako::sys
 
-#endif // !DRAKO_NATIVE_IO_API_HPP
+#endif // !DRAKO_NATIVE_IO_API_HPP_

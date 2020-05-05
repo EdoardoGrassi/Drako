@@ -15,74 +15,7 @@ namespace drako::gpx
     class vulkan_gpu_tex2d
     {
     public:
-        explicit vulkan_gpu_tex2d(vk::Device device, const texture_2d_view& tex) noexcept
-            : _device(device)
-        {
-            DRAKO_ASSERT(device != vk::Device{ nullptr });
-
-            const vk::ImageCreateInfo staging_image_info{
-                vk::ImageCreateFlagBits{},
-                vk::ImageType::e2D,
-                vk::Format::eA8B8G8R8UintPack32,
-                vk::Extent3D{ width(tex), height(tex), 1 },
-                1,
-                1,
-                vk::SampleCountFlagBits::e1,
-                vk::ImageTiling::eOptimal,
-                vk::ImageUsageFlagBits::eTransferSrc,
-                vk::SharingMode::eExclusive,
-                0,
-                nullptr,
-                vk::ImageLayout::eTransferSrcOptimal
-            };
-
-            auto [staging_image_result, staging_image] = _device.createImage(staging_image_info);
-            if (staging_image_result != vk::Result::eSuccess)
-            {
-                std::exit(EXIT_FAILURE);
-            }
-
-            const vk::ImageCreateInfo sample_image_info{
-                vk::ImageCreateFlagBits{},
-                vk::ImageType::e2D,
-                vk::Format::eA8B8G8R8UnormPack32,
-                vk::Extent3D{ width(tex), height(tex), 1 },
-                mipmap_levels(tex),
-                1,
-                vk::SampleCountFlagBits::e8,
-                vk::ImageTiling::eOptimal,
-                vk::ImageUsageFlagBits::eInputAttachment | vk::ImageUsageFlagBits::eTransferDst,
-                vk::SharingMode::eExclusive,
-                0,
-                nullptr,
-                vk::ImageLayout::eShaderReadOnlyOptimal
-            };
-
-            if (auto [result, image] = _device.createImageUnique(sample_image_info);
-                result == vk::Result::eSuccess)
-            {
-                _image = std::move(image);
-            }
-            else
-            {
-                DRAKO_LOG_ERROR("[Vulkan] " + to_string(result));
-                std::exit(EXIT_FAILURE);
-            }
-
-
-            const vk::ImageViewCreateInfo sample_view_info{
-                vk::ImageViewCreateFlags{},
-                _image.get(),
-                vk::ImageViewType::e2D,
-                vk::Format::eA8B8G8R8UintPack32,
-                vk::ComponentMapping{},
-                vk::ImageSubresourceRange{
-                    vk::ImageAspectFlagBits::eColor,
-                    0, mipmap_levels(tex),
-                    0, 1 }
-            };
-            auto [sample_view_result, sample_view] = _device.createImageView(sample_view_info);
-        }
+        explicit vulkan_gpu_tex2d(vk::Device device, const texture_2d_view& tex) noexcept;
 
     private:
         const vk::Device    _device;

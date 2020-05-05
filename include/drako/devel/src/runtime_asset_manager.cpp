@@ -6,8 +6,38 @@
 
 namespace drako::engine
 {
+    [[nodiscard]] std::tuple<bool, std::size_t>
+    runtime_asset_manager::_find_loaded_asset_index(const asset_id id) noexcept
+    {
+        if (const auto found = std::find(
+                std::cbegin(_loaded_asset_guids), std::cend(_loaded_asset_guids), id);
+            found != std::cend(_loaded_asset_guids))
+        {
+            return { true, std::distance(std::cbegin(_loaded_asset_guids), found) };
+        }
+        return { false, std::numeric_limits<std::size_t>::max() };
+    }
+
+    [[nodiscard]] std::tuple<bool, std::size_t>
+    runtime_asset_manager::_find_loaded_bundle_index(const asset_bundle_id b) noexcept
+    {
+        if (const auto found = std::find(
+                std::cbegin(_loaded_bundles_guids), std::cend(_loaded_bundles_guids), b);
+            found != std::cend(_loaded_bundles_guids))
+        {
+            return { true, std::distance(std::cbegin(_loaded_bundles_guids), found) };
+        }
+        return { false, std::numeric_limits<std::size_t>::max() };
+    }
+
+    [[nodiscard]] std::vector<std::byte>
+    runtime_asset_manager::_load_raw_asset() noexcept;
+
+    void runtime_asset_manager::_execute_pending_bundle_requests() noexcept;
+
+
     runtime_asset_manager::runtime_asset_manager(
-        const std::vector<guid<asset_bundle>>& bundle_guids,
+        const std::vector<asset_bundle_id>& bundle_guids,
         const std::vector<std::string>&        bundle_names,
         const std::vector<_fs::path>&          bundle_paths)
         : _available_bundles_guids(bundle_guids)
@@ -26,7 +56,7 @@ namespace drako::engine
     }
 
     [[nodiscard]] const asset_bundle&
-    runtime_asset_manager::load_asset_bundle(const asset_bundle_id id) noexcept
+    runtime_asset_manager::load_bundle(const asset_bundle_id id) noexcept
     {
         // search between loaded bundles
         if (const auto found = std::find(
@@ -50,6 +80,12 @@ namespace drako::engine
             DRAKO_LOG_ERROR("Can't locate asset bundle with id " + std::to_string(id));
             std::exit(EXIT_FAILURE);
         }
+    }
+
+    void runtime_asset_manager::load_bundle_async(const asset_bundle_id id) noexcept
+    {
+        _bundle_load_request request{};
+        _bundle_load_requests.push_back(request);
     }
 
     /*
@@ -79,19 +115,10 @@ namespace drako::engine
     }
     */
 
-    void runtime_asset_manager::load_asset(const std::vector<uuid>& ids) noexcept
+    void runtime_asset_manager::unload_bundle(asset_bundle_id id)
     {
-        for (const auto& id : ids)
-            load_asset(id);
-    }
-
-    void runtime_asset_manager::unload_asset_bundle(asset_bundle_id id)
-    {
-        if (const auto bundle = std::find(
-                std::cbegin(_loaded_bundles_guids), std::cend(_loaded_bundles_guids), id);
-            bundle != std::cend(_loaded_bundles_guids))
+        if (const auto [found, index] = _find_loaded_bundle_index(id); found)
         {
-            const auto index = std::distance(std::cbegin(_loaded_bundles_guids), bundle);
             --_loaded_bundles_refcount[index];
             if (_loaded_bundles_refcount[index] == 0)
             {

@@ -67,7 +67,7 @@ namespace drako
     {
         using _ec  = std::error_code;
         using _apm = asset_manifest_entry;
-        using _apd = asset_file_info;
+        using _apd = asset_load_info;
 
         if (_ec ec; !_fs::is_directory(folder, ec))
             return build_error{};

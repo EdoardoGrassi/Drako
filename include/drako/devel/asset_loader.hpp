@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_ASSET_LOADER_HPP_
-#define DRAKO_ASSET_LOADER_HPP_
+#ifndef DRAKO_ASSET_LOADER_HPP
+#define DRAKO_ASSET_LOADER_HPP
 
 #include <cstddef>
 #include <filesystem>
@@ -125,7 +125,7 @@ namespace drako
 
         template <typename Al>
         [[nodiscard]] const memory_stream<Al>
-        load(const asset_packaging_descriptor& desc, Al& al) noexcept;
+        load(const asset_load_info& desc, Al& al) noexcept;
 
     private:
         std::vector<sys::native_file> _packages;
@@ -178,7 +178,7 @@ namespace drako
     template <typename Allocator>
     template <typename ResourceAllocator>
     [[nodiscard]] const memory_stream<ResourceAllocator>
-    asset_loader<Allocator>::load(const asset_packaging_descriptor& asset_info, ResourceAllocator& al) noexcept
+    asset_loader<Allocator>::load(const asset_load_info& asset_info, ResourceAllocator& al) noexcept
     {
         auto&      src             = _packages[asset_info.package_guid()];
         const auto src_data_size   = asset_info.packed_size_bytes();
@@ -252,4 +252,4 @@ namespace drako
 
 } // namespace drako
 
-#endif // !DRAKO_ASSET_LOADER_HPP_
+#endif // !DRAKO_ASSET_LOADER_HPP

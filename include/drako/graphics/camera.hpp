@@ -21,9 +21,11 @@ namespace drako::gpx
         // Z-depth far plane.
         float zmax;
 
-        explicit constexpr camera_frustum(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) noexcept;
+        explicit constexpr camera_frustum(
+            float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) noexcept;
 
-        explicit constexpr camera_frustum(float xfov, float yfov, float zmin, float zmax) noexcept;
+        explicit constexpr camera_frustum(
+            float xfov, float yfov, float zmin, float zmax) noexcept;
     };
     
 

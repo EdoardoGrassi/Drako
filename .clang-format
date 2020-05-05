@@ -31,6 +31,7 @@ BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 ColumnLimit: 0
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
 Cpp11BracedListStyle: false # causes weird formatting on multilines constructors
 DerivePointerAlignment: true
 FixNamespaceComments: true

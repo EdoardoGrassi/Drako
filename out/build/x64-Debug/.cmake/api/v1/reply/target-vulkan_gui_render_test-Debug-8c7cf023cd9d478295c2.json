@@ -81,10 +81,6 @@
 				{
 					"backtrace" : 4,
 					"define" : "NOMINMAX"
-				},
-				{
-					"backtrace" : 2,
-					"define" : "VULKAN_HPP_NO_EXCEPTIONS"
 				}
 			],
 			"includes" : 

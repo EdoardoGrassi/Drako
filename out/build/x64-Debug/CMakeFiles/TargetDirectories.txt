@@ -31,9 +31,10 @@ C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/drako-json.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/edit_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/drako_input.dir
-C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/input-test-app.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/rebuild_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/test.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/drako_gestures.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/input-test-app.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/input/CMakeFiles/edit_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/physics/CMakeFiles/drako-physics.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/physics/CMakeFiles/rebuild_cache.dir

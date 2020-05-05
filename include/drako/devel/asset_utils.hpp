@@ -5,8 +5,10 @@
 #include "drako/devel/asset_types.hpp"
 
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace drako
 {
@@ -41,7 +43,7 @@ namespace drako
     struct asset_bundle
     {
         std::vector<asset_id>        asset_ids;
-        std::vector<asset_file_info> asset_infos;
+        std::vector<asset_load_info> asset_infos;
     };
 
     [[nodiscard]] asset_bundle load_bundle_manifest(const sfs::path& file)
@@ -59,6 +61,34 @@ namespace drako
 
         return result;
     }
+
+    [[nodiscard]] std::tuple<bool, std::size_t>
+    find_asset_index(const asset_bundle& b, asset_id a)
+    {
+        if (const auto found = std::find(
+                std::cbegin(b.asset_ids), std::cend(b.asset_ids), a);
+            found != std::cend(b.asset_ids))
+        {
+            const auto index = std::distance(std::cbegin(b.asset_ids), found);
+            return { true, index };
+        }
+        return { false, std::numeric_limits<size_t>::max() };
+    }
+
+    /*
+    [[nodiscard]] std::tuple<bool, asset_file_info>
+    find_info_in_bundle(const asset_bundle& b, asset_id id) noexcept
+    {
+        if (const auto found = std::find(
+                std::cbegin(b.asset_ids), std::cend(b.asset_ids), id);
+            found != std::cend(b.asset_ids))
+        {
+            const auto index = std::distance(std::cbegin(b.asset_ids), found);
+            return { true, b.asset_infos[index] };
+        }
+        return { false, {} };
+    }
+    */
 
 } // namespace drako
 

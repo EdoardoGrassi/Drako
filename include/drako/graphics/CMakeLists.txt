@@ -13,10 +13,6 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # This will return Boolean 'Vulkan_FOUND' indicating the status of find as success(ON) or fail(OFF).
 # Include directory path - 'Vulkan_INCLUDE_DIRS' and 'Vulkan_LIBRARY' with required libraries.
 find_package(Vulkan REQUIRED)
-
-if(WIN32)
-    add_compile_definitions(VK_USE_PLATFORM_WIN32_KHR)
-endif()
 	
 # Try extracting VulkanSDK path from ${Vulkan_INCLUDE_DIRS}
 if(NOT ${Vulkan_INCLUDE_DIRS} STREQUAL "")
@@ -32,8 +28,9 @@ if(NOT Vulkan_FOUND)
 	if(EXISTS "${VULKAN_PATH}")
 		message(STATUS "Successfully located the Vulkan SDK: ${VULKAN_PATH}")
 	else()
-		message(SEND_ERROR "Error: Unable to locate Vulkan SDK. Please turn off auto locate option by specifying 'AUTO_LOCATE_VULKAN' as 'OFF'"
-	        "and specify manually path using 'VULKAN_SDK' and 'VULKAN_VERSION' variables in the CMakeLists.txt.")
+		message(SEND_ERROR "Error: Unable to locate Vulkan SDK."
+			"Please turn off auto locate option by specifying 'AUTO_LOCATE_VULKAN' as 'OFF'"
+	        "and manually specify path using 'VULKAN_SDK' and 'VULKAN_VERSION' variables in CMakeLists.txt.")
 		return()
 	endif()
 endif()
@@ -47,7 +44,10 @@ target_include_directories(vulkan-forward-renderer PUBLIC ${Vulkan_INCLUDE_DIRS}
 target_link_libraries(vulkan-forward-renderer PUBLIC ${Vulkan_LIBRARIES})
 
 # Disable exceptions in Vulkan headers.
-target_compile_definitions(vulkan-forward-renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
+# target_compile_definitions(vulkan-forward-renderer PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
+if(WIN32)
+	target_compile_definitions(vulkan-forward-renderer PRIVATE "VK_USE_PLATFORM_WIN32_KHR")
+endif()
 
 
 add_library(vulkan-gui-renderer STATIC "./src/vk_gui_renderer.cpp")
@@ -58,7 +58,7 @@ target_include_directories(vulkan-gui-renderer PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(vulkan-gui-renderer PUBLIC ${Vulkan_LIBRARIES})
 
 # Disable exceptions in Vulkan headers
-target_compile_definitions(vulkan-gui-renderer PUBLIC VULKAN_HPP_NO_EXCEPTIONS)
+# target_compile_definitions(vulkan-gui-renderer PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
 
 
 add_library(render-system STATIC "./src/render_system.cpp")

@@ -208,6 +208,7 @@ namespace drako::sys::hid
                 default: ::DefWindowProcW(msg.hwnd, msg.message, msg.wParam, msg.lParam);
             }
         }
+        return {};
     }
 
 

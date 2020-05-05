@@ -1046,6 +1046,30 @@
 			"value" : "C:/VulkanSDK/1.1.130.0/Lib/vulkan-1.lib"
 		},
 		{
+			"name" : "XINPUT_FOUND",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to a library."
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/um/x64/xinput.lib"
+		},
+		{
+			"name" : "XInput_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for XInput."
+				}
+			],
+			"type" : "PATH",
+			"value" : "XInput_DIR-NOTFOUND"
+		},
+		{
 			"name" : "drako_BINARY_DIR",
 			"properties" : 
 			[
