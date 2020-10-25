@@ -15,13 +15,15 @@ namespace fs = std::filesystem;
 namespace drako::editor
 {
 
-    struct _serialized_project_importable
-    {
-    };
-
     fs::path _external_asset_to_metafile(const fs::path& source);
 
     fs::path _guid_to_metafile(const uuid& guid) noexcept;
+
+    void _create_project_info_file(const fs::path& where)
+    {
+        project_info info;
+        std::ofstream ofs{ where / "project.dkproj" };
+    }
 
 
     [[nodiscard]] project_info load_project_info(const fs::path& metafile)
@@ -66,21 +68,17 @@ namespace drako::editor
         try
         {
             fs::create_directories(root);
-            fs::create_directory(root / PROJECT_ASSET_DIR);
-            fs::create_directory(root / PROJECT_CACHE_DIR);
-            fs::create_directory(root / PROJECT_META_DIR);
+            fs::create_directory(root / project_asset_dir);
+            fs::create_directory(root / project_cache_dir);
+            fs::create_directory(root / project_meta_dir);
+
+            project_info info{};
+            std::ofstream ofs{ root / project_config_file };
         }
         catch (const fs::filesystem_error&)
         {
             fs::remove_all(root);
             throw;
-        }
-
-        std::ofstream config{ root / PROJECT_CONFIG_FILE };
-        if (config.good())
-        {
-            // TODO: write config file
-            //config.write();
         }
     }
 
@@ -104,7 +102,7 @@ namespace drako::editor
         }
     }
 
-    void make_imported_asset(
+    void create_imported_asset(
         const project_info&          project,
         const std::vector<fs::path>& inputs,
         const std::vector<fs::path>& outputs)
@@ -124,7 +122,7 @@ namespace drako::editor
         // TODO: end impl
     }
 
-    void make_asset(const project_info& p, const fs::path& asset)
+    void create_asset(const project_info& p, const fs::path& asset)
     {
         DRAKO_ASSERT(fs::is_regular_file(asset));
 
@@ -135,33 +133,50 @@ namespace drako::editor
         metafile << metainfo;
     }
 
-    [[nodiscard]] project load_project(const project_info& p)
-    {
-        // std::vector<uuid> uuids;
-        // std::vector<internal_asset_info> assets;
-        project result;
 
-        /* load project assets metadata */
-        for (const auto& entry : fs::directory_iterator{ p.meta_directory() })
+    [[nodiscard]] project create_project_tree(const fs::path& where)
+    {
+        if (!fs::is_directory(where))
+            throw std::invalid_argument{ DRAKO_STRINGIZE(where) };
+
+        return project{};
+    }
+
+    void load_project(project& p)
+    {
+        // scan the whole meta folder for metafiles
+        for (const auto& f : fs::directory_iterator{ p.meta_directory() })
         {
             try
             {
-                const auto asset_info = load_meta_info(entry.path());
-                result.asset_uuids.push_back(asset_info.guid);
-                result.asset_names.push_back(asset_info.name);
-                //result.asset_infos.push_back()
+                if (fs::is_regular_file(f) && f.path().extension() == ".dkmeta")
+                {
+
+                    std::ifstream       ifs(f.path());
+                    internal_asset_info info = from_stream(ifs);
+
+                    p.asset_table.asset_guids.push_back(info.guid());
+                    p.asset_table.asset_names.push_back(info.name());
+                    p.asset_table.asset_paths.push_back(info.path());
+                }
             }
             catch (const fs::filesystem_error& e)
             {
-                std::cerr << "Error " << e.code() << " (" << e.path1() << "," << e.path2() << "):\n"
-                          << e.what() << '\n';
-                throw;
+                std::cout << "While loading meta files an error occurred:\n"
+                          << '\t' << e.what() << '\n'
+                          << "\twith path1: " << e.path1() << '\n'
+                          << "\twith path2: " << e.path2() << '\n';
             }
         }
-        return result;
+        std::cout << "Project loaded!\n";
     }
 
-    [[nodiscard]] fs::path guid_to_path(const project_info& p, const uuid& asset)
+    void save_project(const project& p)
+    {
+        throw std::runtime_error{ "Not implemented yet!" };
+    }
+
+    [[nodiscard]] fs::path guid_to_path(const project& p, const uuid& asset)
     {
         return p.cache_directory() / to_string(asset);
     }

@@ -2,10 +2,8 @@
 #ifndef DRAKO_VULKAN_QUEUE_HPP
 #define DRAKO_VULKAN_QUEUE_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
-#include "drako/graphics/vulkan_runtime_context.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -55,7 +53,7 @@ namespace drako::gpx::vulkan
 
     [[nodiscard]] vk::PhysicalDevice make_physical_device(vk::Instance i) noexcept
     {
-        DRAKO_ASSERT(i != VK_NULL_HANDLE);
+        DRAKO_ASSERT(i);
 
         const auto pdevices = i.enumeratePhysicalDevices();
         for (const auto& pdevice : pdevices)
@@ -83,7 +81,7 @@ namespace drako::gpx::vulkan
 
     [[nodiscard]] vk::UniqueDevice make_logical_device(vk::PhysicalDevice p) noexcept
     {
-        DRAKO_ASSERT(p != VK_NULL_HANDLE);
+        DRAKO_ASSERT(p);
 
         const auto family_properties = p.getQueueFamilyProperties();
         for (const auto& family : family_properties)
@@ -126,22 +124,6 @@ namespace drako::gpx::vulkan
             nullptr // &pdevice_features
         };
         return p.createDeviceUnique(device_create_info);
-    }
-
-    void debug_print_all_queue_families(const context& ctx)
-    {
-        const auto properties = ctx.physical_device.getQueueFamilyProperties();
-        std::cout << "[Vulkan] Available queue families:\n";
-        for (const auto& family : properties)
-        {
-            std::cout << "\tQueue family:\n"
-                      << "\tcount: " << family.queueCount << '\n'
-                      << "\tflags: " << to_string(family.queueFlags) << '\n'
-                      << "\tmin transfer granularity:\n"
-                      << "\t\t- width:  " << family.minImageTransferGranularity.width << '\n'
-                      << "\t\t- height: " << family.minImageTransferGranularity.height << '\n'
-                      << "\t\t- depth:  " << family.minImageTransferGranularity.depth << '\n';
-        }
     }
 
 } // namespace drako::gpx::vulkan

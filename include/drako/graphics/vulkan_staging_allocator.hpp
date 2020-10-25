@@ -219,6 +219,4 @@ namespace drako::gpx::vulkan
     }
 } // namespace drako::gpx::vulkan
 
-} // namespace drako::gpx::vulkan
-
 #endif // !DRAKO_VULKAN_STAGING_ALLOCATOR_HPP

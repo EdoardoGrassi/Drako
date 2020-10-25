@@ -5,7 +5,7 @@ enable_testing()
 # Set required c++ standard.
 # Enable an error report if the standard isn't supported.
 # Disable compiler specific extensions.
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -32,6 +32,7 @@ add_subdirectory("include/drako/concurrency")
 add_subdirectory("include/drako/devel")
 add_subdirectory("include/drako/file_formats")
 add_subdirectory("include/drako/input")
+add_subdirectory("include/drako/io")
 add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
 add_subdirectory("include/drako/graphics")
@@ -49,16 +50,9 @@ add_executable(drako_keyboard_test WIN32 "./test/keyboard_app_test.cpp")
 target_link_libraries(drako_keyboard_test PRIVATE drako::native-sys)
 
 
-# Experimental GUI render
-add_executable(vulkan_gui_render_test WIN32 "./src/vulkan_gui_render_win32.cpp")
-target_link_libraries(vulkan_gui_render_test PRIVATE drako::vulkan-gui-renderer)
-
-
-
 # Experimental Drako engine with forward renderer
 add_executable(drako-engine WIN32 "./src/vulkan_engine_win32.cpp")
 target_link_libraries(drako-engine PRIVATE drako::vulkan-forward-renderer)
-
 
 
 # Console interface for Drako projects
@@ -68,11 +62,9 @@ set_target_properties(drako-cli-editor PROPERTIES OUTPUT_NAME "drako-cli-editor"
 target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 
 
-
 # Compiler for runtime resources consumed by the Drako engine
 add_executable(drako-builder "./src/drako_resource_compiler.cpp")
 set_target_properties(drako-builder PROPERTIES OUTPUT_NAME "drako-builder")
-
 
 
 add_executable(drako-obj-importer "./src/drako_obj_importer.cpp")

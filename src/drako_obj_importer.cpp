@@ -1,21 +1,22 @@
 #pragma once
 
+#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/file_formats/wavefront/parser.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <variant>
-
-#include "drako/file_formats/wavefront_obj.hpp"
 
 const auto HELP_TEXT = "Drako obj importer (built on" __DATE__ "with" DRAKO_CC_VERSION ")\n"
                        "Usage: obj-to-mesh [OPTION]... [FILE]...\n"
                        "Import mesh data from .obj files into .dkmesh files."
                        "\n"
                        "Behaviour:\n"
-                       "\t--override-output        overrides already existings files\n"
+                       "\t--override-output \toverrides already existings files\n"
                        "\n"
                        "Miscellaneous:\n"
-                       "\t--verbose-output         enables verbose output\n";
+                       "\t--verbose-output  \tenables verbose output\n";
 
 /*
 enum class _program_options
@@ -117,10 +118,10 @@ int main(const int argc, const char* argv[])
         }
         */
         std::cout << "Begin parsing...\n";
-        const auto parse_output = parse(std::string_view{ buffer.data(), buffer.size() }, config);
+        const auto result = parse(std::string_view{ buffer.data(), buffer.size() }, config);
         std::cout << "Parsing ended\n";
 
-        if (const auto report = std::get_if<parser_error_report>(&parse_output); report)
+        if (const auto report = std::get_if<parser_error_report>(&result); report)
         {
             const std::string_view src_error_line{ buffer.data() + report->char_index(), 10 };
             std::cerr << src_path << ':' << report->line() << '.' << report->column()

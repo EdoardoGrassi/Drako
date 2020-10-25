@@ -3,10 +3,10 @@ enable_testing()
 
 add_library(drako-devel STATIC
     "./src/build_utils.cpp"
+    "./src/project_types.cpp"
     "./src/project_utils.cpp"
     "./src/uuid.cpp"
-    "./src/mesh_importers.cpp"
-    "./src/runtime_asset_manager.cpp")
+    "./src/mesh_importers.cpp")
 add_library(drako::devel ALIAS drako-devel)
 
 # vvv test executables vvv

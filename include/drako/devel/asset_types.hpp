@@ -1,28 +1,26 @@
 #pragma once
-#ifndef DRAKO_ASSET_TYPES_HPP_
-#define DRAKO_ASSET_TYPES_HPP_
+#ifndef DRAKO_ASSET_TYPES_HPP
+#define DRAKO_ASSET_TYPES_HPP
+
+#include "drako/core/drako_api_defs.hpp"
+#include "drako/devel/uuid.hpp"
 
 #include <cstddef>
+#include <filesystem>
+#include <span>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
-
-#include "drako/core/drako_api_defs.hpp"
-#include "drako/devel/uuid.hpp"
 
 namespace drako
 {
     using asset_id        = std::uint32_t;
     using asset_bundle_id = std::uint16_t;
 
-    struct asset_manifest_header
-    {
-        api_version   version;
-        std::uint32_t crc;
-        std::uint32_t items_count;
-    };
+    [[nodiscard]] bool constexpr valid(const asset_bundle_id id) noexcept { return id != 0; }
 
+    /// @brief Single item of an asset manifest.
     struct asset_manifest_entry
     {
         asset_id        asset_guid;
@@ -87,68 +85,52 @@ namespace drako
         asset_storage_flags _storage_flags;
         asset_format_flags  _format_flags;
     };
-    static_assert(sizeof(asset_file_info) == 16 * sizeof(std::byte),
+    static_assert(sizeof(asset_load_info) == 16 * sizeof(std::byte),
         "Bad class layout: required internal padding bits");
-    static_assert(alignof(asset_file_info) <= sizeof(asset_file_info),
+    static_assert(alignof(asset_load_info) <= sizeof(asset_load_info),
         "Bad class layout: required external padding bits");
 
 
-
-    class serialized_component_array
+    /// @brief Metadata descriptor of an asset bundle.
+    struct asset_bundle_meta
     {
+        // Name of the bundle.
+        char name[16];
+
+        // Path to storage file.
+        char path[16];
+
+        // Size in bytes of bundle data in storage file.
+        std::uint64_t size;
+
+        // Offset in bytes relative to begin of storage file.
+        std::uint64_t offset;
+    };
+
+
+
+    struct asset_bundle
+    {
+
     public:
-    private:
-        std::uint32_t _component_type_id;
-        std::uint32_t _size;
-        std::uint8_t  _stride;
+        void load_from_file();
+
+        void save_to_file();
     };
 
-    class serialized_instance_array_view
+
+    /// @brief Manifest file name of an asset bundle.
+    [[nodiscard]] std::filesystem::path manifest_filename(asset_bundle_id bundle)
     {
-        static_assert(std::is_trivially_constructible_v<serialized_component_array>,
-            "Required for direct construction with memory copy");
+        return "bundle_" + std::to_string(bundle) + ".manifest.drako";
+    }
 
-    public:
-        explicit serialized_instance_array_view(std::byte* data, size_t size) noexcept
-            : _data(data)
-            , _size(size)
-        {
-        }
-
-        [[nodiscard]] const serialized_component_array* cbegin() const noexcept
-        {
-            return reinterpret_cast<serialized_component_array*>(_data);
-        }
-
-        [[nodiscard]] const serialized_component_array* cend() const noexcept
-        {
-            return reinterpret_cast<serialized_component_array*>(_data) + _size;
-        }
-
-        [[nodiscard]] serialized_component_array* begin() noexcept
-        {
-            return reinterpret_cast<serialized_component_array*>(_data);
-        }
-
-        [[nodiscard]] serialized_component_array* end() noexcept
-        {
-            return reinterpret_cast<serialized_component_array*>(_data) + _size;
-        }
-
-    private:
-        std::uint32_t _size;
-        std::byte*    _data;
-    };
-
-
-    struct asset_group
+    /// @brief Storage file name of an asset bundle.
+    [[nodiscard]] std::filesystem::path storage_filename(asset_bundle_id bundle)
     {
-        std::vector<asset_bundle_id> required_bundles;
-
-        std::vector<asset_id>        asset_instance_id;
-        std::vector<asset_bundle_id> asset_bundle_id;
-    };
+        return "bundle_" + std::to_string(bundle) + ".storage.drako";
+    }
 
 } // namespace drako
 
-#endif // !DRAKO_ASSET_TYPES_HPP_
+#endif // !DRAKO_ASSET_TYPES_HPP

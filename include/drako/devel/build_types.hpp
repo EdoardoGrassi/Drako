@@ -3,23 +3,23 @@
 #define DRAKO_BUILD_TYPES_HPP_
 
 #include <cstdint>
+#include <exception>
 #include <filesystem>
 
 namespace drako
 {
-    namespace _fs           = std::filesystem;
-    using _build_asset_path = std::filesystem::path;
+    namespace _fs = std::filesystem;
 
 
     struct project_build_item
     {
-        std::uint32_t uuid;
+        std::uint32_t id;
 
-        size_t             inputs_count;
-        _build_asset_path* inputs;
+        size_t    inputs_count;
+        _fs::path inputs;
 
-        size_t             outputs_count;
-        _build_asset_path* outputs;
+        size_t     outputs_count;
+        _fs::path* outputs;
 
         size_t transforms_count;
         void*  transforms;
@@ -30,15 +30,12 @@ namespace drako
     {
     };
 
-    struct build_error
+    struct build_error : std::exception
     {
-        build_error_code ec;
     };
 
     struct packaging_result
     {
-        std::vector<asset_package_descriptor>   packages;
-        std::vector<asset_packaging_descriptor> assets;
     };
 
 } // namespace drako

@@ -7,16 +7,16 @@
 /// @author Grassi Edoardo
 /// @date   Last update: 03-09-2019
 
-#include <array>
-#include <cstdlib>
+#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/devel/assertion.hpp"
+#include "drako/math/vector4.hpp"
 
 #if defined(DRAKO_API_SIMD)
 #include <immintrin.h>
 #endif
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
-#include "drako/math/vector4.hpp"
+#include <array>
+#include <cstdlib>
 
 namespace drako
 {
@@ -25,9 +25,6 @@ namespace drako
     {
     public:
         using _cmm4 = _cm_mat4x4;
-
-        static constexpr size_t _col_count = 4;
-        static constexpr size_t _row_count = 4;
 
         DRAKO_FORCE_INLINE explicit constexpr _cm_mat4x4() noexcept;
         DRAKO_FORCE_INLINE explicit constexpr _cm_mat4x4(float) noexcept;
@@ -61,19 +58,19 @@ namespace drako
         DRAKO_FORCE_INLINE constexpr friend _cmm4 operator-(float, const _cmm4&) noexcept;
         DRAKO_FORCE_INLINE constexpr friend _cmm4 operator-(const _cmm4&, const _cmm4&) noexcept;
 
-        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(const _cmm4&, float)noexcept;
-        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(float, const _cmm4&)noexcept;
+        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(const _cmm4&, float) noexcept;
+        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(float, const _cmm4&) noexcept;
 
         DRAKO_FORCE_INLINE constexpr friend _cmm4 operator/(const _cmm4&, float) noexcept;
         DRAKO_FORCE_INLINE constexpr friend _cmm4 operator/(float, const _cmm4&) noexcept;
 
-        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(const _cmm4&, const _cmm4&)noexcept;
+        DRAKO_FORCE_INLINE constexpr friend _cmm4 operator*(const _cmm4&, const _cmm4&) noexcept;
 
         DRAKO_FORCE_INLINE constexpr friend bool operator==(const _cmm4&, const _cmm4&) noexcept;
         DRAKO_FORCE_INLINE constexpr friend bool operator!=(const _cmm4&, const _cmm4&) noexcept;
 
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr float* operator[](size_t idx) noexcept;
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const float* operator[](size_t idx) const noexcept;
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr float* operator[](size_t idx) noexcept;
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr const float* operator[](size_t idx) const noexcept;
 
         /// @brief Computes the determinant of the matrix.
         inline constexpr friend float determinant(const _cm_mat4x4&) noexcept;
@@ -85,17 +82,17 @@ namespace drako
         DRAKO_FORCE_INLINE constexpr friend _cm_mat4x4 hadamard(const _cm_mat4x4&, const _cm_mat4x4&) noexcept;
 
         // Identity matrix.
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE static constexpr _cm_mat4x4 identity()
+        [[nodiscard]] DRAKO_FORCE_INLINE static constexpr _cm_mat4x4 identity()
         {
-            return _cm_mat4x4{{1.f, 0.f, 0.f, 0.f,
+            return _cm_mat4x4{ { 1.f, 0.f, 0.f, 0.f,
                 0.f, 1.f, 0.f, 0.f,
                 0.f, 0.f, 1.f, 0.f,
-                0.f, 0.f, 0.f, 1.f}};
+                0.f, 0.f, 0.f, 1.f } };
         }
 
     private:
-#if !defined(DRAKO_SIMD)
-        float _mm[_col_count][_row_count];
+#if !defined(DRAKO_API_SIMD)
+        float _mm[4][4];
 #else
         __m512 _mm;
 
@@ -120,7 +117,7 @@ namespace drako
 
     DRAKO_FORCE_INLINE constexpr _cm_mat4x4::_cm_mat4x4(float f) noexcept
 #if !defined(DRAKO_API_SIMD)
-        : _mm{{f, f, f, f}, {f, f, f, f}, {f, f, f, f}, {f, f, f, f}}
+        : _mm{ { f, f, f, f }, { f, f, f, f }, { f, f, f, f }, { f, f, f, f } }
     {
     }
 #else
@@ -131,8 +128,8 @@ namespace drako
 
     DRAKO_FORCE_INLINE constexpr _cm_mat4x4::_cm_mat4x4(const std::array<float, 16>& f) noexcept
 #if !defined(DRAKO_API_SIMD)
-        : _mm{f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7],
-              f[8], f[9], f[10], f[11], f[12], f[13], f[14], f[15]}
+        : _mm{ f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7],
+            f[8], f[9], f[10], f[11], f[12], f[13], f[14], f[15] }
     {
     }
 #else
@@ -148,8 +145,8 @@ namespace drako
         const std::array<float, 4>& z,
         const std::array<float, 4>& w) noexcept
 #if !defined(DRAKO_API_SIMD)
-        : _mm{{x[0], x[1], x[2], x[3]}, {y[0], y[1], y[2], y[3]},
-              {z[0], z[1], z[2], z[3]}, {w[0], w[1], w[2], w[3]}}
+        : _mm{ { x[0], x[1], x[2], x[3] }, { y[0], y[1], y[2], y[3] },
+            { z[0], z[1], z[2], z[3] }, { w[0], w[1], w[2], w[3] } }
     {
     }
 #else
@@ -192,7 +189,7 @@ namespace drako
         return *this;
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr _cm_mat4x4
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr _cm_mat4x4
     operator+(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -206,7 +203,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr _cm_mat4x4
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr _cm_mat4x4
     operator-(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -220,7 +217,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr bool
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr bool
     operator==(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -233,7 +230,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr bool
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr bool
     operator!=(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -246,7 +243,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr _cm_mat4x4
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr _cm_mat4x4
     operator*(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -262,8 +259,8 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr float*
-        _cm_mat4x4::operator[](size_t idx) noexcept
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr float*
+    _cm_mat4x4::operator[](size_t idx) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
         return _mm[idx];
@@ -271,8 +268,8 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const float*
-        _cm_mat4x4::operator[](size_t idx) const noexcept
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr const float*
+    _cm_mat4x4::operator[](size_t idx) const noexcept
     {
 #if !defined(DRAKO_API_SIMD)
         return _mm[idx];
@@ -280,7 +277,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD inline constexpr float determinant(const _cm_mat4x4& m) noexcept
+    [[nodiscard]] inline constexpr float determinant(const _cm_mat4x4& m) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
 
@@ -310,7 +307,7 @@ namespace drako
 #endif
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr _cm_mat4x4
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr _cm_mat4x4
     transposed(const _cm_mat4x4& m) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -327,13 +324,13 @@ namespace drako
 
     /// @brief Computes the trace of the matrix (sum of the elements on the main diagonal).
     ///
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr float
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr float
     trace(const _cm_mat4x4& m) noexcept
     {
         return m[0][0] + m[1][1] + m[2][2] + m[3][3];
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr _cm_mat4x4
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr _cm_mat4x4
     hadamard(const _cm_mat4x4& lhs, const _cm_mat4x4& rhs) noexcept
     {
 #if !defined(DRAKO_API_SIMD)
@@ -349,7 +346,7 @@ namespace drako
 
     /// @brief Computes the inverse of the matrix.
     ///
-    DRAKO_NODISCARD constexpr _cm_mat4x4 inverse(const _cm_mat4x4& m) noexcept;
+    [[nodiscard]] constexpr _cm_mat4x4 inverse(const _cm_mat4x4& m) noexcept;
     /*{
         // TODO: end impl
         // matrix inversion with Cayley-Hamilton method

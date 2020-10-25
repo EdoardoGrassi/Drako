@@ -6,8 +6,8 @@
 
 #include "drako/core/memory/unsync_linear_allocator.hpp"
 #include "drako/devel/logging.hpp"
-#include "drako/devel/runtime_asset_manager.hpp"
 #include "drako/devel/uuid.hpp"
+#include "drako/engine/runtime_asset_manager.hpp"
 #include "drako/graphics/material_types.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/render_system.hpp"
@@ -16,10 +16,9 @@
 #include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/graphics/vulkan_wireframe_pipeline.hpp"
-#include "drako/math/mat4x4.hpp"
-#include "drako/system/native_window.hpp"
+#include "drako/system/desktop_window.hpp"
 
-#if !defined(DRAKO_PLT_WIN32)
+#if !defined(_drako_platform_Win32)
 #error This source file should be included only on Windows builds
 #endif
 
@@ -34,10 +33,10 @@ const _fs::path FRAG_SOURCE  = "gui_base.frag.spv";
 using _g_alloc = unsync_linear_allocator;
 _g_alloc g_allocator{ 1'000'000 };
 
-std::vector<mesh_id>        g_mesh_guids;
-std::vector<mesh<_g_alloc>> g_mesh_assets;
+std::vector<mesh_id> g_mesh_guids;
+std::vector<mesh>    g_mesh_assets;
 
-std::vector<gpx::vulkan_mesh_view> g_gpu_meshes;
+std::vector<gpx::vulkan::mesh_view> g_gpu_meshes;
 
 std::vector<guid<gpx::material_template>> g_mtl_template_guids;
 std::vector<gpx::material_template>       g_mtl_template_assets;
@@ -55,14 +54,14 @@ std::vector<gpx::shader_source>       g_shader_assets;
 const std::vector<guid<asset_bundle>> bundles_guids = { 1 };
 const std::vector<std::string>        bundles_names = { "main" };
 const std::vector<_fs::path>          bundles_paths = { "./bundles/main.dkbundle" };
-drako::engine::runtime_asset_manager  g_asset_manager{ bundles_guids, bundles_names, bundles_paths };
+engine::runtime_asset_manager         g_asset_manager{ bundles_guids, bundles_names, bundles_paths };
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
     g_asset_manager.load_bundle("main");
 
-    sys::native_window render_window(L"Drako engine");
+    sys::desktop_window render_window(L"Drako engine");
     render_window.show();
 
     mat4x4 m = transform(vec3(1, 1, 1), uquat::identity(), vec3(1));

@@ -16,8 +16,7 @@ namespace drako::gpx::vulkan
     class forward_renderer
     {
     public:
-        explicit forward_renderer(
-            const context& ctx, uint32_t width, uint32_t height);
+        explicit forward_renderer(const context& ctx, uint32_t width, uint32_t height);
 
         ~forward_renderer() noexcept;
 
@@ -32,14 +31,14 @@ namespace drako::gpx::vulkan
             return _renderpass.get();
         }
 
-        void draw(const vulkan_material_pipeline& pipeline,
-            const std::vector<mat4x4>&            mvp,
-            const std::vector<vulkan_mesh_view>&  mesh) noexcept;
+        void draw(const material_pipeline& pipeline,
+            const std::vector<mat4x4>&     mvp,
+            const std::vector<mesh_view>&  mesh) noexcept;
 
-        void draw(const vulkan_material_pipeline&        pipeline,
-            const std::vector<mat4x4>&                   mvps,
-            const std::vector<vulkan_mesh_view>&         meshes,
-            const std::vector<vulkan_material_instance>& materials) noexcept;
+        void draw(const material_pipeline&        pipeline,
+            const std::vector<mat4x4>&            mvps,
+            const std::vector<mesh_view>&         meshes,
+            const std::vector<material_instance>& materials) noexcept;
 
     private:
         struct frame_attachments

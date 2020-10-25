@@ -1,15 +1,16 @@
+#include "drako/devel/logging.hpp"
+#include "drako/system/desktop_window.hpp"
+#include "drako/system/native_mouse_device.hpp"
+
 #include <cstdlib>
 #include <thread>
-
-#include "drako/devel/logging.hpp"
-#include "drako/system/native_mouse_device.hpp"
 
 using namespace drako;
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-    sys::native_window main(L"Main window");
+    sys::desktop_window main(L"Main window");
     main.show();
 
     sys::native_mouse_device mouse(main);

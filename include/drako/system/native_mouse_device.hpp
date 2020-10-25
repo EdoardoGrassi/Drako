@@ -8,7 +8,7 @@
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/core/preprocessor/platform_macros.hpp"
 #include "drako/math/vector2.hpp"
-#include "drako/system/native_window.hpp"
+#include "drako/system/desktop_window.hpp"
 
 namespace drako::sys
 {
@@ -80,7 +80,7 @@ namespace drako::sys
         // using mouse_event_handler = void(*)(const mouse_action_event&);
 
 #if defined(DRAKO_PLT_WIN32)
-        explicit native_mouse_device(const native_window& context) noexcept
+        explicit native_mouse_device(const desktop_window& context) noexcept
             : _context(context)
         {
         }
@@ -92,7 +92,7 @@ namespace drako::sys
 
     private:
 #if defined(DRAKO_PLT_WIN32)
-        const native_window& _context;
+        const desktop_window& _context;
 #endif
     };
 } // namespace drako::sys

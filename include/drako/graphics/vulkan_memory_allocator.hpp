@@ -36,12 +36,13 @@ namespace drako::gpx::vulkan
 
         // std::array<vk::MemoryType, VK_MAX_MEMORY_TYPES> _mem_types;
         // std::array<vk::MemoryHeap, VK_MAX_MEMORY_HEAPS> _mem_heaps;
-        std::array<vulkan_memory_pool, VK_MAX_MEMORY_TYPES> _mem_pools;
+        std::array<vk::UniqueDeviceMemory, VK_MAX_MEMORY_TYPES> _mem_pools;
     };
 
     global_allocator::global_allocator(const context& ctx)
         : _pdevice(ctx.physical_device), _ldevice(ctx.logical_device.get())
     {
+        /*
         const auto properties = _pdevice.getMemoryProperties();
         for (uint32_t i = 0; i < properties.memoryHeapCount; ++i)
         {
@@ -49,14 +50,16 @@ namespace drako::gpx::vulkan
 
             const vk::MemoryAllocateInfo alloc_info{
                 vk::DeviceSize{ heap.size / 2 }, // reserve half of heap capacity
-                heap.
+                heap
             };
             const auto mem = _ldevice.allocateMemoryUnique(alloc_info);
         }
+        */
     }
 
-    void global_allocator::bind_non_sparse(vk::Buffer desc) noexcept
+    void global_allocator::bind_non_sparse(vk::Buffer desc)
     {
+        /*
         const auto buffer_mem_req = _ldevice.getBufferMemoryRequirements(desc);
         DRAKO_ASSERT(buffer_mem_req.memoryTypeBits != 0, "Required by Vulkan standard");
         DRAKO_ASSERT(buffer_mem_req.alignment % 2 == 0, "Required by Vulkan standard");
@@ -66,17 +69,12 @@ namespace drako::gpx::vulkan
             while (buffer_mem_req.memoryTypeBits & (1 << mem_type_index))
                 ++mem_type_index;
 
-            auto&      mem_pool = _mem_pools[mem_type_index];
+            auto&      mem_pool = _mem_pools[mem_type_index].get();
             const auto mem_bind = mem_pool.allocate(buffer_mem_req.size, buffer_mem_req.alignment);
 
-            if (const auto err = _ldevice.bindBufferMemory(desc, mem_bind.memory, mem_bind.offset);
-                err == vk::Result::eSuccess)
-            {
-                return;
-            }
+            _ldevice.bindBufferMemory(desc, mem_bind.memory, mem_bind.offset);
         }
-        DRAKO_LOG_FAILURE("[Vulkan] Failed to allocate suitable memory");
-        std::exit(EXIT_FAILURE);
+        */
     }
 
 
@@ -119,24 +117,14 @@ namespace drako::gpx::vulkan
             static_cast<uint32_t>(std::size(queues)),
             queues.data()
         };
-        if (auto [err, buffer] = _device.createBufferUnique(buffer_info);
-            err == vk::Result::eSuccess)
-        {
-            _buffer = std::move(buffer);
-        }
-        else
-            DRAKO_LOG_ERROR("[Vulkan] Failed buffer creation");
+        _buffer = _device.createBufferUnique(buffer_info);
 
         const auto specs = _device.getBufferMemoryRequirements(_buffer.get());
 
         const vk::MemoryAllocateInfo device_alloc_info{
             specs.size,
         };
-        if (auto [err, memory] = _device.allocateMemoryUnique(device_alloc_info);
-            err == vk::Result::eSuccess)
-            _memory = std::move(memory);
-        else
-            DRAKO_LOG_ERROR("[Vulkan] Failed memory allocation");
+        _memory = _device.allocateMemoryUnique(device_alloc_info);
     }
 
     void device_local_allocator::allocate(vk::Buffer buffer)
@@ -188,21 +176,9 @@ namespace drako::gpx::vulkan
         const vk::MemoryAllocateInfo device_alloc_info{
             vk::DeviceSize{ bytes },
         };
-        if (const auto [err, memory] = _device.allocateMemory(device_alloc_info);
-            err == vk::Result::eSuccess)
-        {
-            _device_memory = memory;
-        }
-        else
-            DRAKO_LOG_ERROR("[Vulkan] Failed memory allocation");
+        _device_memory = _device.allocateMemory(device_alloc_info);
 
-        if (const auto [err, ptr] = _device.mapMemory(
-                _device_memory, vk::DeviceSize{ 0 }, vk::DeviceSize{ VK_WHOLE_SIZE }, {});
-            err == vk::Result::eSuccess)
-        {
-        }
-        else
-            DRAKO_LOG_ERROR("[Vulkan] Failed memory mapping");
+        const auto ptr = _device.mapMemory(_device_memory, vk::DeviceSize{ 0 }, vk::DeviceSize{ VK_WHOLE_SIZE }, {});
     }
 
     host_mapped_allocator::~host_mapped_allocator()
@@ -244,17 +220,8 @@ namespace drako::gpx::vulkan
                 static_cast<uint32_t>(std::size(queues)),
                 queues.data()
             };
-            if (auto [err, buffer] = _device.createBufferUnique(buffer_create_info);
-                err == vk::Result::eSuccess)
-            {
-                _buffer = std::move(buffer);
-            }
-            else
-            {
-                DRAKO_LOG_ERROR("[Vulkan] Failed buffer creation");
-            }
+            _buffer = _device.createBufferUnique(buffer_create_info);
             _memory = _alloc.allocate(_buffer.get());
-
             _device.bindBufferMemory(_buffer.get(), )
         }
 

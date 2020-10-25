@@ -4,15 +4,16 @@
 
 #include "drako/core/preprocessor/platform_macros.hpp"
 #include "drako/graphics/vulkan_queue.hpp"
-#include "drako/system/native_window.hpp"
+#include "drako/system/desktop_window.hpp"
 
-#include <iostream>
-#include <vector>
 #include <vulkan/vulkan.hpp>
 
 #if defined(DRAKO_PLT_WIN32)
 #include <vulkan/vulkan_win32.h> // enables VK_KHR_win32_surface extension
 #endif
+
+#include <iostream>
+#include <vector>
 
 namespace drako::gpx::vulkan
 {
@@ -90,14 +91,13 @@ namespace drako::gpx::vulkan
     }
 
 
-    [[nodiscard]] vk::UniqueSurfaceKHR
-    make_surface(vk::Instance instance, const sys::native_window& w) noexcept
+    [[nodiscard]] vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w) noexcept
     {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
         const vk::Win32SurfaceCreateInfoKHR surface_create_info{
             vk::Win32SurfaceCreateFlagsKHR{},
-            w.instance_handle_win32(),
-            w.window_handle_win32()
+            w.instance_win32(),
+            w.handle_win32()
         };
         return instance.createWin32SurfaceKHRUnique(surface_create_info);
 
@@ -194,9 +194,10 @@ namespace drako::gpx::vulkan
     }
 
 
+    /// @brief Context of a Vulkan application.
     struct context
     {
-        explicit context(const sys::native_window& w) noexcept;
+        explicit context(const sys::desktop_window& w) noexcept;
 
         context(const context&) = delete;
         context& operator=(const context&) = delete;
@@ -212,7 +213,7 @@ namespace drako::gpx::vulkan
         vk::UniqueDebugUtilsMessengerEXT debug;
     };
 
-    context::context(const sys::native_window& w) noexcept
+    context::context(const sys::desktop_window& w) noexcept
         : instance(make_instance())
     {
         physical_device = make_physical_device(instance.get());
@@ -234,6 +235,22 @@ namespace drako::gpx::vulkan
             nullptr
         };
         debug = instance.get().createDebugUtilsMessengerEXTUnique(debug_messenger_info);
+    }
+
+    void debug_print_all_queue_families(const context& ctx)
+    {
+        const auto properties = ctx.physical_device.getQueueFamilyProperties();
+        std::cout << "[Vulkan] Available queue families:\n";
+        for (const auto& family : properties)
+        {
+            std::cout << "\tQueue family:\n"
+                      << "\tcount: " << family.queueCount << '\n'
+                      << "\tflags: " << to_string(family.queueFlags) << '\n'
+                      << "\tmin transfer granularity:\n"
+                      << "\t\t- width:  " << family.minImageTransferGranularity.width << '\n'
+                      << "\t\t- height: " << family.minImageTransferGranularity.height << '\n'
+                      << "\t\t- depth:  " << family.minImageTransferGranularity.depth << '\n';
+        }
     }
 
 } // namespace drako::gpx::vulkan

@@ -14,15 +14,15 @@ namespace fs = std::filesystem; // convenient alias
 
 namespace drako
 {
-    // Computes cyclic redundancy check (version C32) of given byte sequence.
+    /// @brief Cyclic redundancy check (version C32) of given byte sequence.
     [[nodiscard]] std::uint32_t crc32c(const std::byte* data, size_t size) noexcept;
 
 
-    // Computes cyclic redundancy check (version C32) of given byte sequence.
+    /// @brief Cyclic redundancy check (version C32) of given byte sequence.
     [[nodiscard]] std::uint32_t crc32c(const std::uint32_t* data, size_t size) noexcept;
 
 
-    // Computes cyclic redundancy check (version C32) of given byte sequence.
+    /// @brief Cyclic redundancy check (version C32) of given byte sequence.
     [[nodiscard]] std::uint32_t crc32c(const std::uint64_t* data, size_t size) noexcept;
 
 
@@ -34,8 +34,8 @@ namespace drako
     build_packages_for_devel(const fs::path& folder, const std::vector<std::string>& names, const std::vector<asset_type>& types);
 
 
-    [[nodiscard]] std::variant<asset_manifest, build_error>
-    build_asset_manifest(const fs::path& build_folder);
+    //[[nodiscard]] std::variant<asset_manifest, build_error>
+    //build_asset_manifest(const fs::path& build_folder);
 
 } // namespace drako
 

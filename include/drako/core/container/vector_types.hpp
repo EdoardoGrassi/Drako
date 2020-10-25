@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_VECTOR_TYPES_HPP_
-#define DRAKO_VECTOR_TYPES_HPP_
+#ifndef DRAKO_VECTOR_TYPES_HPP
+#define DRAKO_VECTOR_TYPES_HPP
 
 #include "drako/devel/assertion.hpp"
 
@@ -282,4 +282,4 @@ namespace drako
     }
 } // namespace drako
 
-#endif // !DRAKO_VECTOR_TYPES_HPP_
+#endif // !DRAKO_VECTOR_TYPES_HPP

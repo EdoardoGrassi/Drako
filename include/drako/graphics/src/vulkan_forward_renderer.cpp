@@ -224,18 +224,10 @@ namespace drako::gpx::vulkan
 
 
     void forward_renderer::draw(
-        const vulkan_material_pipeline&      pipeline,
-        const std::vector<mat4x4>&           mvp,
-        const std::vector<vulkan_mesh_view>& mesh) noexcept
-    {
-    }
-
-
-    void forward_renderer::draw(
-        const vulkan_material_pipeline&              pipeline,
+        const material_pipeline&              pipeline,
         const std::vector<mat4x4>&                   mvps,
-        const std::vector<vulkan_mesh_view>&         meshes,
-        const std::vector<vulkan_material_instance>& materials) noexcept
+        const std::vector<mesh_view>&         meshes,
+        const std::vector<material_instance>& materials) noexcept
     {
         DRAKO_ASSERT(std::size(mvps) == std::size(meshes));
         DRAKO_ASSERT(std::size(mvps) == std::size(materials));

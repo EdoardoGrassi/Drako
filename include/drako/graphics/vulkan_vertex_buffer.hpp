@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
     // Uniform buffer on gpu side specialized for vertex attributes.
     class vk_vertex_buffer
@@ -16,7 +16,7 @@ namespace drako::gpx
             vk::Queue                              transfert_queue,
             vk::DeviceSize                         size,
             const void*                            data,
-            vk::CommandBuffer                      transfert_cmdbuffer) noexcept
+            vk::CommandBuffer                      transfert_cmdbuffer)
             : _ldevice(ldevice)
             , _size(size)
         {
@@ -27,13 +27,7 @@ namespace drako::gpx
                 vk::SharingMode::eExclusive,
                 0, nullptr /* Not needed for exclusive ownership */
             };
-
-            auto [staging_buffer_result, staging_buffer] = _ldevice.createBuffer(staging_buffer_info);
-            if (staging_buffer_result != vk::Result::eSuccess)
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] Failed to create staging buffer - " + to_string(staging_buffer_result));
-                std::exit(EXIT_FAILURE);
-            }
+            auto staging_buffer = _ldevice.createBuffer(staging_buffer_info);
 
             const vk::BufferCreateInfo vertex_buffer_info{
                 vk::BufferCreateFlagBits::eSparseBinding,
@@ -43,32 +37,19 @@ namespace drako::gpx
                 0, nullptr /* Not needed for exclusive ownership */
             };
 
-            auto [vertex_buffer_result, vertex_buffer] = _ldevice.createBuffer(vertex_buffer_info);
-            if (vertex_buffer_result != vk::Result::eSuccess)
-            {
-                DRAKO_LOG_FAILURE("[Vulkan] Failed to create vertex buffer - " + to_string(vertex_buffer_result));
-                std::exit(EXIT_FAILURE);
-            }
+            auto vertex_buffer = _ldevice.createBuffer(vertex_buffer_info);
 
             const vk::MemoryAllocateInfo allocation{
                 size,
                 0
             };
-            const auto [allocate_result, staging_memory] = _ldevice.allocateMemory(allocation);
-            if (allocate_result != vk::Result::eSuccess)
-            {
-                std::exit(EXIT_FAILURE);
-            }
+            const auto staging_memory = _ldevice.allocateMemory(allocation);
 
-            const auto [mapping_result, memory_ptr] = _ldevice.mapMemory(
+            const auto memory_ptr = _ldevice.mapMemory(
                 staging_memory,
                 0,
                 size,
                 vk::MemoryMapFlags{});
-            if (mapping_result != vk::Result::eSuccess)
-            {
-                std::exit(EXIT_FAILURE);
-            }
 
             std::memcpy(memory_ptr, data, size);
             _ldevice.unmapMemory(staging_memory);
@@ -111,12 +92,12 @@ namespace drako::gpx
 
 
     template <typename VulkanAllocator>
-    class vulkan_vertex_buffer
+    class vertex_buffer
     {
     public:
         using VkAl = VulkanAllocator;
 
-        explicit vulkan_vertex_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept;
+        explicit vertex_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc);
 
         [[nodiscard]] constexpr vk::Buffer
         buffer() const noexcept { return _buffer.get(); }
@@ -132,7 +113,7 @@ namespace drako::gpx
     };
 
     template <typename VkAl>
-    vulkan_vertex_buffer<VkAl>::vulkan_vertex_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept
+    vertex_buffer<VkAl>::vertex_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc)
         : _device(device)
         , _size(size)
     {
@@ -186,7 +167,7 @@ namespace drako::gpx
             vk::Queue                             transfert_queue_,
             vk::DeviceSize                        buffer_size_,
             const void*                           data_,
-            vk::CommandBuffer                     transfert_cmdbuffer_) noexcept
+            vk::CommandBuffer                     transfert_cmdbuffer_)
             : _ldevice(ldevice_)
             , _size(buffer_size_)
         {
@@ -197,11 +178,7 @@ namespace drako::gpx
                 vk::SharingMode::eExclusive,
                 0, nullptr);
 
-            auto [staging_buffer_create_result, staging_buffer] = _ldevice.createBuffer(staging_buffer_info);
-            if (staging_buffer_create_result != vk::Result::eSuccess)
-            {
-                std::exit(EXIT_FAILURE);
-            }
+            auto staging_buffer = _ldevice.createBuffer(staging_buffer_info);
 
             const vk::BufferCreateInfo vertex_buffer_info(
                 vk::BufferCreateFlagBits::eSparseBinding,
@@ -210,14 +187,10 @@ namespace drako::gpx
                 vk::SharingMode::eExclusive,
                 0, nullptr);
 
-            auto [vertex_buffer_create_result, vertex_buffer] = _ldevice.createBuffer(vertex_buffer_info);
-            if (vertex_buffer_create_result != vk::Result::eSuccess)
-            {
-                std::exit(EXIT_FAILURE);
-            }
+            auto vertex_buffer = _ldevice.createBuffer(vertex_buffer_info);
 
             vk::DeviceMemory staging_memory;
-            const auto [map_result, ptr] = _ldevice.mapMemory(
+            const auto ptr = _ldevice.mapMemory(
                 staging_memory,
                 0,
                 buffer_size_,
@@ -269,12 +242,12 @@ namespace drako::gpx
 
 
     template <typename VulkanAllocator>
-    class vulkan_index_buffer
+    class index_buffer
     {
     public:
         using VkAl = VulkanAllocator;
 
-        explicit vulkan_index_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept;
+        explicit index_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc);
 
         [[nodiscard]] constexpr vk::Buffer
         buffer() const noexcept { return _buffer.get(); }
@@ -290,7 +263,7 @@ namespace drako::gpx
     };
 
     template <typename VkAl>
-    vulkan_index_buffer<VkAl>::vulkan_index_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc) noexcept
+    index_buffer<VkAl>::index_buffer(vk::Device device, size_t size, const void* data, VkAl& alloc)
         : _device(device)
         , _size(size)
     {

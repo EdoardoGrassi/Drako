@@ -2,20 +2,17 @@
 #ifndef DRAKO_VULKAN_TEXTURE_TYPES_HPP
 #define DRAKO_VULKAN_TEXTURE_TYPES_HPP
 
-#include <vulkan/vulkan.hpp>
-
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
-#include "drako/devel/logging.hpp"
 #include "drako/graphics/texture_types.hpp"
 
-namespace drako::gpx
+#include <vulkan/vulkan.hpp>
+
+namespace drako::gpx::vulkan
 {
     // Texture resource hosted on GPU memory that can be accessed by shaders.
-    class vulkan_gpu_tex2d
+    class gpu_tex2d
     {
     public:
-        explicit vulkan_gpu_tex2d(vk::Device device, const texture_2d_view& tex) noexcept;
+        explicit gpu_tex2d(vk::Device device, const texture_2d_view& tex) noexcept;
 
     private:
         const vk::Device    _device;
@@ -25,14 +22,19 @@ namespace drako::gpx
 
 
     template <typename VulkanAllocator>
-    class vulkan_texture
+    class texture
     {
     };
 
-    class vulkan_texture_view
+    /// @brief Non-owning view of a texture resource.
+    class texture_view
     {
+    public:
+    private:
+        vk::UniqueImage     _image;
+        vk::UniqueImageView _view;
     };
 
-} // namespace drako::gpx
+} // namespace drako::gpx::vulkan
 
 #endif // !DRAKO_VULKAN_TEXTURE_TYPES_HPP

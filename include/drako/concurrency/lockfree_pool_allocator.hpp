@@ -214,6 +214,7 @@ namespace drako
 
 } // namespace drako
 
+/*
 template <size_t Size, size_t Align>
 struct std::allocator_traits<drako::lockfree_pool_allocator<Size, Align>>
 {
@@ -221,5 +222,6 @@ struct std::allocator_traits<drako::lockfree_pool_allocator<Size, Align>>
 
     static pointer allocate();
 };
+*/
 
 #endif // !DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP

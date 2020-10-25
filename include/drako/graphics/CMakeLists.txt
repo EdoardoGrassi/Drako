@@ -35,8 +35,11 @@ if(NOT Vulkan_FOUND)
 	endif()
 endif()
 
+if(WIN32)
+	add_compile_definitions("VK_USE_PLATFORM_WIN32_KHR")
+endif()
 
-add_library(vulkan-forward-renderer STATIC "./src/vulkan_forward_renderer.cpp")
+add_library(vulkan-forward-renderer STATIC "src/vulkan_forward_renderer.cpp")
 add_library(drako::vulkan-forward-renderer ALIAS vulkan-forward-renderer)
 
 # set_property(TARGET vulkan_forward_renderer PROPERTY CXX_STANDARD 17)
@@ -45,12 +48,9 @@ target_link_libraries(vulkan-forward-renderer PUBLIC ${Vulkan_LIBRARIES})
 
 # Disable exceptions in Vulkan headers.
 # target_compile_definitions(vulkan-forward-renderer PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
-if(WIN32)
-	target_compile_definitions(vulkan-forward-renderer PRIVATE "VK_USE_PLATFORM_WIN32_KHR")
-endif()
 
 
-add_library(vulkan-gui-renderer STATIC "./src/vk_gui_renderer.cpp")
+add_library(vulkan-gui-renderer STATIC "src/vulkan_gui_renderer.cpp")
 add_library(drako::vulkan-gui-renderer ALIAS vulkan-gui-renderer)
 
 # set_property(TARGET vulkan_gui_renderer PROPERTY CXX_STANDARD 17)
@@ -61,7 +61,7 @@ target_link_libraries(vulkan-gui-renderer PUBLIC ${Vulkan_LIBRARIES})
 # target_compile_definitions(vulkan-gui-renderer PRIVATE VULKAN_HPP_NO_EXCEPTIONS)
 
 
-add_library(render-system STATIC "./src/render_system.cpp")
+add_library(render-system STATIC "src/render_system.cpp")
 add_library(drako::render-system ALIAS render-system)
 
 target_link_libraries(render-system PRIVATE drako::vulkan-forward-renderer)

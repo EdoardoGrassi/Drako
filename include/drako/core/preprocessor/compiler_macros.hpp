@@ -13,18 +13,28 @@
 #ifdef _MSC_VER
 // Defined for Microsoft MSVC compiler.
 #define DRAKO_CC_MSVC
+#define _drako_compiler_msvc
 #endif
 
 
 #ifdef __GNUC__
 // Defined for GNU Gcc compiler.
 #define DRAKO_CC_GCC
+#define _drako_compiler_gcc
 #endif
 
 
 #ifdef __clang__
 // Defined for CLang compiler.
 #define DRAKO_CC_CLANG
+#define _drako_compiler_clang
+#endif
+
+
+#if defined(_drako_compiler_msvc)
+#define _drako_flexible_array_member // MSVC extension uses syntax 'int array[]' 
+#else
+#error Compiler extension 'flexible array member' is not available.
 #endif
 
 

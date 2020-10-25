@@ -13,7 +13,6 @@
 #include <thread>
 #include <tuple>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/concurrency/lockfree_pool_allocator.hpp"
 #include "drako/devel/assertion.hpp"
 
@@ -27,7 +26,6 @@ namespace drako
     public:
     };
 
-    /*
 
     /// @brief Thread-safe linearizable container with FIFO policy and bounded capacity.
     ///
@@ -41,7 +39,7 @@ namespace drako
 
         static constexpr const auto node_id_mask = (std::numeric_limits<node_id>::max() >> 1);
 
-        static_assert(std::atomic<T*>::is_always_lock_free);
+        static_assert(std::atomic<T*>::is_always_lock_free, "Can't guarantee atomicity");
 
     public:
 
@@ -63,7 +61,7 @@ namespace drako
 
         /// @brief   Number of objects that the queue can hold.
         ///
-        DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr size_t capacity() const noexcept
+        [[nodiscard]] constexpr size_t capacity() const noexcept
         {
             return _allocator.capacity();
         }
@@ -72,13 +70,13 @@ namespace drako
         /// @param[in] value     Object to enqueue.
         /// @return              Returns true if the operation succeeded, false otherwise.
         ///
-        DRAKO_NODISCARD bool enque(const T& value) noexcept;
+        [[nodiscard]] bool enque(const T& value) noexcept;
 
         /// @brief               Removes an object from the head of the queue.
         /// @param[out] result   Dequeued object.
         /// @return              Returns true if the operation succeeded, false otherwise.
         ///
-        DRAKO_NODISCARD auto deque() noexcept;
+        [[nodiscard]] auto deque() noexcept;
         // DRAKO_NODISCARD auto deque(T& result) noexcept;
 
     private:
@@ -144,8 +142,6 @@ namespace drako
             }
         }
     }
-
-    */
 
 } // namespace drako
 

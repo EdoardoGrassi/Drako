@@ -6,8 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(drako_input STATIC "./src/input_system.cpp")
 if(WIN32)
-    find_library(XINPUT_FOUND "xinput1_4"
-        DOC "XInput library")
+    find_library(XINPUT_FOUND "xinput" DOC "XInput library")
     if(XINPUT_FOUND)
         message(STATUS "XInput found at ${XINPUT_FOUND}")
         target_compile_definitions(drako_input PRIVATE "WIN32_LEAN_AND_MEAN" "NOMINMAX")

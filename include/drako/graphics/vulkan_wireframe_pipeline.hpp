@@ -14,7 +14,7 @@ namespace drako::gpx::vulkan
     struct graphics_pipeline
     {
         vk::UniquePipeline       pipeline;
-        vk::UniquePipelineLayout pipeline_layout;
+        vk::UniquePipelineLayout layout;
     };
 
 
@@ -29,13 +29,13 @@ namespace drako::gpx::vulkan
         return validation;
     }
 
-    graphics_pipeline make_vulkan_wireframe_pipeline(
-        const vk::Device&        device,
-        const vulkan_gpu_shader& vert,
-        const vk::RenderPass&    renderpass) noexcept
+    [[nodiscard]] graphics_pipeline make_vulkan_wireframe_pipeline(
+        const vk::Device& device, const gpu_shader& vert, const vk::RenderPass& renderpass)
     {
         /*vvv create pipeline layout vvv*/
-        const vk::DescriptorSetLayout descriptor_set_layouts[] = {};
+        const vk::DescriptorSetLayout descriptor_set_layouts[] = {
+            {}
+        };
 
         const vk::PushConstantRange push_constants[] = {
             // model-view-proj matrix
@@ -52,7 +52,7 @@ namespace drako::gpx::vulkan
             static_cast<uint32_t>(std::size(push_constants)), push_constants
         };
 
-        const auto layout = device.createPipelineLayoutUnique(pipeline_layout_info);
+        auto layout = device.createPipelineLayoutUnique(pipeline_layout_info);
 
         /*vvv create pipeline vvv*/
 
@@ -61,7 +61,7 @@ namespace drako::gpx::vulkan
                 vk::PipelineShaderStageCreateFlags{},
                 vk::ShaderStageFlagBits::eVertex,
                 vert.shader_module(),
-                vert.vk_vertex_function_name(),
+                vert.vertex_function_name(),
                 static_cast<vk::SpecializationInfo*>(nullptr) }
         };
 
@@ -192,14 +192,14 @@ namespace drako::gpx::vulkan
             &depth_stencil_state,
             &color_blend_state,
             &dynamic_state,
-            pipeline_layout.get(),
+            layout.get(),
             renderpass,
             0,                       // subpass
             vk::Pipeline{ nullptr }, // base pipeline
             0                        // base pipeline index
         };
-
-        return device.createGraphicsPipelineUnique(vk::PipelineCache{ nullptr }, pipeline_info);
+        auto pipeline = device.createGraphicsPipelineUnique(vk::PipelineCache{ nullptr }, pipeline_info);
+        return { .pipeline = std::move(pipeline), .layout = std::move(layout) };
     }
 
 } // namespace drako::gpx::vulkan

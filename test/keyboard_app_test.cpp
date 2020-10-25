@@ -1,13 +1,16 @@
-#include "drako/system/native_keyboard_device.hpp"
+#include "drako/system/desktop_window.hpp"
+#include "drako/system/keyboard_device.hpp"
 
 #include <chrono>
 #include <ostream>
+#include <string>
 #include <thread>
 
 int main()
 {
-    const std::chrono::milliseconds    timeout{ 100 };
-    drako::sys::native_keyboard_device keyboard;
+    drako::sys::desktop_window      main(L"Keyboard Test App");
+    const std::chrono::milliseconds timeout{ 100 };
+    drako::sys::keyboard_device     keyboard{ main };
 
     while (true)
     {
@@ -16,7 +19,10 @@ int main()
         const auto events = keyboard.poll_events();
         for (auto& e : events)
         {
-            std::cout << e;
+            std::cout << "action:\t" << to_string(e.action) << '\n'
+                      << "timestamp:\t" << std::to_string(e.timestamp.count()) << '\n'
+                      << "scan code:\t" << to_string(e.scan_code) << '\n'
+                      << "virtual code:\t" << to_string(e.virt_code) << '\n';
         }
         std::cout.flush();
     }

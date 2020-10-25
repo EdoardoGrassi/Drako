@@ -2,9 +2,11 @@
 #ifndef DRAKO_FIBER_HPP
 #define DRAKO_FIBER_HPP
 
-#include <cstdlib>
-
 #include "drako/core/preprocessor/platform_macros.hpp"
+
+#if defined(DRAKO_PLT_WIN32)
+#include <Windows.h>
+#endif
 
 namespace drako
 {

@@ -1,8 +1,10 @@
 #pragma once
 #include "drako/devel/mesh_importers.hpp"
 
+#include "drako/file_formats/drakoson.hpp" // NOTE: for the time being we use Drakoson format
+
 #include <filesystem>
-#include <iostream>
+#include <fstream>
 
 namespace drako::editor
 {
@@ -49,7 +51,7 @@ namespace drako::editor
                     vertex_attribute::index,
                     1
                 };
-                const auto mesh = from_obj_source(verts_layout, index_layout, object, al);
+                const auto mesh = from_obj_source(verts_layout, index_layout, object);
                 ofs << mesh;
             }
         }

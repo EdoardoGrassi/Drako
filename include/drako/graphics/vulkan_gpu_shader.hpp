@@ -9,19 +9,19 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::gpx::vulkan
 {
-    // A vulkan shader object.
-    class vulkan_gpu_shader
+    /// @brief A vulkan shader object.
+    class gpu_shader
     {
     public:
-        explicit vulkan_gpu_shader(vk::Device device, const shader_source& source) noexcept;
+        explicit gpu_shader(vk::Device device, const shader_source& source);
 
-        vulkan_gpu_shader(const vulkan_gpu_shader&) = delete;
-        vulkan_gpu_shader& operator=(const vulkan_gpu_shader&) = delete;
+        gpu_shader(const gpu_shader&) = delete;
+        gpu_shader& operator=(const gpu_shader&) = delete;
 
-        vulkan_gpu_shader(vulkan_gpu_shader&&) = delete;
-        vulkan_gpu_shader& operator=(vulkan_gpu_shader&&) = delete;
+        gpu_shader(gpu_shader&&) = delete;
+        gpu_shader& operator=(gpu_shader&&) = delete;
 
         [[nodiscard]] const vk::ShaderModule& shader_module() const noexcept
         {
@@ -29,7 +29,7 @@ namespace drako::gpx
         }
 
         // Returns the identifier of the entry function of vertex stage.
-        [[nodiscard]] static constexpr auto vk_vertex_function_name() noexcept
+        [[nodiscard]] static constexpr auto vertex_function_name() noexcept
         {
             return "main";
         }
@@ -38,7 +38,7 @@ namespace drako::gpx
         vk::UniqueShaderModule _module;
     };
 
-    vulkan_gpu_shader::vulkan_gpu_shader(vk::Device device, const shader_source& source) noexcept
+    gpu_shader::gpu_shader(vk::Device device, const shader_source& source)
     {
         DRAKO_ASSERT(device != vk::Device{ nullptr });
         DRAKO_ASSERT(source.size() > 0);
@@ -50,16 +50,7 @@ namespace drako::gpx
             reinterpret_cast<const uint32_t*>(source.data())
         };
 
-        if (auto [err, module] = device.createShaderModuleUnique(shader_module);
-            err == vk::Result::eSuccess)
-        {
-            _module = std::move(module);
-        }
-        else
-        {
-            DRAKO_LOG_FAILURE("[Vulkan] Shader object creation failed - " + to_string(err));
-            std::exit(EXIT_FAILURE);
-        }
+        _module = device.createShaderModuleUnique(shader_module);
     }
 
 } // namespace drako::gpx

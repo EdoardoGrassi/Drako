@@ -4,7 +4,6 @@
 
 #include "drako/graphics/material_types.hpp"
 #include "drako/graphics/mesh_types.hpp"
-
 #include "drako/graphics/vulkan_forward_renderer.hpp"
 #include "drako/graphics/vulkan_memory_allocator.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
@@ -57,10 +56,10 @@ namespace drako::gpx
     class render_system
     {
         using _vk_pipeline  = vulkan::graphics_pipeline;
-        using _vk_mesh_view = vulkan_mesh_view;
+        using _vk_mesh_view = vulkan::mesh_view;
         using _vk_text_view = vulkan::texture_view;
-        using _vk_mtl_data  = vulkan_material_instance;
-        using _vk_shader    = vulkan_gpu_shader;
+        using _vk_mtl_data  = vulkan::material_instance;
+        using _vk_shader    = vulkan::gpu_shader;
 
     public:
         explicit render_system(const vulkan::context& ctx) noexcept;
@@ -117,12 +116,16 @@ namespace drako::gpx
         std::vector<shader_id>     _destroy_shaders;
         std::vector<renderable_id> _destroy_renderables;
 
-        std::vector<renderable_id> _renderable_ids;
-        std::vector<_vk_mesh_view> _renderable_meshes;
-        std::vector<_vk_mtl_data>  _renderable_materials;
-        std::vector<_vk_pipeline>  _renderable_pipelines;
+        struct _renderable_table
+        {
+            std::vector<renderable_id> ids;
+            std::vector<_vk_mesh_view> meshes;
+            std::vector<_vk_mtl_data>  materials;
+            std::vector<_vk_pipeline>  pipelines;
+        };
+        _renderable_table _renderables;
 
-        vulkan::vulkan_forward_renderer _renderer;
+        vulkan::forward_renderer _renderer;
 
         void _process_pending_meshes() noexcept;
 

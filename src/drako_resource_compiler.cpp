@@ -13,31 +13,6 @@ namespace _fs = std::filesystem;
 
 const std::string PROGRAM_USAGE = "";
 
-namespace drako
-{
-    using _build_asset_path = _fs::path;
-
-    struct project_info
-    {
-        _fs::file_time_type last_project_scan;
-    };
-
-    struct project_build_item
-    {
-        std::uint32_t uuid;
-
-        size_t             inputs_count;
-        _build_asset_path* inputs;
-
-        size_t             outputs_count;
-        _build_asset_path* outputs;
-
-        size_t transforms_count;
-        void*  transforms;
-    };
-
-} // namespace drako
-
 int main(int argc, char* argv[])
 {
     for (auto i = 1; i < argc; ++i)
@@ -51,7 +26,7 @@ int main(int argc, char* argv[])
     //for (const auto& metadata : metadata_files) {}
 
     const std::vector<drako::project_build_item> curr_build_items;
-    std::vector<drako::_build_asset_path> curr_build_inputs;
+    std::vector<_fs::path> curr_build_inputs;
 
     // TODO: load cache
 

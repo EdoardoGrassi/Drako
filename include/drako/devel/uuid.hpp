@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_UUID_HPP_
-#define DRAKO_UUID_HPP_
+#ifndef DRAKO_UUID_HPP
+#define DRAKO_UUID_HPP
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/core/preprocessor/platform_macros.hpp"
@@ -33,6 +33,8 @@ namespace drako
 
         // Constructs an UUID from a byte array.
         explicit constexpr uuid(const std::array<std::byte, 16>&) noexcept;
+
+        explicit uuid(const std::string_view&);
 
         // Constructs an UUID from a character string.
         // constexpr uuid(const char[37]) noexcept;
@@ -141,8 +143,28 @@ namespace drako
         std::memset(this, 0, sizeof(uuid));
     }
 
-    [[nodiscard]] std::variant<uuid, std::error_code> parse(const std::string_view s) noexcept;
+    [[nodiscard]] uuid parse(const std::string_view s);
+
+    [[nodiscard]] std::variant<uuid, std::error_code> try_parse(const std::string_view s) noexcept;
+
+
+
+    // Generator for standard UUID version 1
+    class uuid_v1_engine
+    {
+        // TODO: end impl
+    public:
+        uuid_v1_engine();
+
+        uuid_v1_engine(const uuid_v1_engine&) = delete;
+        uuid_v1_engine& operator=(const uuid_v1_engine&) = delete;
+
+        [[nodiscard]] uuid operator()() noexcept;
+
+    private:
+        std::byte _mac[8];
+    };
 
 } // namespace drako
 
-#endif // !DRAKO_UUID_HPP_
+#endif // !DRAKO_UUID_HPP

@@ -5,13 +5,11 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 if(WIN32)
     add_library(drako-native-sys STATIC
-        "./src/native_io_api_win32.cpp"
-        "./src/native_io_file_win32.cpp"
-        "./src/native_window_win32.cpp"
-        "./src/native_keyboard_device_win32.cpp"
-        "./src/native_mouse_device_win32.cpp"
-        "./src/hid_api_win32.cpp"
-        "./src/system_info_win32.cpp")
+        "src/desktop_window_win32.cpp"
+        "src/keyboard_device_win32.cpp"
+        "src/native_mouse_device_win32.cpp"
+        "src/hid_api_win32.cpp"
+        "src/system_info_win32.cpp")
 
     target_compile_definitions(drako-native-sys PRIVATE
         "UNICODE"

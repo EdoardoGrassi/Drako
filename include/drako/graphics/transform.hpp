@@ -123,7 +123,7 @@ namespace drako
         const float syy = 2.f / (y_max - y_min); // normalize y in range [-1, 1]
         const float szz = 1.f / (z_max - z_min); // normalize z in range [0, 1]
 
-        auto S = mat4x4({ sxx, 0.f, 0.f, 0.f,
+        mat4x4 scale({ sxx, 0.f, 0.f, 0.f,
             0.f, syy, 0.f, 0.f,
             0.f, 0.f, szz, 0.f,
             0.f, 0.f, 0.f, 1.f });
@@ -133,12 +133,12 @@ namespace drako
         const float tyy = -(y_max + y_min) / 2.f;
         const float tzz = -(z_max + z_min) / 2.f;
 
-        auto T = mat4x4({ 1.f, 0.f, 0.f, txx,
+        mat4x4 translate({ 1.f, 0.f, 0.f, txx,
             0.f, 1.f, 0.f, tyy,
             0.f, 0.f, 1.f, tzz,
             0.f, 0.f, 0.f, 1.f });
 
-        return S * T;
+        return scale * translate;
         /*
         return mat4x4({ 1.f, 0.f, 0.f, 0.f,
                         0.f, 1.f, 0.f, 0.f,
@@ -158,24 +158,6 @@ namespace drako
 
         const float txx = -(r + l) / (r - l);
         const float tyy = -(t + b) / (t - b);
-
-        return mat4x4({ sxx, 0.f, txx, 0.f,
-            0.f, syy, tyy, 0.f,
-            0.f, 0.f, szz, sww,
-            0.f, 0.f, 1.f, 1.f });
-    }
-
-    // Creates a perspective projection matrix.
-    [[nodiscard]] inline constexpr mat4x4
-    perspective(const gpx::camera_frustum& f) noexcept
-    {
-        const float sxx = 2 * f.zmin / (f.xmax - f.xmin);
-        const float syy = 2 * f.zmin / (f.ymax - f.ymin);
-        const float szz = f.zmax / (f.zmax - f.zmin);
-        const float sww = -f.zmax * f.zmin / (f.zmax - f.zmin);
-
-        const float txx = -(f.xmax + f.xmin) / (f.xmax - f.xmin);
-        const float tyy = -(f.ymax + f.ymin) / (f.ymax - f.ymin);
 
         return mat4x4({ sxx, 0.f, txx, 0.f,
             0.f, syy, tyy, 0.f,

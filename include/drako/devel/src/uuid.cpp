@@ -271,7 +271,7 @@ namespace drako
         return uuid{ bytes };
     }
 
-    std::variant<uuid, std::error_code> parse(const std::string_view s) noexcept
+    std::variant<uuid, std::error_code> try_parse(const std::string_view s) noexcept
     {
         // accepted canonical format:
         //      xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
