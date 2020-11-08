@@ -3,10 +3,12 @@
 #include "drako/devel/assertion.hpp"
 #include "drako/file_formats/wavefront/object.hpp"
 
+#include <algorithm>
+#include <array>
+#include <cassert>
 #include <charconv>
-#include <istream>
-#include <iterator>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -15,403 +17,598 @@
 
 namespace drako::file_formats::obj
 {
-    namespace details
+    using _pec = parser_error_code;
+
+    // TODO: substitute constexpr with constinit when is available.
+
+    constexpr const value default_vertex_weight  = 1.f; // default value for vertex weight (from obj specs)
+    constexpr const value default_texcoord_value = 0.f; // default value for texture coordinate (from obj specs)
+    constexpr const char  line_continuation      = '\\';
+    //constexpr const std::string_view OBJ_TAG_COMMENT         = "#";
+    //constexpr const std::string_view OBJ_TAG_POINT           = "v";
+    //constexpr const std::string_view OBJ_TAG_NORMAL          = "vn";
+    //constexpr const std::string_view OBJ_TAG_TEXCOORDS       = "vt"
+
+    constexpr const std::string_view ignored_keywords[] = {
+        "call",   // file import command
+        "csh",    // UNIX shell command
+        "mtllib", // material attribute
+        "s",      // smoothing group statement
+        "usemtl"  // material reference statement
+    };
+
+
+    struct _token // single token info
     {
-        const float            DEFAULT_VERTEX_WEIGHT   = 1.f; // default value for vertex weight (from obj specs)
-        const float            DEFAULT_VERTEX_TEXCOORD = 0.f; // default value for texture coordinate (from obj specs)
-        const std::string_view line_continuation       = "\x5c";
-        //const std::string_view OBJ_TAG_COMMENT         = "#";
-        //const std::string_view OBJ_TAG_POINT           = "v";
-        //const std::string_view OBJ_TAG_NORMAL          = "vn";
-        //const std::string_view OBJ_TAG_TEXCOORDS       = "vt"
+        const char* _first;
+        const char* _last;
+        //size_t           row;
+        //size_t           col;
 
-        constexpr const std::string_view ignored_keywords[] = {
-            "call",   // file import command
-            "csh",    // UNIX shell command
-            "g",      // grouping statement
-            "mtllib", // material attribute
-            "s",      // smoothing group statement
-            "usemtl"  // material reference statement
-        };
-
-        enum class _tag_f_format // triplets of indexes v/[vt]/[vn]
-        {
-            unknown,       // current format is still unspecified
-            format_v,      // current format is v//
-            format_v_vt,   // current format is v/vt/
-            format_v_vn,   // current format is v//vn
-            format_v_vt_vn // current format is v/vt/vn
-        };
-
-        struct _parser_token
-        {
-            const char* begin;
-            const char* end;
-            size_t      row;
-            size_t      col;
-            size_t      offset;
-
-            // explicit _parser_token() noexcept = default;
-
-            explicit constexpr _parser_token(const char* begin, const char* end,
-                size_t file_row_number, size_t file_col_number, size_t file_char_offset) noexcept
-                : begin{ begin }
-                , end{ end }
-                , row{ file_row_number }
-                , col{ file_col_number }
-                , offset{ file_char_offset }
-            {
-            }
-
-            explicit operator std::string_view() const noexcept
-            {
-                return std::string_view(begin, std::distance(begin, end));
-            }
-        };
-        using _pt = _parser_token;
-
-        struct _parser_line
-        {
-            const char* begin;
-            size_t      row;
-        };
-        using _pl = _parser_line;
+        explicit constexpr _token(const char* first, const char* last) noexcept
+            : _first{ first }, _last{ last } {}
 
         /*
-        struct _parser_local_state
+        explicit constexpr _token(std::string_view token,
+            size_t row, size_t column, size_t file_char_index) noexcept
+            : _string{ token }, row{ row }, col{ column }, offset{ file_char_index }
         {
-            std::vector<float> points;
-            std::vector<float> normals;
-            std::vector<float> texcoords;
+        }*/
+
+        [[nodiscard]] const char* first() const noexcept { return _first; }
+        [[nodiscard]] const char* last() const noexcept { return _last; }
+
+        [[nodiscard]] std::string_view view() const noexcept
+        {
+            return { _first, static_cast<size_t>(std::distance(_first, _last)) };
+        }
+        //[[nodiscard]] size_t           file_line() const noexcept { return row; }
+        //[[nodiscard]] size_t           file_column() const noexcept { return col; }
+    };
+
+    struct _line // single file line info
+    {
+        const char* begin;
+        size_t      row;
+    };
+
+
+    struct _context // parser state
+    {
+        struct _group_soa
+        {
+            struct _group_data
+            {
+                std::vector<index> faces;
+            };
+
+            std::vector<std::string> names = { "default" };
+            std::vector<_group_data> data  = { {} };
+        } groups;
+
+        struct _object_soa
+        {
+            struct _object_data
+            {
+                std::vector<index> faces;
+            };
+
+            std::vector<std::string>  names;
+            std::vector<_object_data> data;
+        } objects;
+
+        std::vector<vertex>   v;
+        std::vector<normal>   vn;
+        std::vector<texcoord> vt;
+
+        std::vector<face> faces;
+
+        std::vector<std::size_t> active_groups_ids = { 0 }; // 'default' group
+        index                    last_face_index_checkpoint;
+    };
+
+    [[nodiscard]] parser_result _make_result(_context&& c)
+    {
+        assert(std::size(c.objects.names) == std::size(c.objects.data));
+
+        std::vector<object> objects;
+        objects.reserve(std::size(c.objects.names));
+        for (auto i = 0; i < std::size(c.objects.names); ++i)
+            objects.push_back(
+                { .name    = std::move(c.objects.names[i]),
+                    .faces = std::move(c.objects.data[i].faces) });
+
+        assert(std::size(c.groups.names) == std::size(c.groups.data));
+
+        std::vector<group> groups;
+        groups.reserve(std::size(c.groups.names));
+        for (auto i = 0; i < std::size(c.groups.names); ++i)
+            groups.push_back(
+                { .name    = std::move(c.groups.names[i]),
+                    .faces = std::move(c.groups.data[i].faces) });
+
+        return parser_result{
+            .data    = { .v = std::move(c.v), .vn = std::move(c.vn), .vt = std::move(c.vt) },
+            .objects = { std::move(objects) },
+            .groups  = { std::move(groups) }
         };
+    }
 
-        struct _parser_global_state
+    // check if a keyword is ignored by current implementation
+    [[nodiscard]] bool _is_ignored_keyword(const std::string_view keyword) noexcept
+    {
+        return std::find(std::cbegin(ignored_keywords), std::cend(ignored_keywords),
+                   keyword) != std::cend(ignored_keywords);
+    }
+
+
+#if !defined(_drako_disable_exception) /*vvv implementation with exceptions vvv*/
+
+    // parse an index integer according to specs
+    [[nodiscard]] index _parse_index(const char* first, const char* last)
+    {
+        index v;
+        if (const auto r = std::from_chars(first, last, v); r.ec != std::errc{})
+            throw parser_error{ parser_error_code::invalid_arg_format };
+        return v;
+    }
+
+    // parse an index integer according to specs
+    [[nodiscard]] index _parse_index(const _token& t)
+    {
+        return _parse_index(t.first(), t.last());
+    }
+
+    [[nodiscard]] value _parse_value(const char* first, const char* last)
+    {
+        value v;
+        if (const auto r = std::from_chars(first, last, v, std::chars_format::fixed);
+            r.ec != std::errc{})
+            throw parser_error{ parser_error_code::invalid_arg_format };
+        return v;
+    }
+
+    // parse a floating point value according to specs
+    [[nodiscard]] value _parse_value(const _token& t)
+    {
+        return _parse_value(t.first(), t.last());
+    }
+
+    [[nodiscard]] std::string_view _find_next_line(std::string_view data) noexcept
+    {
+        for (auto begin = 0;; ++begin)
         {
-            std::vector<parser_warning_report>& warnings;
-            std::vector<parser_error_report>&   errors;
+            const auto end = data.find_first_of('\n');
+
+            if (data[begin] == '#') // line is a comment
+                continue;
+            if (data[end - 1] == '\\') // line wraps into the next one
+                continue;
+
+            return data.substr(begin, end);
+        }
+    }
+
+    [[nodiscard]] std::vector<_token> _tokenize_line(char* first, char* last)
+    {
+        assert(*last == '\n');
+        *last = ' ';
+
+        std::vector<_token> result{};
+        for (char* ch = first; ch != last;)
+        {
+            while (*ch == ' ')
+                ++ch;
+            const auto first = ch;
+            while (*ch != ' ')
+                ++ch;
+            const auto last = ch;
+            result.emplace_back(first, last);
+        }
+        return result;
+    }
+
+    [[nodiscard]] triplette _parse_triplette(const _token& t)
+    {
+        const auto s = t.view();
+
+        const auto sep_1 = s.find_first_of('/');
+        const auto v     = _parse_index(&s[0], &s[sep_1]);
+
+        const auto sep_2 = s.find_first_of('/', sep_1);
+        const auto vt    = _parse_index(&s[sep_1 + 1], &s[sep_2]);
+
+        const auto vn = _parse_index(&s[sep_2 + 1], &s[s.size()]);
+        return { .v = v, .vt = vt, .vn = vn };
+    }
+
+    void _handle_v_line(std::span<const _token> args, _context& state)
+    {
+        if (const auto s = std::size(args); s != 3 && s != 4)
+            throw parser_error{ _pec::tag_v_invalid_args_count };
+
+        float v[4];
+        v[3] = default_vertex_weight;
+        for (auto i = 0; i < std::size(args); ++i)
+            v[i] = _parse_value(args[i]);
+
+        state.v.emplace_back(v[0], v[1], v[2], v[3]);
+    }
+
+    void _handle_v_line_ext(std::span<const _token> args, _context& state);
+
+    void _handle_vn_line(std::span<const _token> args, _context& state)
+    {
+        if (std::size(args) != 3)
+            throw parser_error{ parser_error_code::tag_vn_invalid_args_count };
+
+        value vn[3];
+        for (auto i = 0; i < 3; ++i)
+            vn[i] = _parse_value(args[i]);
+
+        state.vn.emplace_back(vn[0], vn[1], vn[2]);
+    }
+
+    void _handle_vt_line(std::span<const _token> args, _context& ctx)
+    {
+        if (const auto s = std::size(args); s < 1 || s > 3)
+            throw parser_error{ _pec::tag_vt_invalid_args_count };
+
+        float vt[3] = { default_texcoord_value, default_texcoord_value, default_texcoord_value };
+        for (auto i = 0; i < std::size(args); ++i)
+            vt[i] = _parse_value(args[i]);
+
+        ctx.vt.emplace_back(vt[0], vt[1], vt[2]);
+    }
+
+    void _handle_f_line(std::span<const _token> args, _context& state)
+    {
+        if (std::size(args) != 3) // NOTE: currently we only support triangular faces
+            throw parser_error{ _pec::tag_f_invalid_args_count };
+
+        face f{
+            _parse_triplette(args[0]),
+            _parse_triplette(args[1]),
+            _parse_triplette(args[2])
         };
-        */
+        //const auto v1, vt1, vn1 = _parse_triplette(args[0]);
 
-        // construct report for line wide errors
-        [[nodiscard]] parser_error_report
-        _make_line_error(const _pl& _in_line, parser_error_code _in_ec) noexcept
+        if (std::any_of(f.triplets.cbegin(), f.triplets.cend(),
+                [](auto x) { return x.v == 0; }))
+            throw parser_error{ _pec::tag_f_invalid_args_format };
+
+        /*
+        // check if some triple is missing a vertex
+        if (const auto c = std::count(vt.begin(), vt.end(), 0); c != 0 && c != 3)
+            throw parser_error{ _pec::tag_f_invalid_args_format };
+
+        // check if some triple is missing a vertex
+        if (const auto c = std::count(vn.begin(), vn.end(), 0); c != 0 && c != 3)
+            throw parser_error{ _pec::tag_f_invalid_args_format };
+            */
+
+        state.faces.emplace_back(f);
+    }
+
+    void _handle_o_line(std::span<const _token> args, _context& state)
+    {
+        if (std::size(args) != 1)
+            throw parser_error{ _pec::tag_o_invalid_args_count };
+
+        state.objects.data.emplace_back();
+        state.objects.names.emplace_back(args[0].view());
+    }
+
+    void _handle_g_line(std::span<const _token> args, _context& state)
+    {
+        if (std::size(args) == 0)
+            throw parser_error{ _pec::invalid_arg_count };
+
+        assert(state.last_face_index_checkpoint <= std::size(state.faces));
+
+        auto& data = state.groups.data;
+        for (auto g = 0; g < std::size(state.active_groups_ids); ++g)
+            for (auto i = state.last_face_index_checkpoint; i < std::size(state.faces); ++i)
+                data[g].faces.emplace_back(i);
+
+
+        state.active_groups_ids.clear();
+        state.last_face_index_checkpoint = std::size(state.faces);
+
+        auto& names = state.groups.names;
+        for (const auto& name : args)
         {
-            return parser_error_report{ _in_line.row, 0, 0, _in_ec };
-        }
-
-        // construct report for token related errors
-        [[nodiscard]] parser_error_report
-        _make_token_error(const _pt& _in_token, parser_error_code _in_ec) noexcept
-        {
-            const auto row = _in_token.row;
-            const auto col = _in_token.col;
-            return parser_error_report{ row, col, , _in_ec };
-        }
-
-        // construct report for token related errors
-        [[nodiscard]] parser_error_report
-        _make_token_error(const _pl& _in_line, const _pt& _in_token, parser_error_code _in_ec) noexcept
-        {
-            const auto row = _in_line.row;
-            const auto col = static_cast<size_t>(std::distance(_in_line.begin, _in_token.begin));
-            return parser_error_report{ row, col, 0, _in_ec };
-        }
-
-        // check if a keyword is ignored by current implementation
-        [[nodiscard]] bool
-        _is_ignored_keyword(const std::string_view keyword) noexcept
-        {
-            return std::find(std::cbegin(ignored_keywords), std::cend(ignored_keywords),
-                       keyword) != std::cend(ignored_keywords);
-        }
-
-        [[nodiscard]] std::string_view _find_virtual_line();
-
-        [[nodiscard]] const char*
-        _tokenize_line(const char* _in_begin, const char* _in_end, std::vector<_pt>& _out_tokens)
-        {
-            auto line_begin = _in_begin;
-            auto line_end   = _in_begin;
-            for (auto curr_line_index = 0; line_end != _in_end; ++curr_line_index)
-            {
-                line_end = std::find(line_begin, _in_end, '\n');
-                if (line_begin == line_end) // skip empty line
-                    continue;
-
-                if (*line_begin == '#') // skip comment line
-                    continue;
-
-                for (auto ch = _in_begin; ch != line_end;)
-                {
-                    while (*ch == ' ') // skip leading whitespace
-                        ++ch;
-                    const auto token_begin = ch;
-
-                    while (*ch != ' ' && *ch != '\n') // reach trailing whitespace or line termination
-                        ++ch;
-                    const auto token_end = ch;
-
-                    // const auto col = static_cast<size_t>(std::distance(token_begin, token_end));
-                    if (token_begin != token_end)
-                        _out_tokens.emplace_back(_pt{ token_begin, token_end }); //, curr_line_index, col });
-                }
-
-                if (std::string_view{ _out_tokens.back() } != line_continuation)
-                    break;
-                // else tokenize next line
-                line_begin = std::next(line_end);
+            const auto it = std::find(names.cbegin(), names.cend(), name.view());
+            if (it == names.cend())
+            { // create a new group with provided name
+                names.emplace_back(name.view());
+                state.groups.data.emplace_back();
             }
-            return line_begin;
+            const auto index = static_cast<std::size_t>(std::distance(names.cbegin(), it));
+            state.active_groups_ids.emplace_back(index);
+        }
+    }
+
+    parser_result parse(const std::string_view source, const parser_config& config)
+    {
+        _context state{};
+
+        for (auto head = 0; head < std::size(source);)
+        {
+            const auto line = _find_next_line(source.substr(head));
+            std::cout << line << '\n';
+            head += std::size(line);
+
+            /*
+            const auto tokens = _tokenize_line(line);
+
+            if (std::empty(tokens))
+                continue;
+
+            const std::string_view        tag{ tokens[0] };
+            const std::span<const _token> args(tokens.data() + 1, tokens.size() - 1);
+
+            if (_is_ignored_keyword(tag))
+                continue;
+            if (tag == "v")
+            {
+                _handle_v_line(args, state);
+                continue;
+            }
+            else if (tag == "vn")
+            {
+                _handle_vn_line(args, state);
+                continue;
+            }
+            else if (tag == "vt")
+            {
+                _handle_vt_line(args, state);
+                continue;
+            }
+            else if (tag == "f")
+            {
+                _handle_f_line(args, state);
+                continue;
+            }
+            else if (tag == "g")
+            {
+                _handle_g_line(args, state);
+                continue;
+            }
+            else if (tag == "o")
+            {
+                _handle_o_line(args, state);
+                continue;
+            }
+            else
+                throw parser_error{ parser_error_code::unknown_tag };
+                */
+        }
+        return _make_result(std::move(state));
+    }
+
+
+#else /*^^^ implementation with exceptions ^^^/vvv implementation with error codes vvv*/
+
+    // construct report for line wide errors
+    [[nodiscard]] parser_error_report _make_line_error(const _line& l, _pec ec) noexcept
+    {
+        return { l.row, 0, 0, ec };
+    }
+
+    // construct report for token related errors
+    [[nodiscard]] parser_error_report _make_token_error(const _token& t, _pec ec) noexcept
+    {
+        return { t.row, t.col, 0, ec };
+    }
+
+    // construct report for token related errors
+    [[nodiscard]] parser_error_report
+    _make_token_error(const _line& l, const _token& t, _pec ec) noexcept
+    {
+        const auto col = static_cast<size_t>(std::distance(l.begin, t.begin));
+        return parser_error_report{ l.row, col, 0, ec };
+    }
+
+    // parse line with starting keyword 'v' and [first, last) tokens
+    [[nodiscard]] parser_error_report
+    _handle_v_line(const _line& l, std::span<const _token> args, _context& state) noexcept
+    {
+        const auto V_MIN_ARGC = 3;
+        const auto V_MAX_ARGC = 4;
+
+        if (std::size(args) < V_MIN_ARGC)
+            return _make_token_error(l, args.front(), _pec::tag_v_invalid_args_count);
+        if (std::size(args) > V_MAX_ARGC)
+            return _make_token_error(l, args[V_MAX_ARGC + 1], _pec::tag_v_invalid_args_count);
+
+        std::array<float, 4> v;
+        v[3] = default_vertex_weight;
+        for (auto i = 0; i < std::size(args); ++i)
+        {
+            if (const auto [ptr, errc] = std::from_chars(args[i].first(), args[i].last(), v[i]);
+                errc != std::errc{})
+            {
+                return _make_token_error(l, args[i], _pec::invalid_arg_format);
+            }
+        }
+        state.v.emplace_back(v[0], v[1], v[2], v[3]);
+    }
+
+    // parse line with starting keyword 'vn' and [first, last) tokens
+    [[nodiscard]] parser_error_report
+    _handle_vn_line(const _line& l, std::span<const _token> args, _context& state) noexcept
+    {
+        const auto VN_ARGC = 3;
+        // NOTE: normal vector is not required to be normalized by .OBJ specs
+        if (std::size(tokens) != VN_ARGC)
+        {
+            if (std::size(tokens) > VN_ARGC)
+                return _make_token_error(line, tokens[VN_ARGC], _pec::tag_vn_invalid_args_count);
+            else
+                return _make_token_error(line, tokens.back(), _pec::tag_vn_invalid_args_count);
         }
 
-        // parse line with starting keyword 'v' and [first, last) tokens
-        [[nodiscard]] std::optional<parser_error_report>
-        _try_parse_v_line(const _pl& _in_line, const std::vector<_pt>& _in_tokens, std::vector<float>& _out_v) noexcept
+        float xyz[VN_ARGC];
+        for (auto i = 0; i < VN_ARGC; ++i)
         {
-            using _pec = parser_error_code;
-            // geometric vertex statement
-            // SYNTAX:      v x y z [w]
-            // DEFAULT:     w = 1.0
-
-            DRAKO_ASSERT(!std::empty(_in_tokens));
-            DRAKO_ASSERT(std::string_view{ _in_tokens.front() } == "v");
-
-            const auto V_MIN_ARGC = 3;
-            const auto V_MAX_ARGC = 4;
-
-            if (std::size(_in_tokens) < V_MIN_ARGC)
-                return _make_token_error(_in_line, _in_tokens.front(), _pec::tag_v_invalid_args_count);
-
-            if (std::size(_in_tokens) > V_MAX_ARGC)
-                return _make_token_error(_in_line, _in_tokens[V_MAX_ARGC + 1], _pec::tag_v_invalid_args_count);
-
-            std::array<float, 4> xyzw;
-            std::fill(std::begin(xyzw), std::end(xyzw), DEFAULT_VERTEX_WEIGHT);
-            for (auto i = 0; i < std::size(_in_tokens); ++i)
+            if (const auto [ptr, err] = std::from_chars(tokens[i].begin, tokens[i].end, xyz[i]);
+                err != std::errc{})
             {
-                if (const auto [ptr, errc] = std::from_chars(_in_tokens[i].begin, _in_tokens[i].end, xyzw[i]);
-                    errc != std::errc{})
-                {
-                    return _make_token_error(_in_line, _in_tokens[i], _pec::invalid_arg_format);
-                }
+                return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
             }
-            for (auto coord : xyzw)
-                _out_v.emplace_back(coord);
-
-            return {};
         }
+        for (auto coord : xyz)
+            vn.emplace_back(coord);
 
-        void _parse_v_line(const _pl& line, const std::vector<_pt>& tokens)
+        return {};
+    }
+
+    // parse line with starting keyword 'vt' and [first, last) tokens
+    [[nodiscard]] std::optional<parser_error_report>
+    _handle_vt_line(const _line& l, std::span<const _token> args, _context& state) noexcept
+    {
+        const auto VT_MIN_ARGC = 1;
+        const auto VT_MAX_ARGC = 3;
+
+        if (std::size(tokens) < VT_MIN_ARGC)
+            return _make_token_error(line, tokens.back(), _pec::tag_vt_invalid_args_count);
+
+        if (std::size(tokens) > VT_MAX_ARGC)
+            return _make_token_error(line, tokens[VT_MAX_ARGC + 1], _pec::tag_vt_invalid_args_count);
+
+        float texcoords[VT_MAX_ARGC];
+        std::fill(std::begin(texcoords), std::end(texcoords), DEFAULT_VERTEX_TEXCOORD);
+        for (auto i = 0; i < std::size(tokens); ++i)
         {
-            using _ec = parser_error_code;
-
-            const auto min_argc = 3;
-            const auto max_argc = 4;
-            if (const auto s = std::size(tokens); s < min_argc || s > max_argc)
-                throw parser_error{ _ec::tag_v_invalid_args_count };
-
-            for (auto i = 0; i < std::size(tokens); ++i)
+            if (const auto [ptr, err] = std::from_chars(tokens[i].begin, tokens[i].end, texcoords[i]);
+                err != std::errc{})
             {
+                return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
             }
-            // TODO: end impl
         }
+        for (auto coord : texcoords)
+            vt.emplace_back(coord);
 
-        // parse line with starting keyword 'vn' and [first, last) tokens
-        [[nodiscard]] std::optional<parser_error_report>
-        _try_parse_vn_line(const _pl& line, const std::vector<_pt>& tokens, std::vector<float>& vn) noexcept
+        return {};
+    }
+
+    // parse line with starting keyword 'f' and [first, last) tokens
+    [[nodiscard]] parser_error_report
+    _handle_f_line(const _line& l, std::span<const _token> args, _context& state) noexcept
+    {
+        using _pec = parser_error_code;
+
+        DRAKO_ASSERT(!std::empty(tokens));
+        DRAKO_ASSERT(tokens.front().view() == "f");
+
+        const auto F_MIN_ARGC = 4;
+
+        if (std::size(tokens) < F_MIN_ARGC)
+            return _make_token_error(line, tokens.back(), _pec::tag_f_invalid_args_count);
+
+        std::vector<int32_t> v(std::size(tokens));  // geometric vertices index
+        std::vector<int32_t> vt(std::size(tokens)); // texture vertices index
+        std::vector<int32_t> vn(std::size(tokens)); // vertex normals index
+
+        for (auto i = 1 /*skip keyword token*/; i < std::size(tokens); ++i)
         {
-            using _pec = parser_error_code;
+            // tokenize triplet v/[vt]/[vn]
+            if (std::count(tokens[i].begin, tokens[i].end, '/') != 2)
+                return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
 
-            DRAKO_ASSERT(!std::empty(tokens));
-            DRAKO_ASSERT(std::string_view{ tokens.front() } == "vn");
-
-            const auto VN_ARGC = 3;
-            // NOTE: normal vector is not required to be normalized by .OBJ specs
-            if (std::size(tokens) != VN_ARGC)
+            _parser_token tk_v, tk_vt, tk_vn;
             {
-                if (std::size(tokens) > VN_ARGC)
-                    return _make_token_error(line, tokens[VN_ARGC], _pec::tag_vn_invalid_args_count);
-                else
-                    return _make_token_error(line, tokens.back(), _pec::tag_vn_invalid_args_count);
+                auto c = tokens[i].begin;
+                while (*c != '/')
+                    ++c;
+                tk_v = _parser_token{ tokens[i].begin, c };
+
+                while (*c != '/')
+                    ++c;
+                tk_vt = _parser_token{ tk_v.end + 1, c };
+
+                tk_vn = _parser_token{ tk_vt.end + 1, tokens[i].end };
             }
 
-            float xyz[VN_ARGC];
-            for (auto i = 0; i < VN_ARGC; ++i)
+            int32_t index_v, index_vt, index_vn;
+
+            /*vvv [v/../..] vvv*/
+            if (const auto [ptr, ec] = std::from_chars(tk_v.begin, tk_v.end, index_v);
+                ec != std::errc{})
             {
-                if (const auto [ptr, err] = std::from_chars(tokens[i].begin, tokens[i].end, xyz[i]);
-                    err != std::errc{})
-                {
-                    return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
-                }
+                return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
             }
-            for (auto coord : xyz)
-                vn.emplace_back(coord);
-
-            return {};
-        }
-
-        // parse line with starting keyword 'vt' and [first, last) tokens
-        [[nodiscard]] std::optional<parser_error_report>
-        _try_parse_vt_line(const _pl& line, const std::vector<_pt>& tokens, std::vector<float>& vt) noexcept
-        {
-            using _pec = parser_error_code;
-
-            DRAKO_ASSERT(!std::empty(tokens));
-            DRAKO_ASSERT(std::string_view{ tokens.front() } == "vt");
-
-            const auto VT_MIN_ARGC = 1;
-            const auto VT_MAX_ARGC = 3;
-
-            if (std::size(tokens) < VT_MIN_ARGC)
-                return _make_token_error(line, tokens.back(), _pec::tag_vt_invalid_args_count);
-
-            if (std::size(tokens) > VT_MAX_ARGC)
-                return _make_token_error(line, tokens[VT_MAX_ARGC + 1], _pec::tag_vt_invalid_args_count);
-
-            float texcoords[VT_MAX_ARGC];
-            std::fill(std::begin(texcoords), std::end(texcoords), DEFAULT_VERTEX_TEXCOORD);
-            for (auto i = 0; i < std::size(tokens); ++i)
+            if (const auto i = index_v; i == 0 || std::abs(i) > std::size(obj.vertex_points))
             {
-                if (const auto [ptr, err] = std::from_chars(tokens[i].begin, tokens[i].end, texcoords[i]);
-                    err != std::errc{})
-                {
-                    return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
-                }
+                return _make_token_error(line, tokens[i], _pec::index_out_of_range);
             }
-            for (auto coord : texcoords)
-                vt.emplace_back(coord);
 
-            return {};
-        }
-
-        // parse line with starting keyword 'f' and [first, last) tokens
-        [[nodiscard]] std::optional<parser_error_report>
-        _try_parse_f_line(const _pl& line, const std::vector<_pt>& tokens, object& obj) noexcept
-        {
-            using _pec = parser_error_code;
-
-            DRAKO_ASSERT(!std::empty(tokens));
-            DRAKO_ASSERT(std::string_view{ tokens.front() } == "f");
-
-            const auto F_MIN_ARGC = 4;
-
-            if (std::size(tokens) < F_MIN_ARGC)
-                return _make_token_error(line, tokens.back(), _pec::tag_f_invalid_args_count);
-
-            std::vector<int32_t> v(std::size(tokens));  // geometric vertices index
-            std::vector<int32_t> vt(std::size(tokens)); // texture vertices index
-            std::vector<int32_t> vn(std::size(tokens)); // vertex normals index
-
-            for (auto i = 1 /*skip keyword token*/; i < std::size(tokens); ++i)
-            {
-                // tokenize triplet v/[vt]/[vn]
-                if (std::count(tokens[i].begin, tokens[i].end, '/') != 2)
-                    return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
-
-                _parser_token tk_v, tk_vt, tk_vn;
-                {
-                    auto c = tokens[i].begin;
-                    while (*c != '/')
-                        ++c;
-                    tk_v = _parser_token{ tokens[i].begin, c };
-
-                    while (*c != '/')
-                        ++c;
-                    tk_vt = _parser_token{ tk_v.end + 1, c };
-
-                    tk_vn = _parser_token{ tk_vt.end + 1, tokens[i].end };
-                }
-
-                int32_t index_v, index_vt, index_vn;
-
-                /*vvv [v/../..] vvv*/
-                if (const auto [ptr, ec] = std::from_chars(tk_v.begin, tk_v.end, index_v);
+            /*vvv [../vt/..] vvv*/
+            if (std::distance(tk_vt.begin, tk_vt.end) > 0)
+            { // vt token is present
+                if (const auto [ptr, ec] = std::from_chars(tk_vt.begin, tk_vt.end, index_vt);
                     ec != std::errc{})
                 {
                     return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
                 }
-                if (const auto i = index_v; i == 0 || std::abs(i) > std::size(obj.vertex_points))
+                if (const auto i = index_vt; i == 0 || std::abs(i) > std::size(obj.vertex_texcoords))
                 {
-                    return _make_token_error(line, tokens[i], _pec::index_out_of_range);
+                    return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
                 }
-
-                /*vvv [../vt/..] vvv*/
-                if (std::distance(tk_vt.begin, tk_vt.end) > 0)
-                { // vt token is present
-                    if (const auto [ptr, ec] = std::from_chars(tk_vt.begin, tk_vt.end, index_vt);
-                        ec != std::errc{})
-                    {
-                        return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
-                    }
-                    if (const auto i = index_vt; i == 0 || std::abs(i) > std::size(obj.vertex_texcoords))
-                    {
-                        return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
-                    }
-                }
-
-                /*vvv [../../vn] vvv*/
-                if (std::distance(tk_vn.begin, tk_vn.end) > 0)
-                { // vn token is present
-                    if (const auto [ptr, ec] = std::from_chars(tk_vn.begin, tk_vn.end, index_vn);
-                        ec != std::errc{})
-                    {
-                        return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
-                    }
-                    if (const auto i = index_vn; i == 0 || std::abs(i) > std::size(obj.vertex_normals))
-                    {
-                        return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
-                    }
-                }
-                obj.faces.emplace_back(index_v);
-                obj.faces.emplace_back(index_vt);
-                obj.faces.emplace_back(index_vn);
             }
-            return {};
+
+            /*vvv [../../vn] vvv*/
+            if (std::distance(tk_vn.begin, tk_vn.end) > 0)
+            { // vn token is present
+                if (const auto [ptr, ec] = std::from_chars(tk_vn.begin, tk_vn.end, index_vn);
+                    ec != std::errc{})
+                {
+                    return _make_token_error(line, tokens[i], _pec::tag_f_invalid_args_format);
+                }
+                if (const auto i = index_vn; i == 0 || std::abs(i) > std::size(obj.vertex_normals))
+                {
+                    return _make_token_error(line, tokens[i], _pec::invalid_arg_format);
+                }
+            }
+            obj.faces.emplace_back(index_v);
+            obj.faces.emplace_back(index_vt);
+            obj.faces.emplace_back(index_vn);
         }
+        return {};
+    }
 
-        // parse line with starting keyword 'o' and [first, last) tokens
-        template <typename Iter>
-        [[nodiscard]] std::optional<parser_error_report>
-        _try_parse_o_line(Iter _in_first_token, Iter _in_last_token, object& _out_obj)
+    // parse line with starting keyword 'o' and [first, last) tokens
+    [[nodiscard]] parser_error_report
+    _handle_o_line(std::span<const _token> args, _context& state) noexcept
+    {
+        static_assert(std::is_same_v<std::iterator_traits<Iter>::value_type, _parser_token>,
+            "Iterator value_type must match " DRAKO_STRINGIZE(_parser_token));
+
+        if (std::distance(_in_first_token, _in_last_token) != 1)
+            return _make_token_error(std::next(_in_first_token), _pec::tag_o_invalid_args_count);
+
+        _out_obj = { std::string{ _in_first_token.begin, _in_last_token.end } };
+        continue;
+    }
+
+    [[nodiscard]] std::variant<parser_result, parser_error_report>
+    _try_parse_buffer_until_error(const std::string_view source, const _config& config)
+    {
+        _prr result{};
+
+        std::vector<float>    v_points(_in_config.expected_vertex_count * 3);    // vertex geometry
+        std::vector<float>    v_normals(_in_config.expected_vertex_count * 3);   // vertex normals
+        std::vector<float>    v_texcoords(_in_config.expected_vertex_count * 3); // vertex texcoords
+        std::vector<uint32_t> faces(_in_config.expected_triangle_count * 3);
+
+        object            curr_object;
+        std::size_t       curr_source_row = 0;
+        std::vector<_ptk> tokens(10); // estimate of max token count
+        for (const auto line_begin = _in_src_begin; line_begin != _in_src_end;)
         {
-            static_assert(std::is_same_v<std::iterator_traits<Iter>::value_type, _parser_token>,
-                "Iterator value_type must match " DRAKO_STRINGIZE(_parser_token));
-
-            if (std::distance(_in_first_token, _in_last_token) != 1)
-                return _make_token_error(std::next(_in_first_token), _pec::tag_o_invalid_args_count);
-
-            _out_obj = { std::string{ _in_first_token.begin, _in_last_token.end } };
-            continue;
-        }
-
-        [[nodiscard]] std::variant<parser_result, parser_error_report>
-        _try_parse_buffer_until_error(const char* _in_src_begin, const char* _in_src_end, const parser_config& _in_config)
-        {
-            using _ptk = _parser_token;
-            using _pec = parser_error_code;
-            using _prr = parser_result_report;
-
-            DRAKO_ASSERT(_in_src_begin != nullptr);
-            DRAKO_ASSERT(_in_src_end != nullptr);
-            DRAKO_ASSERT(_in_src_begin <= _in_src_end, "Invalid iterator range");
-
-            if (_in_src_begin == _in_src_end)
-                return _prr{};
-
-            _prr result{};
-
-            std::vector<float>    v_points(_in_config.expected_vertex_count * 3);    // vertex geometry
-            std::vector<float>    v_normals(_in_config.expected_vertex_count * 3);   // vertex normals
-            std::vector<float>    v_texcoords(_in_config.expected_vertex_count * 3); // vertex texcoords
-            std::vector<uint32_t> faces(_in_config.expected_triangle_count * 3);
-
-            object            curr_object;
-            std::size_t       curr_source_row = 0;
-            std::vector<_ptk> tokens(10); // estimate of max token count
-            for (const auto line_begin = _in_src_begin; line_begin != _in_src_end;)
-            {
-                tokens.clear();
-                /*
+            tokens.clear();
+            /*
                 do
                 {
                     ++curr_source_row;
@@ -434,151 +631,132 @@ namespace drako::file_formats::obj
                     }
                 } while (std::string_view{ tokens.back() } == line_continuation);
                 */
-                _tokenize_line()
-
-                    const std::string_view keyword{ tokens.front() };
-                if (keyword == "v") // vertex geometric data: v x y z [w]
-                {
-                    if (const auto err = _parse_v_line(tokens, v_points); err)
-                        return *err;
-                    continue;
-                }
-                else if (keyword == "vn") // vertex normal data: vn x y z
-                {
-                    if (const auto err = _parse_vn_line(tokens, v_normals); err)
-                        return *err;
-                    continue;
-                }
-                else if (keyword == "vt") // vertex uv data: vt u [v] [w]
-                {
-                    if (const auto err = _parse_vt_line(tokens, v_texcoords); err)
-                        return *err;
-                    continue;
-                }
-                else if (keyword == "f") // face element: v1/[vt1]/[vn1] v2/[vt2]/[vn2] v3/[vt3]/[vn3] [v4/vt4/vn4 ...]
-                {
-                    if (const auto err = _parse_f_line(tokens, curr_object); err)
-                        return *err;
-                    continue;
-                }
-                else if (keyword == "o") // new object name statement: o object_name
-                {
-                    if (std::size(tokens) != 2)
-                        return _make_token_error(tokens.front(), _pec::tag_o_invalid_args_count);
-
-                    result.objects.emplace_back(curr_object);
-                    curr_object = object{ std::string{ tokens[0].begin, tokens[0].end } };
-                    continue;
-                }
-
-                if (_is_ignored_keyword(keyword))
-                    continue; // skip current line
-
-                return _make_token_error(tokens.front(), _pec::unknown_tag); // unrecognized keyword
-            }
-
-            return result;
-        }
-
-        [[nodiscard]] std::tuple<parser_result, std::vector<parser_error_report>>
-        _try_parse_buffer_skip_errors(const char* src_begin, const char* src_end, const parser_config& cfg)
-        {
-            using _ptk = _parser_token;
-            using _pec = parser_error_code;
-
-            DRAKO_ASSERT(src_begin != nullptr);
-            DRAKO_ASSERT(src_end != nullptr);
-            DRAKO_ASSERT(src_begin <= src_end, "Invalid iterator range");
-
-            // TODO: review impl
-            if (src_begin == src_end)
-                return { {}, {} };
-
-            std::vector<parser_error_report> errors; // logs error generated by parsing
-            std::vector<object>              objects;
-            std::vector<float>               v_points(cfg.expected_vertex_count * 3);    // vertex geometry
-            std::vector<float>               v_normals(cfg.expected_vertex_count * 3);   // vertex normals
-            std::vector<float>               v_texcoords(cfg.expected_vertex_count * 3); // vertex texcoords
-            std::vector<uint32_t>            faces(cfg.expected_triangle_count * 3);
-
-            object            curr_object;
-            std::size_t       curr_line_index = 1;
-            std::vector<_ptk> tokens(100);
-            for (const auto line_begin = src_begin; line_begin != src_end;)
-            {
-                _tokenize_line(line_begin, line_end, tokens);
+            _tokenize_line()
 
                 const std::string_view keyword{ tokens.front() };
-                if (keyword == "v") // vertex geometric data: v x y z [w]
-                {
-                    if (const auto err = _parse_v_line(tokens, v_points); err)
-                        errors.emplace_back(*err);
-                    continue;
-                }
-                else if (keyword == "vn") // vertex normal data: vn x y z
-                {
-                    if (const auto err = _parse_vn_line(tokens, v_normals); err)
-                        errors.emplace_back(*err);
-                    continue;
-                }
-                else if (keyword == "vt") // vertex uv data: vt u [v] [w]
-                {
-                    if (const auto err = _parse_vt_line(tokens, v_texcoords); err)
-                        errors.emplace_back(*err);
-                    continue;
-                }
-                else if (keyword == "f") // face element: v1/[vt1]/[vn1] v2/[vt2]/[vn2] v3/[vt3]/[vn3] [v4/vt4/vn4 ...]
-                {
-                    if (const auto err = _parse_f_line(tokens, curr_object); err)
-                        errors.emplace_back(*err);
-                    continue;
-                }
-                else if (keyword == "o") // new object name statement: o object_name
-                {
-                    if (std::size(tokens) == 2)
-                    {
-                        objects.emplace_back(curr_object);
-                        curr_object = object{ std::string{ tokens[0].begin, tokens[0].end } };
-                    }
-                    else
-                        errors.emplace_back(_make_token_error(tokens.front(), _pec::tag_o_invalid_args_count));
-
-                    continue;
-                }
-
-                if (_is_ignored_keyword(keyword))
-                    continue; // skip current line
-
-                errors.emplace_back(_make_token_error(tokens.front(), _pec::unknown_tag)); // unrecognized keyword
+            if (keyword == "v") // vertex geometric data: v x y z [w]
+            {
+                if (const auto err = _parse_v_line(tokens, v_points); err)
+                    return *err;
+                continue;
             }
-            return { objects, errors };
+            else if (keyword == "vn") // vertex normal data: vn x y z
+            {
+                if (const auto err = _parse_vn_line(tokens, v_normals); err)
+                    return *err;
+                continue;
+            }
+            else if (keyword == "vt") // vertex uv data: vt u [v] [w]
+            {
+                if (const auto err = _parse_vt_line(tokens, v_texcoords); err)
+                    return *err;
+                continue;
+            }
+            else if (keyword == "f") // face element: v1/[vt1]/[vn1] v2/[vt2]/[vn2] v3/[vt3]/[vn3] [v4/vt4/vn4 ...]
+            {
+                if (const auto err = _parse_f_line(tokens, curr_object); err)
+                    return *err;
+                continue;
+            }
+            else if (keyword == "o") // new object name statement: o object_name
+            {
+                if (std::size(tokens) != 2)
+                    return _make_token_error(tokens.front(), _pec::tag_o_invalid_args_count);
+
+                result.objects.emplace_back(curr_object);
+                curr_object = object{ std::string{ tokens[0].begin, tokens[0].end } };
+                continue;
+            }
+
+            if (_is_ignored_keyword(keyword))
+                continue; // skip current line
+
+            return _make_token_error(tokens.front(), _pec::unknown_tag); // unrecognized keyword
         }
-    } // namespace details
 
+        return result;
+    }
 
-    parser_result parse(const std::string_view source, const parser_config& config)
+    [[nodiscard]] std::tuple<parser_result, std::vector<parser_error_report>>
+    _try_parse_buffer_skip_errors(const std::string_view source, const _config& config) noexcept
     {
-        for (;;)
+        // TODO: review impl
+        if (src_begin == src_end)
+            return { {}, {} };
+
+        std::vector<parser_error_report> errors; // logs error generated by parsing
+        std::vector<object>              objects;
+        std::vector<float>               v_points(cfg.expected_vertex_count * 3);    // vertex geometry
+        std::vector<float>               v_normals(cfg.expected_vertex_count * 3);   // vertex normals
+        std::vector<float>               v_texcoords(cfg.expected_vertex_count * 3); // vertex texcoords
+        std::vector<uint32_t>            faces(cfg.expected_triangle_count * 3);
+
+        object            curr_object;
+        std::size_t       curr_line_index = 1;
+        std::vector<_ptk> tokens(100);
+        for (const auto line_begin = src_begin; line_begin != src_end;)
         {
-            // find next virtual line
+            _tokenize_line(line_begin, line_end, tokens);
 
-            // parse line
+            const std::string_view keyword{ tokens.front() };
+            if (keyword == "v") // vertex geometric data: v x y z [w]
+            {
+                if (const auto err = _parse_v_line(tokens, v_points); err)
+                    errors.emplace_back(*err);
+                continue;
+            }
+            else if (keyword == "vn") // vertex normal data: vn x y z
+            {
+                if (const auto err = _parse_vn_line(tokens, v_normals); err)
+                    errors.emplace_back(*err);
+                continue;
+            }
+            else if (keyword == "vt") // vertex uv data: vt u [v] [w]
+            {
+                if (const auto err = _parse_vt_line(tokens, v_texcoords); err)
+                    errors.emplace_back(*err);
+                continue;
+            }
+            else if (keyword == "f") // face element: v1/[vt1]/[vn1] v2/[vt2]/[vn2] v3/[vt3]/[vn3] [v4/vt4/vn4 ...]
+            {
+                if (const auto err = _parse_f_line(tokens, curr_object); err)
+                    errors.emplace_back(*err);
+                continue;
+            }
+            else if (keyword == "o") // new object name statement: o object_name
+            {
+                if (std::size(tokens) == 2)
+                {
+                    objects.emplace_back(curr_object);
+                    curr_object = object{ std::string{ tokens[0].begin, tokens[0].end } };
+                }
+                else
+                    errors.emplace_back(_make_token_error(tokens.front(), _pec::tag_o_invalid_args_count));
 
-            // modify current entity
+                continue;
+            }
+
+            if (_is_ignored_keyword(keyword))
+                continue; // skip current line
+
+            errors.emplace_back(_make_token_error(tokens.front(), _pec::unknown_tag)); // unrecognized keyword
         }
+        return { objects, errors };
     }
 
 
     [[nodiscard]] std::variant<parser_result, parser_error_report>
     try_parse(const std::string_view source, const parser_config& config) noexcept
     {
-        return details::_try_parse_buffer_until_error(source.data(), source.data() + std::size(source), config);
+        return _try_parse_buffer_until_error(source.data(), source.data() + std::size(source), config);
     }
 
     [[nodiscard]] std::tuple<parser_result, std::vector<parser_error_report>>
     try_force_parse(const std::string_view source, const parser_config& config) noexcept
     {
-        return details::_try_parse_buffer_skip_errors(source.data(), source.data() + std::size(source), config);
+        return _try_parse_buffer_skip_errors(source.data(), source.data() + std::size(source), config);
     }
+
+#endif /*^^^ implementation with error codes ^^^*/
 
 } // namespace drako::file_formats::obj

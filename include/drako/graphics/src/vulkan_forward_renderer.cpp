@@ -1,15 +1,13 @@
 #include "drako/graphics/vulkan_forward_renderer.hpp"
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
-
 #include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/graphics/vulkan_queue.hpp"
-
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 
+#include <cassert>
 #include <chrono>
 #include <vector>
 
@@ -23,8 +21,8 @@ namespace drako::gpx::vulkan
         , _ldevice(ctx.logical_device.get())
         , _surface(ctx.surface.get())
     {
-        DRAKO_ASSERT(width > 0);
-        DRAKO_ASSERT(height > 0);
+        assert(width > 0);
+        assert(height > 0);
 
         // TODO: from Vulkan 1.0.129 semaphore should have VK_SEMAPHORE_TYPE_BINARY_KHR flag added
         const vk::SemaphoreCreateInfo semaphore_create_info{ vk::SemaphoreCreateFlags{} };
@@ -37,7 +35,7 @@ namespace drako::gpx::vulkan
         _setup_swapchain(_pdevice);
         const auto swapchain_images = _ldevice.getSwapchainImagesKHR(_swapchain.get());
 
-        _frame_attachments.resize(std::size(swapchain_images));
+        _attachments.reserve(std::size(swapchain_images));
         for (auto i = 0; i < std::size(swapchain_images); ++i)
         {
             const vk::ImageViewCreateInfo color_buffer_info{
@@ -54,7 +52,7 @@ namespace drako::gpx::vulkan
                     1  // layer count
                 }
             };
-            _frame_attachments[i].color_buffer_view = _ldevice.createImageView(color_buffer_info);
+            _attachments[i].color_buffer_view = _ldevice.createImageView(color_buffer_info);
 
             const vk::ImageCreateInfo depth_buffer_info{
                 vk::ImageCreateFlags{},
@@ -70,11 +68,11 @@ namespace drako::gpx::vulkan
                 0, nullptr,
                 vk::ImageLayout::eDepthStencilAttachmentOptimal
             };
-            _frame_attachments[i].depth_buffer = _ldevice.createImage(depth_buffer_info);
+            _attachments[i].depth_buffer = _ldevice.createImage(depth_buffer_info);
 
             const vk::ImageViewCreateInfo depth_buffer_view_info{
                 vk::ImageViewCreateFlags{},
-                _frame_attachments[i].depth_buffer,
+                _attachments[i].depth_buffer,
                 vk::ImageViewType::e2D,
                 vk::Format::eD32Sfloat,
                 vk::ComponentMapping{},
@@ -86,14 +84,14 @@ namespace drako::gpx::vulkan
                     1  // layer count
                 }
             };
-            _frame_attachments[i].depth_buffer_view = _ldevice.createImageView(depth_buffer_view_info);
+            _attachments[i].depth_buffer_view = _ldevice.createImageView(depth_buffer_view_info);
 
             const vk::ImageView attachments[] = {
-                _frame_attachments[i].color_buffer_view,
-                _frame_attachments[i].depth_buffer_view
+                _attachments[i].color_buffer_view,
+                _attachments[i].depth_buffer_view
             };
 
-            DRAKO_ASSERT(_renderpass.get(), "Renderpass is invalid");
+            assert(_renderpass.get());
             const vk::FramebufferCreateInfo framebuffer_info{
                 vk::FramebufferCreateFlags{},
                 _renderpass.get(),
@@ -102,7 +100,7 @@ namespace drako::gpx::vulkan
                 height,
                 1
             };
-            _frame_attachments[i].framebuffer = _ldevice.createFramebuffer(framebuffer_info);
+            _attachments[i].framebuffer = _ldevice.createFramebuffer(framebuffer_info);
         }
     }
 
@@ -110,7 +108,7 @@ namespace drako::gpx::vulkan
 
     forward_renderer::~forward_renderer() noexcept
     {
-        for (auto& frame : _frame_attachments)
+        for (auto& frame : _attachments)
         {
             _ldevice.destroy(frame.framebuffer);
             _ldevice.destroy(frame.color_buffer_view);
@@ -223,14 +221,10 @@ namespace drako::gpx::vulkan
     }
 
 
-    void forward_renderer::draw(
-        const material_pipeline&              pipeline,
-        const std::vector<mat4x4>&                   mvps,
-        const std::vector<mesh_view>&         meshes,
-        const std::vector<material_instance>& materials) noexcept
+    void forward_renderer::draw(const draw_batch_mtl_soa& batch) noexcept
     {
-        DRAKO_ASSERT(std::size(mvps) == std::size(meshes));
-        DRAKO_ASSERT(std::size(mvps) == std::size(materials));
+        assert(std::size(batch.mvps) == std::size(batch.meshes));
+        assert(std::size(batch.mvps) == std::size(batch.materials));
 
         // const uint64_t MAX_TIMEOUT_NS = 1000 * 1000 * 100; // max timeout in nanoseconds, we use 100ms
         const std::chrono::nanoseconds MAX_TIMEOUT             = std::chrono::microseconds{ 100 };
@@ -252,49 +246,49 @@ namespace drako::gpx::vulkan
                 return;
 
             default:
-                DRAKO_LOG_FAILURE("[Vulkan] Swapchain failure - " + to_string(acquire_image_result));
-                std::exit(EXIT_FAILURE);
+                log_and_exit("[Vulkan] Swapchain failure - " + to_string(acquire_image_result));
         }
 
         const vk::RenderPassBeginInfo begin_renderpass_info{
             _renderpass.get(),
-            _frame_attachments[present_image_index].framebuffer,
+            _attachments[present_image_index].framebuffer,
             _render_area,
             0, nullptr
         };
         _command_buffer.beginRenderPass(begin_renderpass_info, vk::SubpassContents::eInline);
 
 
-        _command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline.pipeline_handle());
+        _command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, batch.pipeline.pipeline_handle());
 
         // bind shared material data
         _command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
-            pipeline.pipeline_layout_handle(),
+            batch.pipeline.pipeline_layout_handle(),
             0,
-            std::size(pipeline.descriptor_sets()), pipeline.descriptor_sets().data(),
+            std::size(batch.pipeline.descriptor_sets()), batch.pipeline.descriptor_sets().data(),
             0, nullptr);
 
-        for (auto i = 0; i < std::size(mvps); ++i)
+        for (auto i = 0; i < std::size(batch.mvps); ++i)
         {
-            _command_buffer.pushConstants(pipeline.pipeline_layout_handle(),
+            _command_buffer.pushConstants(batch.pipeline.pipeline_layout_handle(),
                 vk::ShaderStageFlagBits::eVertex,
                 0,
                 static_cast<uint32_t>(sizeof(mat4x4)),
-                &mvps[i]);
+                &batch.mvps[i]);
 
-            const vk::Buffer     buffers[] = { meshes[i].vertex_buffer_handle() };
+            const vk::Buffer     buffers[] = { batch.meshes[i].vertex_buffer_handle() };
             const vk::DeviceSize offsets[] = { 0 };
-            DRAKO_ASSERT(std::size(buffers) == std::size(offsets), "Size must match");
+            assert(std::size(buffers) == std::size(offsets));
 
             _command_buffer.bindVertexBuffers(0, static_cast<uint32_t>(std::size(buffers)), buffers, offsets);
-            _command_buffer.bindIndexBuffer(meshes[i].index_buffer_handle(), vk::DeviceSize{ 0 }, vk::IndexType::eUint16);
+            _command_buffer.bindIndexBuffer(batch.meshes[i].index_buffer_handle(), vk::DeviceSize{ 0 }, vk::IndexType::eUint16);
 
             // bind instance material data
             _command_buffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
-                pipeline.pipeline_layout_handle(),
-                0, 1, &pipeline.descriptor_sets()[i], 0, nullptr);
+                batch.pipeline.pipeline_layout_handle(),
+                0, 1, &batch.pipeline.descriptor_sets()[i], 0, nullptr);
 
-            _command_buffer.drawIndexed(static_cast<uint32_t>(meshes[i].index_buffer_size()),
+            _command_buffer.drawIndexed(
+                static_cast<uint32_t>(batch.meshes[i].index_buffer_size()),
                 1,  // instances count
                 0,  // first index
                 0,  // vertex offset
@@ -307,7 +301,7 @@ namespace drako::gpx::vulkan
 
         const vk::Semaphore acquire_sems[] = { _present_complete_sem };
         const vk::Semaphore release_sems[] = { _command_complete_sem };
-        DRAKO_ASSERT(std::size(acquire_sems) == std::size(pipeline_sync_stages));
+        assert(std::size(acquire_sems) == std::size(pipeline_sync_stages));
 
         const vk::SubmitInfo submit_info{
             static_cast<uint32_t>(std::size(acquire_sems)), acquire_sems, pipeline_sync_stages,
@@ -316,11 +310,8 @@ namespace drako::gpx::vulkan
         };
 
         if (const auto result = _command_queue.submit(1, &submit_info, vk::Fence{ nullptr });
-            DRAKO_UNLIKELY(result != vk::Result::eSuccess))
-        {
-            DRAKO_LOG_ERROR("[Vulkan] Queue submit failed" + to_string(result));
-            std::exit(EXIT_FAILURE);
-        }
+            result != vk::Result::eSuccess)
+            [[unlikely]] log_and_exit("[Vulkan] Queue submit failed" + to_string(result));
 
 
         const uint32_t           swapchain_image_indexes[] = { present_image_index };
@@ -340,9 +331,9 @@ namespace drako::gpx::vulkan
                 break;
 
             default:
-                DRAKO_LOG_ERROR("[Vulkan] Failed presentation on swapchain - " + to_string(result));
-                std::exit(EXIT_FAILURE);
+                log_and_exit("[Vulkan] Failed presentation on swapchain - " + to_string(result));
         }
         _present_queue.waitIdle();
     }
+
 } // namespace drako::gpx::vulkan

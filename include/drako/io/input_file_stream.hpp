@@ -10,11 +10,14 @@
 #endif
 
 #include <filesystem>
+#include <new> // placement operator new
 #include <span>
 #include <type_traits>
 
 namespace drako::io
 {
+
+
     /// @brief Unformatted binary input from a file.
     class input_file_stream final
     {
@@ -54,27 +57,51 @@ namespace drako::io
     };
 
 
-    /// @brief Read the value representation of an object.
+    /// @brief Instantiate an object from raw bytes.
+    ///
     /// @tparam T
-    /// @param object
-    /// @param ifs
-    template <typename T>
-    void read_from_bytes(T& object, input_file_stream& ifs) requires std::is_trivially_copyable_v<T>
+    /// @param input   Source input stream.
+    /// @param storage Memory destination.
+    template <typename T> /* clang-format off */
+    requires std::is_trivially_copyable_v<T>
+    void read_from_bytes(input_file_stream& input, T& storage) /* clang-format on */
     {
-        static_assert(std::is_trivially_copyable_v<T>, "Required by C++ standard");
+        static_assert(std::is_trivially_copyable_v<T>,
+            "Required by C++ standard for well-defined type punning.");
         static_assert(!std::is_array_v<T>);
-        ifs.read(reinterpret_cast<std::byte*>(object), sizeof(T));
+
+        const auto location = std::addressof(storage);
+        input.read(reinterpret_cast<std::byte*>(location), sizeof(T));
+        ::new (location) T; // placement new should result in no-op
     }
 
-    template <typename T>
-    void read_from_bytes(T object[], size_t size, input_file_stream& ifs) requires std::is_trivially_copyable_v<T>
+
+    template <typename T, size_t Size> /* clang-format off */
+    requires std::is_trivially_copyable_v<T> && std::is_bounded_array_v<T>
+    void read_from_bytes(input_file_stream& input, T (&storage)[Size]) /* clang-format off */
     {
-        static_assert(std::is_trivially_copyable_v<T>, "Required by C++ standard");
-        ifs.read(reinterpret_cast<std::byte*>(object), sizeof(T) * size);
+        static_assert(std::is_trivially_copyable_v<T>,
+            "Required by C++ standard for well-defined type punning.");
+        static_assert(std::is_bounded_array_v<T>);
+
+        input.read(reinterpret_cast<std::byte*>(storage), sizeof(T) * Size);
+        for (auto i = 0; i < Size; ++i)
+            ::new (storage + i) T; // placement new should result in no-op
     }
 
-    //template <typename T>
-    //void read_from_bytes(std::span<T> object, input_file_stream& ifs) requires std::is_trivially_copyable_v<T>;
+
+    template <typename T> /* clang-format off */
+    requires std::is_trivially_copyable_v<T> //&& std::is_unbounded_array_v<T>
+    void read_from_bytes(input_file_stream& input, T storage[], std::size_t size) /* clang-format off */
+    {
+        static_assert(std::is_trivially_copyable_v<T>,
+            "Required by C++ standard for well-defined type punning.");
+        //static_assert(std::is_unbounded_array_v<T>);
+
+        input.read(reinterpret_cast<std::byte*>(storage), sizeof(T) * size);
+        for (auto i = 0; i < size; ++i)
+            ::new (storage + i) T; // placement new should result in no-op
+    }
 
 } // namespace drako::io
 

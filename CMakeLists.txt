@@ -27,9 +27,11 @@ if(WIN32)
     add_compile_definitions(NOMINMAX)
 endif()
 
+add_subdirectory("include/drako/audio")
 add_subdirectory("include/drako/core")
 add_subdirectory("include/drako/concurrency")
 add_subdirectory("include/drako/devel")
+add_subdirectory("include/drako/engine")
 add_subdirectory("include/drako/file_formats")
 add_subdirectory("include/drako/input")
 add_subdirectory("include/drako/io")
@@ -39,15 +41,11 @@ add_subdirectory("include/drako/graphics")
 
 add_executable(${PROJECT_NAME}_threading_test "./test/main_thread_test.cpp")
 
-add_executable(${PROJECT_NAME}_audio_test
-    "./test/main_audio_test.cpp"
-    "./include/drako/audio/audio_input_device_win.cpp")
-
 add_executable(drako_mouse_test WIN32 "./test/main_mouse_test.cpp")
-target_link_libraries(drako_mouse_test PRIVATE drako::native-sys)
+target_link_libraries(drako_mouse_test PRIVATE drako::system)
 
 add_executable(drako_keyboard_test WIN32 "./test/keyboard_app_test.cpp")
-target_link_libraries(drako_keyboard_test PRIVATE drako::native-sys)
+target_link_libraries(drako_keyboard_test PRIVATE drako::system)
 
 
 # Experimental Drako engine with forward renderer
@@ -66,12 +64,6 @@ target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 add_executable(drako-builder "./src/drako_resource_compiler.cpp")
 set_target_properties(drako-builder PROPERTIES OUTPUT_NAME "drako-builder")
 
-
-add_executable(drako-obj-importer "./src/drako_obj_importer.cpp")
-target_link_libraries(drako-obj-importer PRIVATE drako::obj)
-set_target_properties(drako-obj-importer
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone")
-# install(TARGETS drako-obj-importer DESTINATION "")
 
 # === TESTING ===
 # work in progress...

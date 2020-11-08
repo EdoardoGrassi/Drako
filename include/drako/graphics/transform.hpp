@@ -10,17 +10,17 @@
 namespace drako
 {
     // Creates a translation transform matrix.
-    [[nodiscard]] inline constexpr mat4x4
-    translate(float _x_, float _y_, float _z_) noexcept
+    [[nodiscard]] inline constexpr mat4x4 translate(float _x_, float _y_, float _z_) noexcept
     {
-        return mat4x4({ 1.f, 0.f, 0.f, _x_,
-            0.f, 1.f, 0.f, _y_,
-            0.f, 0.f, 1.f, _z_,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { 1.f, 0.f, 0.f, _x_,
+                         0.f, 1.f, 0.f, _y_,
+                         0.f, 0.f, 1.f, _z_,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    translate(vec3 v) noexcept
+    [[nodiscard]] inline constexpr mat4x4 translate(vec3 v) noexcept
     {
         return translate(v[0], v[1], v[2]);
     }
@@ -29,48 +29,52 @@ namespace drako
     [[nodiscard]] inline constexpr mat4x4 rotate(float x, float y, float z) noexcept;
     [[nodiscard]] inline constexpr mat4x4 rotate(uquat rotation) noexcept;
 
-    [[nodiscard]] inline constexpr mat4x4
-    rotate_x(float radians) noexcept(std::is_nothrow_constructible_v<mat4x4, std::array<float, 16>>)
+    [[nodiscard]] inline mat4x4 rotate_x(float radians) noexcept
     {
         const auto cos = std::cos(radians);
         const auto sin = std::sin(radians);
-        return mat4x4({ 1.f, 0.f, 0.f, 0.f,
-            0.f, cos, -sin, 0.f,
-            0.f, sin, cos, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { 1.f, 0.f, 0.f, 0.f,
+                         0.f, cos, -sin, 0.f,
+                         0.f, sin, cos, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    rotate_y(float radians) noexcept(std::is_nothrow_constructible_v<mat4x4, std::array<float, 16>>)
+    [[nodiscard]] inline mat4x4 rotate_y(float radians) noexcept
     {
         const auto cos = std::cos(radians);
         const auto sin = std::sin(radians);
-        return mat4x4{ { cos, 0.f, sin, 0.f },
-            { 0.f, 1.f, 0.f, 0.f },
-            { -sin, 0.f, cos, 0.f },
-            { 0.f, 0.f, 0.f, 1.f } };
+        /* clang-format off */
+        return mat4x4{ { cos, 0.f, sin, 0.f,
+                         0.f, 1.f, 0.f, 0.f,
+                        -sin, 0.f, cos, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    rotate_z(float radians) noexcept(std::is_nothrow_constructible_v<mat4x4, std::array<float, 16>>)
+    [[nodiscard]] inline mat4x4 rotate_z(float radians) noexcept
     {
         const auto cos = std::cos(radians);
         const auto sin = std::sin(radians);
-        return mat4x4({ cos, -sin, 0.f, 0.f,
-            sin, cos, 0.f, 0.f,
-            0.f, 0.f, 1.f, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { cos, -sin, 0.f, 0.f,
+                         sin, cos, 0.f, 0.f,
+                         0.f, 0.f, 1.f, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
 
 
-    [[nodiscard]] inline constexpr mat4x4
-    scale(float _x_, float _y_, float _z_) noexcept
+    [[nodiscard]] inline constexpr mat4x4 scale(float _x_, float _y_, float _z_) noexcept
     {
-        return mat4x4({ _x_, 0.f, 0.f, 0.f,
-            0.f, _y_, 0.f, 0.f,
-            0.f, 0.f, _z_, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { _x_, 0.f, 0.f, 0.f,
+                         0.f, _y_, 0.f, 0.f,
+                         0.f, 0.f, _z_, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
     // Creates a scaling transform matrix.
@@ -84,31 +88,34 @@ namespace drako
         return scale(s[0], s[1], s[2]);
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    shearing_xy(float _x_, float _y_) noexcept
+    [[nodiscard]] inline constexpr mat4x4 shearing_xy(float _x_, float _y_) noexcept
     {
-        return mat4x4({ 1.f, 0.f, _x_, 0.f,
-            0.f, 1.f, _y_, 0.f,
-            0.f, 0.f, 1.f, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { 1.f, 0.f, _x_, 0.f,
+                         0.f, 1.f, _y_, 0.f,
+                         0.f, 0.f, 1.f, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    shearing_yz(float _y_, float _z_) noexcept
+    [[nodiscard]] inline constexpr mat4x4 shearing_yz(float _y_, float _z_) noexcept
     {
-        return mat4x4({ 1.f, 0.f, 0.f, 0.f,
-            _y_, 1.f, 0.f, 0.f,
-            _z_, 0.f, 1.f, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { 1.f, 0.f, 0.f, 0.f,
+                         _y_, 1.f, 0.f, 0.f,
+                         _z_, 0.f, 1.f, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4
-    shearing_xz(float _x_, float _z_) noexcept
+    [[nodiscard]] inline constexpr mat4x4 shearing_xz(float _x_, float _z_) noexcept
     {
-        return mat4x4({ 1.f, _x_, 0.f, 0.f,
-            0.f, 1.f, 0.f, 0.f,
-            0.f, _z_, 1.f, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { 1.f, _x_, 0.f, 0.f,
+                         0.f, 1.f, 0.f, 0.f,
+                         0.f, _z_, 1.f, 0.f,
+                         0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
     }
 
     // Creates a translation, rotation and scaling transform matrix.
@@ -123,28 +130,26 @@ namespace drako
         const float syy = 2.f / (y_max - y_min); // normalize y in range [-1, 1]
         const float szz = 1.f / (z_max - z_min); // normalize z in range [0, 1]
 
-        mat4x4 scale({ sxx, 0.f, 0.f, 0.f,
-            0.f, syy, 0.f, 0.f,
-            0.f, 0.f, szz, 0.f,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        mat4x4 scale{ { sxx, 0.f, 0.f, 0.f,
+                        0.f, syy, 0.f, 0.f,
+                        0.f, 0.f, szz, 0.f,
+                        0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
 
         // translate to origin (0,0,0)
         const float txx = -(x_max + x_min) / 2.f;
         const float tyy = -(y_max + y_min) / 2.f;
         const float tzz = -(z_max + z_min) / 2.f;
 
-        mat4x4 translate({ 1.f, 0.f, 0.f, txx,
-            0.f, 1.f, 0.f, tyy,
-            0.f, 0.f, 1.f, tzz,
-            0.f, 0.f, 0.f, 1.f });
+        /* clang-format off */
+        mat4x4 translate{ { 1.f, 0.f, 0.f, txx,
+                            0.f, 1.f, 0.f, tyy,
+                            0.f, 0.f, 1.f, tzz,
+                            0.f, 0.f, 0.f, 1.f } };
+        /* clang-format on */
 
         return scale * translate;
-        /*
-        return mat4x4({ 1.f, 0.f, 0.f, 0.f,
-                        0.f, 1.f, 0.f, 0.f,
-                        0.f, 0.f, 0.f, 0.f,
-                        0.f, 0.f, 0.f, 1.f});
-                        */
     }
 
     // Creates a perspective projection matrix.
@@ -159,10 +164,12 @@ namespace drako
         const float txx = -(r + l) / (r - l);
         const float tyy = -(t + b) / (t - b);
 
-        return mat4x4({ sxx, 0.f, txx, 0.f,
-            0.f, syy, tyy, 0.f,
-            0.f, 0.f, szz, sww,
-            0.f, 0.f, 1.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { sxx, 0.f, txx, 0.f,
+                         0.f, syy, tyy, 0.f,
+                         0.f, 0.f, szz, sww,
+                         0.f, 0.f, 1.f, 1.f } };
+        /* clang-format on */
     }
 
     // Rotates about axis passing through point in world space by angle degrees.

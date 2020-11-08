@@ -49,10 +49,12 @@ namespace drako::gpx
         const float txx = -(f.xmax + f.xmin) / (f.xmax - f.xmin);
         const float tyy = -(f.ymax + f.ymin) / (f.ymax - f.ymin);
 
-        return mat4x4({ sxx, 0.f, txx, 0.f,
-            0.f, syy, tyy, 0.f,
-            0.f, 0.f, szz, sww,
-            0.f, 0.f, 1.f, 1.f });
+        /* clang-format off */
+        return mat4x4{ { sxx, 0.f, txx, 0.f,
+                         0.f, syy, tyy, 0.f,
+                         0.f, 0.f, szz, sww,
+                         0.f, 0.f, 1.f, 1.f } };
+        /* clang-format on */
     }
 
 } // namespace drako::gpx

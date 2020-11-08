@@ -29,7 +29,7 @@ namespace drako::gpx::vulkan
         return validation;
     }
 
-    [[nodiscard]] graphics_pipeline make_vulkan_wireframe_pipeline(
+    [[nodiscard]] graphics_pipeline make_wireframe_pipeline(
         const vk::Device& device, const gpu_shader& vert, const vk::RenderPass& renderpass)
     {
         /*vvv create pipeline layout vvv*/

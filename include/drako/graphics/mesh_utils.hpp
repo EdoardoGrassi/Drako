@@ -2,7 +2,7 @@
 #ifndef DRAKO_MESH_UTILS_HPP_
 #define DRAKO_MESH_UTILS_HPP_
 
-#include "drako/file_formats/wavefront/obj_object.hpp"
+#include "drako/file_formats/wavefront/object.hpp"
 #include "drako/graphics/mesh_types.hpp"
 
 #include <iterator>

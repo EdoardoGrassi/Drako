@@ -2,7 +2,6 @@
 #ifndef DRAKO_VULKAN_QUEUE_HPP
 #define DRAKO_VULKAN_QUEUE_HPP
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
 #include <algorithm>
@@ -53,7 +52,7 @@ namespace drako::gpx::vulkan
 
     [[nodiscard]] vk::PhysicalDevice make_physical_device(vk::Instance i) noexcept
     {
-        DRAKO_ASSERT(i);
+        assert(i != vk::Instance{ nullptr });
 
         const auto pdevices = i.enumeratePhysicalDevices();
         for (const auto& pdevice : pdevices)
@@ -81,7 +80,7 @@ namespace drako::gpx::vulkan
 
     [[nodiscard]] vk::UniqueDevice make_logical_device(vk::PhysicalDevice p) noexcept
     {
-        DRAKO_ASSERT(p);
+        assert(p != vk::PhysicalDevice{ nullptr });
 
         const auto family_properties = p.getQueueFamilyProperties();
         for (const auto& family : family_properties)
@@ -90,7 +89,7 @@ namespace drako::gpx::vulkan
         }
 
         const float queue_prios[] = { 1.0f };
-        DRAKO_ASSERT(std::all_of(std::begin(queue_prios), std::end(queue_prios),
+        assert(std::all_of(std::begin(queue_prios), std::end(queue_prios),
             [](float x) { return x <= 1.f && x >= 0.f; }));
 
         const vk::DeviceQueueCreateInfo graphic_queue_info{

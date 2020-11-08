@@ -72,59 +72,6 @@ build ..\..\..\build\drako_threading_test.exe: CXX_EXECUTABLE_LINKER__drako_thre
   TARGET_IMPLIB = drako_threading_test.lib
   TARGET_PDB = ..\..\..\build\drako_threading_test.pdb
 
-
-#############################################
-# Utility command for format
-
-build format: phony CMakeFiles\format
-
-# =============================================================================
-# Object build statements for EXECUTABLE target drako_audio_test
-
-
-#############################################
-# Order-only phony target for drako_audio_test
-
-build cmake_object_order_depends_target_drako_audio_test_Debug: phony || CMakeFiles\drako_audio_test.dir
-
-build CMakeFiles\drako_audio_test.dir\test\main_audio_test.cpp.obj: CXX_COMPILER__drako_audio_test_Debug ..\..\..\test\main_audio_test.cpp || cmake_object_order_depends_target_drako_audio_test_Debug
-  DEFINES = -DNOMINMAX
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = CMakeFiles\drako_audio_test.dir
-  OBJECT_FILE_DIR = CMakeFiles\drako_audio_test.dir\test
-  TARGET_COMPILE_PDB = CMakeFiles\drako_audio_test.dir\
-  TARGET_PDB = ..\..\..\build\drako_audio_test.pdb
-
-build CMakeFiles\drako_audio_test.dir\include\drako\audio\audio_input_device_win.cpp.obj: CXX_COMPILER__drako_audio_test_Debug ..\..\..\include\drako\audio\audio_input_device_win.cpp || cmake_object_order_depends_target_drako_audio_test_Debug
-  DEFINES = -DNOMINMAX
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = CMakeFiles\drako_audio_test.dir
-  OBJECT_FILE_DIR = CMakeFiles\drako_audio_test.dir\include\drako\audio
-  TARGET_COMPILE_PDB = CMakeFiles\drako_audio_test.dir\
-  TARGET_PDB = ..\..\..\build\drako_audio_test.pdb
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target drako_audio_test
-
-
-#############################################
-# Link the executable ..\..\..\build\drako_audio_test.exe
-
-build ..\..\..\build\drako_audio_test.exe: CXX_EXECUTABLE_LINKER__drako_audio_test_Debug CMakeFiles\drako_audio_test.dir\test\main_audio_test.cpp.obj CMakeFiles\drako_audio_test.dir\include\drako\audio\audio_input_device_win.cpp.obj
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = CMakeFiles\drako_audio_test.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\drako_audio_test.dir\
-  TARGET_FILE = ..\..\..\build\drako_audio_test.exe
-  TARGET_IMPLIB = drako_audio_test.lib
-  TARGET_PDB = ..\..\..\build\drako_audio_test.pdb
-
 # =============================================================================
 # Object build statements for EXECUTABLE target drako-engine
 
@@ -135,7 +82,7 @@ build ..\..\..\build\drako_audio_test.exe: CXX_EXECUTABLE_LINKER__drako_audio_te
 build cmake_object_order_depends_target_drako-engine_Debug: phony || cmake_object_order_depends_target_vulkan-forward-renderer_Debug
 
 build CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj: CXX_COMPILER__drako-engine_Debug ..\..\..\src\vulkan_engine_win32.cpp || cmake_object_order_depends_target_drako-engine_Debug
-  DEFINES = -DNOMINMAX
+  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
   OBJECT_DIR = CMakeFiles\drako-engine.dir
@@ -170,7 +117,7 @@ build ..\..\..\build\drako-engine.exe: CXX_EXECUTABLE_LINKER__drako-engine_Debug
 #############################################
 # Order-only phony target for drako_keyboard_test
 
-build cmake_object_order_depends_target_drako_keyboard_test_Debug: phony || cmake_object_order_depends_target_drako-native-sys_Debug
+build cmake_object_order_depends_target_drako_keyboard_test_Debug: phony || cmake_object_order_depends_target_drako-system_Debug
 
 build CMakeFiles\drako_keyboard_test.dir\test\keyboard_app_test.cpp.obj: CXX_COMPILER__drako_keyboard_test_Debug ..\..\..\test\keyboard_app_test.cpp || cmake_object_order_depends_target_drako_keyboard_test_Debug
   DEFINES = -DNOMINMAX
@@ -189,10 +136,10 @@ build CMakeFiles\drako_keyboard_test.dir\test\keyboard_app_test.cpp.obj: CXX_COM
 #############################################
 # Link the executable ..\..\..\build\drako_keyboard_test.exe
 
-build ..\..\..\build\drako_keyboard_test.exe: CXX_EXECUTABLE_LINKER__drako_keyboard_test_Debug CMakeFiles\drako_keyboard_test.dir\test\keyboard_app_test.cpp.obj | include\drako\system\drako-native-sys.lib || include\drako\system\drako-native-sys.lib
+build ..\..\..\build\drako_keyboard_test.exe: CXX_EXECUTABLE_LINKER__drako_keyboard_test_Debug CMakeFiles\drako_keyboard_test.dir\test\keyboard_app_test.cpp.obj | include\drako\system\drako-system.lib || include\drako\system\drako-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
-  LINK_LIBRARIES = include\drako\system\drako-native-sys.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\system\drako-system.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\drako_keyboard_test.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -208,7 +155,7 @@ build ..\..\..\build\drako_keyboard_test.exe: CXX_EXECUTABLE_LINKER__drako_keybo
 #############################################
 # Order-only phony target for drako_mouse_test
 
-build cmake_object_order_depends_target_drako_mouse_test_Debug: phony || cmake_object_order_depends_target_drako-native-sys_Debug
+build cmake_object_order_depends_target_drako_mouse_test_Debug: phony || cmake_object_order_depends_target_drako-system_Debug
 
 build CMakeFiles\drako_mouse_test.dir\test\main_mouse_test.cpp.obj: CXX_COMPILER__drako_mouse_test_Debug ..\..\..\test\main_mouse_test.cpp || cmake_object_order_depends_target_drako_mouse_test_Debug
   DEFINES = -DNOMINMAX
@@ -227,10 +174,10 @@ build CMakeFiles\drako_mouse_test.dir\test\main_mouse_test.cpp.obj: CXX_COMPILER
 #############################################
 # Link the executable ..\..\..\build\drako_mouse_test.exe
 
-build ..\..\..\build\drako_mouse_test.exe: CXX_EXECUTABLE_LINKER__drako_mouse_test_Debug CMakeFiles\drako_mouse_test.dir\test\main_mouse_test.cpp.obj | include\drako\system\drako-native-sys.lib || include\drako\system\drako-native-sys.lib
+build ..\..\..\build\drako_mouse_test.exe: CXX_EXECUTABLE_LINKER__drako_mouse_test_Debug CMakeFiles\drako_mouse_test.dir\test\main_mouse_test.cpp.obj | include\drako\system\drako-system.lib || include\drako\system\drako-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
-  LINK_LIBRARIES = include\drako\system\drako-native-sys.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\system\drako-system.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\drako_mouse_test.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -315,43 +262,11 @@ build ..\..\..\build\drako-builder.exe: CXX_EXECUTABLE_LINKER__drako-builder_Deb
   TARGET_IMPLIB = drako-builder.lib
   TARGET_PDB = ..\..\..\build\drako-builder.pdb
 
-# =============================================================================
-# Object build statements for EXECUTABLE target drako-obj-importer
-
 
 #############################################
-# Order-only phony target for drako-obj-importer
+# Utility command for format
 
-build cmake_object_order_depends_target_drako-obj-importer_Debug: phony || cmake_object_order_depends_target_drako-obj_Debug
-
-build CMakeFiles\drako-obj-importer.dir\src\drako_obj_importer.cpp.obj: CXX_COMPILER__drako-obj-importer_Debug ..\..\..\src\drako_obj_importer.cpp || cmake_object_order_depends_target_drako-obj-importer_Debug
-  DEFINES = -DNOMINMAX
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = CMakeFiles\drako-obj-importer.dir
-  OBJECT_FILE_DIR = CMakeFiles\drako-obj-importer.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\drako-obj-importer.dir\
-  TARGET_PDB = D:\Desktop\drako_test_zone\drako-obj-importer.pdb
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target drako-obj-importer
-
-
-#############################################
-# Link the executable D:\Desktop\drako_test_zone\drako-obj-importer.exe
-
-build D$:\Desktop\drako_test_zone\drako-obj-importer.exe: CXX_EXECUTABLE_LINKER__drako-obj-importer_Debug CMakeFiles\drako-obj-importer.dir\src\drako_obj_importer.cpp.obj | include\drako\file_formats\wavefront\drako-obj.lib || include\drako\file_formats\wavefront\drako-obj.lib
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\file_formats\wavefront\drako-obj.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = CMakeFiles\drako-obj-importer.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\drako-obj-importer.dir\
-  TARGET_FILE = D:\Desktop\drako_test_zone\drako-obj-importer.exe
-  TARGET_IMPLIB = drako-obj-importer.lib
-  TARGET_PDB = D:\Desktop\drako_test_zone\drako-obj-importer.pdb
+build format: phony CMakeFiles\format
 
 
 #############################################
@@ -400,6 +315,138 @@ build CMakeFiles\format: CUSTOM_COMMAND
 # C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
 # =============================================================================
 
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target drako-audio
+
+
+#############################################
+# Order-only phony target for drako-audio
+
+build cmake_object_order_depends_target_drako-audio_Debug: phony || include\drako\audio\CMakeFiles\drako-audio.dir
+
+build include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_input_device_win32.cpp.obj: CXX_COMPILER__drako-audio_Debug ..\..\..\include\drako\audio\src\audio_input_device_win32.cpp || cmake_object_order_depends_target_drako-audio_Debug
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako-audio.dir
+  OBJECT_FILE_DIR = include\drako\audio\CMakeFiles\drako-audio.dir\src
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako-audio.dir\drako-audio.pdb
+  TARGET_PDB = include\drako\audio\drako-audio.pdb
+
+build include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_output_device_win32.cpp.obj: CXX_COMPILER__drako-audio_Debug ..\..\..\include\drako\audio\src\audio_output_device_win32.cpp || cmake_object_order_depends_target_drako-audio_Debug
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako-audio.dir
+  OBJECT_FILE_DIR = include\drako\audio\CMakeFiles\drako-audio.dir\src
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako-audio.dir\drako-audio.pdb
+  TARGET_PDB = include\drako\audio\drako-audio.pdb
+
+build include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_engine_win32.cpp.obj: CXX_COMPILER__drako-audio_Debug ..\..\..\include\drako\audio\src\audio_engine_win32.cpp || cmake_object_order_depends_target_drako-audio_Debug
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako-audio.dir
+  OBJECT_FILE_DIR = include\drako\audio\CMakeFiles\drako-audio.dir\src
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako-audio.dir\drako-audio.pdb
+  TARGET_PDB = include\drako\audio\drako-audio.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target drako-audio
+
+
+#############################################
+# Link the static library include\drako\audio\drako-audio.lib
+
+build include\drako\audio\drako-audio.lib: CXX_STATIC_LIBRARY_LINKER__drako-audio_Debug include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_input_device_win32.cpp.obj include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_output_device_win32.cpp.obj include\drako\audio\CMakeFiles\drako-audio.dir\src\audio_engine_win32.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako-audio.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako-audio.dir\drako-audio.pdb
+  TARGET_FILE = include\drako\audio\drako-audio.lib
+  TARGET_PDB = include\drako\audio\drako-audio.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target drako_audio_test
+
+
+#############################################
+# Order-only phony target for drako_audio_test
+
+build cmake_object_order_depends_target_drako_audio_test_Debug: phony || cmake_object_order_depends_target_drako-audio_Debug
+
+build include\drako\audio\CMakeFiles\drako_audio_test.dir\test\main_audio_test.cpp.obj: CXX_COMPILER__drako_audio_test_Debug ..\..\..\include\drako\audio\test\main_audio_test.cpp || cmake_object_order_depends_target_drako_audio_test_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako_audio_test.dir
+  OBJECT_FILE_DIR = include\drako\audio\CMakeFiles\drako_audio_test.dir\test
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako_audio_test.dir\
+  TARGET_PDB = ..\..\..\build\drako_audio_test.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target drako_audio_test
+
+
+#############################################
+# Link the executable ..\..\..\build\drako_audio_test.exe
+
+build ..\..\..\build\drako_audio_test.exe: CXX_EXECUTABLE_LINKER__drako_audio_test_Debug include\drako\audio\CMakeFiles\drako_audio_test.dir\test\main_audio_test.cpp.obj | include\drako\audio\drako-audio.lib || include\drako\audio\drako-audio.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\audio\drako-audio.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\audio\CMakeFiles\drako_audio_test.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\audio\CMakeFiles\drako_audio_test.dir\
+  TARGET_FILE = ..\..\..\build\drako_audio_test.exe
+  TARGET_IMPLIB = include\drako\audio\drako_audio_test.lib
+  TARGET_PDB = ..\..\..\build\drako_audio_test.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build include\drako\audio\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\audio" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\Edoardo Grassi\Source\Repos\drako_framework" -B"C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug""
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build include\drako\audio\rebuild_cache: phony include\drako\audio\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build include\drako\audio\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\audio" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build include\drako\audio\test: phony include\drako\audio\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\audio\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\audio" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\audio\edit_cache: phony include\drako\audio\CMakeFiles\edit_cache.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
+# =============================================================================
+
 
 #############################################
 # Utility command for rebuild_cache
@@ -439,44 +486,6 @@ build include\drako\core\edit_cache: phony include\drako\core\CMakeFiles\edit_ca
 # Write statements declared in CMakeLists.txt:
 # C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
 # =============================================================================
-
-# =============================================================================
-# Object build statements for EXECUTABLE target sync-queue-test
-
-
-#############################################
-# Order-only phony target for sync-queue-test
-
-build cmake_object_order_depends_target_sync-queue-test_Debug: phony || include\drako\concurrency\CMakeFiles\sync-queue-test.dir
-
-build include\drako\concurrency\CMakeFiles\sync-queue-test.dir\test\concurrent_bounded_queue.cpp.obj: CXX_COMPILER__sync-queue-test_Debug ..\..\..\include\drako\concurrency\test\concurrent_bounded_queue.cpp || cmake_object_order_depends_target_sync-queue-test_Debug
-  DEFINES = -DNOMINMAX
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++17
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\concurrency\CMakeFiles\sync-queue-test.dir
-  OBJECT_FILE_DIR = include\drako\concurrency\CMakeFiles\sync-queue-test.dir\test
-  TARGET_COMPILE_PDB = include\drako\concurrency\CMakeFiles\sync-queue-test.dir\
-  TARGET_PDB = ..\..\..\build\sync-queue-test.pdb
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target sync-queue-test
-
-
-#############################################
-# Link the executable ..\..\..\build\sync-queue-test.exe
-
-build ..\..\..\build\sync-queue-test.exe: CXX_EXECUTABLE_LINKER__sync-queue-test_Debug include\drako\concurrency\CMakeFiles\sync-queue-test.dir\test\concurrent_bounded_queue.cpp.obj
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = include\drako\concurrency\CMakeFiles\sync-queue-test.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\concurrency\CMakeFiles\sync-queue-test.dir\
-  TARGET_FILE = ..\..\..\build\sync-queue-test.exe
-  TARGET_IMPLIB = include\drako\concurrency\sync-queue-test.lib
-  TARGET_PDB = ..\..\..\build\sync-queue-test.pdb
 
 
 #############################################
@@ -572,6 +581,15 @@ build include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj:
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\drako-devel.dir\drako-devel.pdb
   TARGET_PDB = include\drako\devel\drako-devel.pdb
 
+build include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid_engine.cpp.obj: CXX_COMPILER__drako-devel_Debug ..\..\..\include\drako\devel\src\uuid_engine.cpp || cmake_object_order_depends_target_drako-devel_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\devel\CMakeFiles\drako-devel.dir
+  OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\drako-devel.dir\src
+  TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\drako-devel.dir\drako-devel.pdb
+  TARGET_PDB = include\drako\devel\drako-devel.pdb
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target drako-devel
@@ -580,7 +598,7 @@ build include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj:
 #############################################
 # Link the static library include\drako\devel\drako-devel.lib
 
-build include\drako\devel\drako-devel.lib: CXX_STATIC_LIBRARY_LINKER__drako-devel_Debug include\drako\devel\CMakeFiles\drako-devel.dir\src\build_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_types.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj
+build include\drako\devel\drako-devel.lib: CXX_STATIC_LIBRARY_LINKER__drako-devel_Debug include\drako\devel\CMakeFiles\drako-devel.dir\src\build_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_types.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid_engine.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\devel\CMakeFiles\drako-devel.dir
@@ -608,6 +626,15 @@ build include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj:
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\uuid-test1-exe.dir\
   TARGET_PDB = ..\..\..\build\uuid-test1-exe.pdb
 
+build include\drako\devel\CMakeFiles\uuid-test1-exe.dir\src\uuid_engine.cpp.obj: CXX_COMPILER__uuid-test1-exe_Debug ..\..\..\include\drako\devel\src\uuid_engine.cpp || cmake_object_order_depends_target_uuid-test1-exe_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\devel\CMakeFiles\uuid-test1-exe.dir
+  OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\uuid-test1-exe.dir\src
+  TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\uuid-test1-exe.dir\
+  TARGET_PDB = ..\..\..\build\uuid-test1-exe.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target uuid-test1-exe
@@ -616,7 +643,7 @@ build include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj:
 #############################################
 # Link the executable ..\..\..\build\uuid-test1-exe.exe
 
-build ..\..\..\build\uuid-test1-exe.exe: CXX_EXECUTABLE_LINKER__uuid-test1-exe_Debug include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj | include\drako\devel\drako-devel.lib || include\drako\devel\drako-devel.lib
+build ..\..\..\build\uuid-test1-exe.exe: CXX_EXECUTABLE_LINKER__uuid-test1-exe_Debug include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj include\drako\devel\CMakeFiles\uuid-test1-exe.dir\src\uuid_engine.cpp.obj | include\drako\devel\drako-devel.lib || include\drako\devel\drako-devel.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = include\drako\devel\drako-devel.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -657,6 +684,15 @@ build include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\test\build_utils_
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\
   TARGET_PDB = ..\..\..\build\build-utils-test1-exe.pdb
 
+build include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\src\uuid_engine.cpp.obj: CXX_COMPILER__build-utils-test1-exe_Debug ..\..\..\include\drako\devel\src\uuid_engine.cpp || cmake_object_order_depends_target_build-utils-test1-exe_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\devel\CMakeFiles\build-utils-test1-exe.dir
+  OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\src
+  TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\
+  TARGET_PDB = ..\..\..\build\build-utils-test1-exe.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target build-utils-test1-exe
@@ -665,7 +701,7 @@ build include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\test\build_utils_
 #############################################
 # Link the executable ..\..\..\build\build-utils-test1-exe.exe
 
-build ..\..\..\build\build-utils-test1-exe.exe: CXX_EXECUTABLE_LINKER__build-utils-test1-exe_Debug include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\test\build_utils_test1.cpp.obj | include\drako\devel\drako-devel.lib || include\drako\devel\drako-devel.lib
+build ..\..\..\build\build-utils-test1-exe.exe: CXX_EXECUTABLE_LINKER__build-utils-test1-exe_Debug include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\test\build_utils_test1.cpp.obj include\drako\devel\CMakeFiles\build-utils-test1-exe.dir\src\uuid_engine.cpp.obj | include\drako\devel\drako-devel.lib || include\drako\devel\drako-devel.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = include\drako\devel\drako-devel.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -707,6 +743,118 @@ build include\drako\devel\test: phony include\drako\devel\CMakeFiles\test.util
 # =============================================================================
 
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target render-system
+
+
+#############################################
+# Order-only phony target for render-system
+
+build cmake_object_order_depends_target_render-system_Debug: phony || cmake_object_order_depends_target_vulkan-forward-renderer_Debug
+
+build include\drako\engine\CMakeFiles\render-system.dir\src\render_system.cpp.obj: CXX_COMPILER__render-system_Debug ..\..\..\include\drako\engine\src\render_system.cpp || cmake_object_order_depends_target_render-system_Debug
+  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
+  OBJECT_DIR = include\drako\engine\CMakeFiles\render-system.dir
+  OBJECT_FILE_DIR = include\drako\engine\CMakeFiles\render-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\engine\CMakeFiles\render-system.dir\render-system.pdb
+  TARGET_PDB = include\drako\engine\render-system.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target render-system
+
+
+#############################################
+# Link the static library include\drako\engine\render-system.lib
+
+build include\drako\engine\render-system.lib: CXX_STATIC_LIBRARY_LINKER__render-system_Debug include\drako\engine\CMakeFiles\render-system.dir\src\render_system.cpp.obj || include\drako\graphics\vulkan-forward-renderer.lib
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\engine\CMakeFiles\render-system.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\engine\CMakeFiles\render-system.dir\render-system.pdb
+  TARGET_FILE = include\drako\engine\render-system.lib
+  TARGET_PDB = include\drako\engine\render-system.pdb
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target drako-runtime
+
+
+#############################################
+# Order-only phony target for drako-runtime
+
+build cmake_object_order_depends_target_drako-runtime_Debug: phony || include\drako\engine\CMakeFiles\drako-runtime.dir
+
+build include\drako\engine\CMakeFiles\drako-runtime.dir\src\runtime_asset_manager.cpp.obj: CXX_COMPILER__drako-runtime_Debug ..\..\..\include\drako\engine\src\runtime_asset_manager.cpp || cmake_object_order_depends_target_drako-runtime_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir
+  OBJECT_FILE_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir\src
+  TARGET_COMPILE_PDB = include\drako\engine\CMakeFiles\drako-runtime.dir\drako-runtime.pdb
+  TARGET_PDB = include\drako\engine\drako-runtime.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target drako-runtime
+
+
+#############################################
+# Link the static library include\drako\engine\drako-runtime.lib
+
+build include\drako\engine\drako-runtime.lib: CXX_STATIC_LIBRARY_LINKER__drako-runtime_Debug include\drako\engine\CMakeFiles\drako-runtime.dir\src\runtime_asset_manager.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\engine\CMakeFiles\drako-runtime.dir\drako-runtime.pdb
+  TARGET_FILE = include\drako\engine\drako-runtime.lib
+  TARGET_PDB = include\drako\engine\drako-runtime.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build include\drako\engine\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\engine" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\Edoardo Grassi\Source\Repos\drako_framework" -B"C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug""
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build include\drako\engine\rebuild_cache: phony include\drako\engine\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build include\drako\engine\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\engine" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build include\drako\engine\test: phony include\drako\engine\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\engine\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\engine" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\engine\edit_cache: phony include\drako\engine\CMakeFiles\edit_cache.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
 # Object build statements for STATIC_LIBRARY target drako-bmp
 
 
@@ -715,12 +863,12 @@ build include\drako\devel\test: phony include\drako\devel\CMakeFiles\test.util
 
 build cmake_object_order_depends_target_drako-bmp_Debug: phony || include\drako\file_formats\CMakeFiles\drako-bmp.dir
 
-build include\drako\file_formats\CMakeFiles\drako-bmp.dir\src\bmp.cpp.obj: CXX_COMPILER__drako-bmp_Debug ..\..\..\include\drako\file_formats\src\bmp.cpp || cmake_object_order_depends_target_drako-bmp_Debug
+build include\drako\file_formats\CMakeFiles\drako-bmp.dir\bmp\bmp.cpp.obj: CXX_COMPILER__drako-bmp_Debug ..\..\..\include\drako\file_formats\bmp\bmp.cpp || cmake_object_order_depends_target_drako-bmp_Debug
   DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
   OBJECT_DIR = include\drako\file_formats\CMakeFiles\drako-bmp.dir
-  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\drako-bmp.dir\src
+  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\drako-bmp.dir\bmp
   TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\drako-bmp.dir\drako-bmp.pdb
   TARGET_PDB = include\drako\file_formats\drako-bmp.pdb
 
@@ -732,7 +880,7 @@ build include\drako\file_formats\CMakeFiles\drako-bmp.dir\src\bmp.cpp.obj: CXX_C
 #############################################
 # Link the static library include\drako\file_formats\drako-bmp.lib
 
-build include\drako\file_formats\drako-bmp.lib: CXX_STATIC_LIBRARY_LINKER__drako-bmp_Debug include\drako\file_formats\CMakeFiles\drako-bmp.dir\src\bmp.cpp.obj
+build include\drako\file_formats\drako-bmp.lib: CXX_STATIC_LIBRARY_LINKER__drako-bmp_Debug include\drako\file_formats\CMakeFiles\drako-bmp.dir\bmp\bmp.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\file_formats\CMakeFiles\drako-bmp.dir
@@ -811,7 +959,7 @@ build include\drako\file_formats\drako-json.lib: CXX_STATIC_LIBRARY_LINKER__drak
 
 build cmake_object_order_depends_target_drako-drakoson_Debug: phony || include\drako\file_formats\CMakeFiles\drako-drakoson.dir
 
-build include\drako\file_formats\CMakeFiles\drako-drakoson.dir\src\drakoson.cpp.obj: CXX_COMPILER__drako-drakoson_Debug ..\..\..\include\drako\file_formats\src\drakoson.cpp || cmake_object_order_depends_target_drako-drakoson_Debug
+build include\drako\file_formats\CMakeFiles\drako-drakoson.dir\src\dson.cpp.obj: CXX_COMPILER__drako-drakoson_Debug ..\..\..\include\drako\file_formats\src\dson.cpp || cmake_object_order_depends_target_drako-drakoson_Debug
   DEFINES = -DNOMINMAX
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
@@ -828,7 +976,7 @@ build include\drako\file_formats\CMakeFiles\drako-drakoson.dir\src\drakoson.cpp.
 #############################################
 # Link the static library include\drako\file_formats\drako-drakoson.lib
 
-build include\drako\file_formats\drako-drakoson.lib: CXX_STATIC_LIBRARY_LINKER__drako-drakoson_Debug include\drako\file_formats\CMakeFiles\drako-drakoson.dir\src\drakoson.cpp.obj
+build include\drako\file_formats\drako-drakoson.lib: CXX_STATIC_LIBRARY_LINKER__drako-drakoson_Debug include\drako\file_formats\CMakeFiles\drako-drakoson.dir\src\dson.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\file_formats\CMakeFiles\drako-drakoson.dir
@@ -848,6 +996,196 @@ build include\drako\file_formats\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
   restat = 1
 
 build include\drako\file_formats\edit_cache: phony include\drako\file_formats\CMakeFiles\edit_cache.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/file_formats/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target drako-png
+
+
+#############################################
+# Order-only phony target for drako-png
+
+build cmake_object_order_depends_target_drako-png_Debug: phony || include\drako\file_formats\png\CMakeFiles\drako-png.dir
+
+build include\drako\file_formats\png\CMakeFiles\drako-png.dir\src\png.cpp.obj: CXX_COMPILER__drako-png_Debug ..\..\..\include\drako\file_formats\png\src\png.cpp || cmake_object_order_depends_target_drako-png_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\png\CMakeFiles\drako-png.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\png\CMakeFiles\drako-png.dir\src
+  TARGET_COMPILE_PDB = include\drako\file_formats\png\CMakeFiles\drako-png.dir\drako-png.pdb
+  TARGET_PDB = include\drako\file_formats\png\drako-png.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target drako-png
+
+
+#############################################
+# Link the static library include\drako\file_formats\png\drako-png.lib
+
+build include\drako\file_formats\png\drako-png.lib: CXX_STATIC_LIBRARY_LINKER__drako-png_Debug include\drako\file_formats\png\CMakeFiles\drako-png.dir\src\png.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\file_formats\png\CMakeFiles\drako-png.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\png\CMakeFiles\drako-png.dir\drako-png.pdb
+  TARGET_FILE = include\drako\file_formats\png\drako-png.lib
+  TARGET_PDB = include\drako\file_formats\png\drako-png.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build include\drako\file_formats\png\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\png" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\Edoardo Grassi\Source\Repos\drako_framework" -B"C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug""
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build include\drako\file_formats\png\rebuild_cache: phony include\drako\file_formats\png\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build include\drako\file_formats\png\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\png" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build include\drako\file_formats\png\test: phony include\drako\file_formats\png\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\file_formats\png\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\png" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\file_formats\png\edit_cache: phony include\drako\file_formats\png\CMakeFiles\edit_cache.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/Edoardo Grassi/Source/Repos/drako_framework/include/drako/file_formats/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target drako-format-wave
+
+
+#############################################
+# Order-only phony target for drako-format-wave
+
+build cmake_object_order_depends_target_drako-format-wave_Debug: phony || include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir
+
+build include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir\src\wave.cpp.obj: CXX_COMPILER__drako-format-wave_Debug ..\..\..\include\drako\file_formats\wave\src\wave.cpp || cmake_object_order_depends_target_drako-format-wave_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir\src
+  TARGET_COMPILE_PDB = include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir\drako-format-wave.pdb
+  TARGET_PDB = include\drako\file_formats\wave\drako-format-wave.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target drako-format-wave
+
+
+#############################################
+# Link the static library include\drako\file_formats\wave\drako-format-wave.lib
+
+build include\drako\file_formats\wave\drako-format-wave.lib: CXX_STATIC_LIBRARY_LINKER__drako-format-wave_Debug include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir\src\wave.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\wave\CMakeFiles\drako-format-wave.dir\drako-format-wave.pdb
+  TARGET_FILE = include\drako\file_formats\wave\drako-format-wave.lib
+  TARGET_PDB = include\drako\file_formats\wave\drako-format-wave.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target drako-wave-viewer
+
+
+#############################################
+# Order-only phony target for drako-wave-viewer
+
+build cmake_object_order_depends_target_drako-wave-viewer_Debug: phony || cmake_object_order_depends_target_drako-format-wave_Debug cmake_object_order_depends_target_drako-io_Debug
+
+build include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir\src\wave_viewer.cpp.obj: CXX_COMPILER__drako-wave-viewer_Debug ..\..\..\include\drako\file_formats\wave\src\wave_viewer.cpp || cmake_object_order_depends_target_drako-wave-viewer_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir\src
+  TARGET_COMPILE_PDB = include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir\
+  TARGET_PDB = D:\Desktop\drako_test_zone\wave\drako-wave-viewer.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target drako-wave-viewer
+
+
+#############################################
+# Link the executable D:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe
+
+build D$:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe: CXX_EXECUTABLE_LINKER__drako-wave-viewer_Debug include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir\src\wave_viewer.cpp.obj | include\drako\file_formats\wave\drako-format-wave.lib include\drako\io\drako-io.lib || include\drako\file_formats\wave\drako-format-wave.lib include\drako\io\drako-io.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\file_formats\wave\drako-format-wave.lib  include\drako\io\drako-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\wave\CMakeFiles\drako-wave-viewer.dir\
+  TARGET_FILE = D:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe
+  TARGET_IMPLIB = include\drako\file_formats\wave\drako-wave-viewer.lib
+  TARGET_PDB = D:\Desktop\drako_test_zone\wave\drako-wave-viewer.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build include\drako\file_formats\wave\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\wave" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\Edoardo Grassi\Source\Repos\drako_framework" -B"C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug""
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build include\drako\file_formats\wave\rebuild_cache: phony include\drako\file_formats\wave\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build include\drako\file_formats\wave\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\wave" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build include\drako\file_formats\wave\test: phony include\drako\file_formats\wave\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\file_formats\wave\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\file_formats\wave" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\file_formats\wave\edit_cache: phony include\drako\file_formats\wave\CMakeFiles\edit_cache.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -898,6 +1236,44 @@ build include\drako\file_formats\wavefront\drako-obj.lib: CXX_STATIC_LIBRARY_LIN
   TARGET_COMPILE_PDB = include\drako\file_formats\wavefront\CMakeFiles\drako-obj.dir\drako-obj.pdb
   TARGET_FILE = include\drako\file_formats\wavefront\drako-obj.lib
   TARGET_PDB = include\drako\file_formats\wavefront\drako-obj.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target drako-obj-viewer
+
+
+#############################################
+# Order-only phony target for drako-obj-viewer
+
+build cmake_object_order_depends_target_drako-obj-viewer_Debug: phony || cmake_object_order_depends_target_drako-io_Debug cmake_object_order_depends_target_drako-obj_Debug
+
+build include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir\src\drako_obj_viewer.cpp.obj: CXX_COMPILER__drako-obj-viewer_Debug ..\..\..\include\drako\file_formats\wavefront\src\drako_obj_viewer.cpp || cmake_object_order_depends_target_drako-obj-viewer_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir\src
+  TARGET_COMPILE_PDB = include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir\
+  TARGET_PDB = D:\Desktop\drako_test_zone\drako-obj-viewer.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target drako-obj-viewer
+
+
+#############################################
+# Link the executable D:\Desktop\drako_test_zone\drako-obj-viewer.exe
+
+build D$:\Desktop\drako_test_zone\drako-obj-viewer.exe: CXX_EXECUTABLE_LINKER__drako-obj-viewer_Debug include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir\src\drako_obj_viewer.cpp.obj | include\drako\file_formats\wavefront\drako-obj.lib include\drako\io\drako-io.lib || include\drako\file_formats\wavefront\drako-obj.lib include\drako\io\drako-io.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\file_formats\wavefront\drako-obj.lib  include\drako\io\drako-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\wavefront\CMakeFiles\drako-obj-viewer.dir\
+  TARGET_FILE = D:\Desktop\drako_test_zone\drako-obj-viewer.exe
+  TARGET_IMPLIB = include\drako\file_formats\wavefront\drako-obj-viewer.lib
+  TARGET_PDB = D:\Desktop\drako_test_zone\drako-obj-viewer.pdb
 
 
 #############################################
@@ -1107,7 +1483,7 @@ build include\drako\input\edit_cache: phony include\drako\input\CMakeFiles\edit_
 
 build cmake_object_order_depends_target_drako-io_Debug: phony || include\drako\io\CMakeFiles\drako-io.dir
 
-build include\drako\io\CMakeFiles\drako-io.dir\src\inout_file_stream.cpp.obj: CXX_COMPILER__drako-io_Debug ..\..\..\include\drako\io\src\inout_file_stream.cpp || cmake_object_order_depends_target_drako-io_Debug
+build include\drako\io\CMakeFiles\drako-io.dir\src\input_output_file_stream.cpp.obj: CXX_COMPILER__drako-io_Debug ..\..\..\include\drako\io\src\input_output_file_stream.cpp || cmake_object_order_depends_target_drako-io_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
@@ -1152,6 +1528,15 @@ build include\drako\io\CMakeFiles\drako-io.dir\src\vio_file_handle.cpp.obj: CXX_
   TARGET_COMPILE_PDB = include\drako\io\CMakeFiles\drako-io.dir\drako-io.pdb
   TARGET_PDB = include\drako\io\drako-io.pdb
 
+build include\drako\io\CMakeFiles\drako-io.dir\test\input_output_test.cpp.obj: CXX_COMPILER__drako-io_Debug ..\..\..\include\drako\io\test\input_output_test.cpp || cmake_object_order_depends_target_drako-io_Debug
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\io\CMakeFiles\drako-io.dir
+  OBJECT_FILE_DIR = include\drako\io\CMakeFiles\drako-io.dir\test
+  TARGET_COMPILE_PDB = include\drako\io\CMakeFiles\drako-io.dir\drako-io.pdb
+  TARGET_PDB = include\drako\io\drako-io.pdb
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target drako-io
@@ -1160,7 +1545,7 @@ build include\drako\io\CMakeFiles\drako-io.dir\src\vio_file_handle.cpp.obj: CXX_
 #############################################
 # Link the static library include\drako\io\drako-io.lib
 
-build include\drako\io\drako-io.lib: CXX_STATIC_LIBRARY_LINKER__drako-io_Debug include\drako\io\CMakeFiles\drako-io.dir\src\inout_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\input_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\output_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\aio_file_handle.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\vio_file_handle.cpp.obj
+build include\drako\io\drako-io.lib: CXX_STATIC_LIBRARY_LINKER__drako-io_Debug include\drako\io\CMakeFiles\drako-io.dir\src\input_output_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\input_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\output_file_stream.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\aio_file_handle.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\src\vio_file_handle.cpp.obj include\drako\io\CMakeFiles\drako-io.dir\test\input_output_test.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\io\CMakeFiles\drako-io.dir
@@ -1169,6 +1554,44 @@ build include\drako\io\drako-io.lib: CXX_STATIC_LIBRARY_LINKER__drako-io_Debug i
   TARGET_COMPILE_PDB = include\drako\io\CMakeFiles\drako-io.dir\drako-io.pdb
   TARGET_FILE = include\drako\io\drako-io.lib
   TARGET_PDB = include\drako\io\drako-io.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target test_io_1
+
+
+#############################################
+# Order-only phony target for test_io_1
+
+build cmake_object_order_depends_target_test_io_1_Debug: phony || include\drako\io\CMakeFiles\test_io_1.dir
+
+build include\drako\io\CMakeFiles\test_io_1.dir\test\input_output_test.cpp.obj: CXX_COMPILER__test_io_1_Debug ..\..\..\include\drako\io\test\input_output_test.cpp || cmake_object_order_depends_target_test_io_1_Debug
+  DEFINES = -DNOMINMAX
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\io\CMakeFiles\test_io_1.dir
+  OBJECT_FILE_DIR = include\drako\io\CMakeFiles\test_io_1.dir\test
+  TARGET_COMPILE_PDB = include\drako\io\CMakeFiles\test_io_1.dir\
+  TARGET_PDB = ..\..\..\build\test_io_1.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target test_io_1
+
+
+#############################################
+# Link the executable ..\..\..\build\test_io_1.exe
+
+build ..\..\..\build\test_io_1.exe: CXX_EXECUTABLE_LINKER__test_io_1_Debug include\drako\io\CMakeFiles\test_io_1.dir\test\input_output_test.cpp.obj
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\io\CMakeFiles\test_io_1.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\io\CMakeFiles\test_io_1.dir\
+  TARGET_FILE = ..\..\..\build\test_io_1.exe
+  TARGET_IMPLIB = include\drako\io\test_io_1.lib
+  TARGET_PDB = ..\..\..\build\test_io_1.pdb
 
 
 #############################################
@@ -1286,88 +1709,77 @@ build include\drako\physics\edit_cache: phony include\drako\physics\CMakeFiles\e
 # C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
 # =============================================================================
 
-
-#############################################
-# Utility command for edit_cache
-
-build include\drako\system\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\system" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
-  DESC = No interactive CMake dialog available...
-  restat = 1
-
-build include\drako\system\edit_cache: phony include\drako\system\CMakeFiles\edit_cache.util
-
 # =============================================================================
-# Object build statements for STATIC_LIBRARY target drako-native-sys
+# Object build statements for STATIC_LIBRARY target drako-system
 
 
 #############################################
-# Order-only phony target for drako-native-sys
+# Order-only phony target for drako-system
 
-build cmake_object_order_depends_target_drako-native-sys_Debug: phony || include\drako\system\CMakeFiles\drako-native-sys.dir
+build cmake_object_order_depends_target_drako-system_Debug: phony || include\drako\system\CMakeFiles\drako-system.dir
 
-build include\drako\system\CMakeFiles\drako-native-sys.dir\src\desktop_window_win32.cpp.obj: CXX_COMPILER__drako-native-sys_Debug ..\..\..\include\drako\system\src\desktop_window_win32.cpp || cmake_object_order_depends_target_drako-native-sys_Debug
+build include\drako\system\CMakeFiles\drako-system.dir\src\desktop_window_win32.cpp.obj: CXX_COMPILER__drako-system_Debug ..\..\..\include\drako\system\src\desktop_window_win32.cpp || cmake_object_order_depends_target_drako-system_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
-  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir\src
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
+  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
-build include\drako\system\CMakeFiles\drako-native-sys.dir\src\keyboard_device_win32.cpp.obj: CXX_COMPILER__drako-native-sys_Debug ..\..\..\include\drako\system\src\keyboard_device_win32.cpp || cmake_object_order_depends_target_drako-native-sys_Debug
+build include\drako\system\CMakeFiles\drako-system.dir\src\keyboard_device_win32.cpp.obj: CXX_COMPILER__drako-system_Debug ..\..\..\include\drako\system\src\keyboard_device_win32.cpp || cmake_object_order_depends_target_drako-system_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
-  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir\src
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
+  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
-build include\drako\system\CMakeFiles\drako-native-sys.dir\src\native_mouse_device_win32.cpp.obj: CXX_COMPILER__drako-native-sys_Debug ..\..\..\include\drako\system\src\native_mouse_device_win32.cpp || cmake_object_order_depends_target_drako-native-sys_Debug
+build include\drako\system\CMakeFiles\drako-system.dir\src\native_mouse_device_win32.cpp.obj: CXX_COMPILER__drako-system_Debug ..\..\..\include\drako\system\src\native_mouse_device_win32.cpp || cmake_object_order_depends_target_drako-system_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
-  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir\src
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
+  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
-build include\drako\system\CMakeFiles\drako-native-sys.dir\src\hid_api_win32.cpp.obj: CXX_COMPILER__drako-native-sys_Debug ..\..\..\include\drako\system\src\hid_api_win32.cpp || cmake_object_order_depends_target_drako-native-sys_Debug
+build include\drako\system\CMakeFiles\drako-system.dir\src\hid_api_win32.cpp.obj: CXX_COMPILER__drako-system_Debug ..\..\..\include\drako\system\src\hid_api_win32.cpp || cmake_object_order_depends_target_drako-system_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
-  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir\src
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
+  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
-build include\drako\system\CMakeFiles\drako-native-sys.dir\src\system_info_win32.cpp.obj: CXX_COMPILER__drako-native-sys_Debug ..\..\..\include\drako\system\src\system_info_win32.cpp || cmake_object_order_depends_target_drako-native-sys_Debug
+build include\drako\system\CMakeFiles\drako-system.dir\src\system_info_win32.cpp.obj: CXX_COMPILER__drako-system_Debug ..\..\..\include\drako\system\src\system_info_win32.cpp || cmake_object_order_depends_target_drako-system_Debug
   DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
   INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
-  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir\src
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
+  OBJECT_FILE_DIR = include\drako\system\CMakeFiles\drako-system.dir\src
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
 
 # =============================================================================
-# Link build statements for STATIC_LIBRARY target drako-native-sys
+# Link build statements for STATIC_LIBRARY target drako-system
 
 
 #############################################
-# Link the static library include\drako\system\drako-native-sys.lib
+# Link the static library include\drako\system\drako-system.lib
 
-build include\drako\system\drako-native-sys.lib: CXX_STATIC_LIBRARY_LINKER__drako-native-sys_Debug include\drako\system\CMakeFiles\drako-native-sys.dir\src\desktop_window_win32.cpp.obj include\drako\system\CMakeFiles\drako-native-sys.dir\src\keyboard_device_win32.cpp.obj include\drako\system\CMakeFiles\drako-native-sys.dir\src\native_mouse_device_win32.cpp.obj include\drako\system\CMakeFiles\drako-native-sys.dir\src\hid_api_win32.cpp.obj include\drako\system\CMakeFiles\drako-native-sys.dir\src\system_info_win32.cpp.obj
+build include\drako\system\drako-system.lib: CXX_STATIC_LIBRARY_LINKER__drako-system_Debug include\drako\system\CMakeFiles\drako-system.dir\src\desktop_window_win32.cpp.obj include\drako\system\CMakeFiles\drako-system.dir\src\keyboard_device_win32.cpp.obj include\drako\system\CMakeFiles\drako-system.dir\src\native_mouse_device_win32.cpp.obj include\drako\system\CMakeFiles\drako-system.dir\src\hid_api_win32.cpp.obj include\drako\system\CMakeFiles\drako-system.dir\src\system_info_win32.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
-  OBJECT_DIR = include\drako\system\CMakeFiles\drako-native-sys.dir
+  OBJECT_DIR = include\drako\system\CMakeFiles\drako-system.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-native-sys.dir\drako-native-sys.pdb
-  TARGET_FILE = include\drako\system\drako-native-sys.lib
-  TARGET_PDB = include\drako\system\drako-native-sys.pdb
+  TARGET_COMPILE_PDB = include\drako\system\CMakeFiles\drako-system.dir\drako-system.pdb
+  TARGET_FILE = include\drako\system\drako-system.lib
+  TARGET_PDB = include\drako\system\drako-system.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target drako-hid-test
@@ -1376,7 +1788,7 @@ build include\drako\system\drako-native-sys.lib: CXX_STATIC_LIBRARY_LINKER__drak
 #############################################
 # Order-only phony target for drako-hid-test
 
-build cmake_object_order_depends_target_drako-hid-test_Debug: phony || cmake_object_order_depends_target_drako-native-sys_Debug
+build cmake_object_order_depends_target_drako-hid-test_Debug: phony || cmake_object_order_depends_target_drako-system_Debug
 
 build include\drako\system\CMakeFiles\drako-hid-test.dir\test\hid_app_test.cpp.obj: CXX_COMPILER__drako-hid-test_Debug ..\..\..\include\drako\system\test\hid_app_test.cpp || cmake_object_order_depends_target_drako-hid-test_Debug
   DEFINES = -DNOMINMAX
@@ -1395,10 +1807,10 @@ build include\drako\system\CMakeFiles\drako-hid-test.dir\test\hid_app_test.cpp.o
 #############################################
 # Link the executable ..\..\..\build\drako-hid-test.exe
 
-build ..\..\..\build\drako-hid-test.exe: CXX_EXECUTABLE_LINKER__drako-hid-test_Debug include\drako\system\CMakeFiles\drako-hid-test.dir\test\hid_app_test.cpp.obj | include\drako\system\drako-native-sys.lib || include\drako\system\drako-native-sys.lib
+build ..\..\..\build\drako-hid-test.exe: CXX_EXECUTABLE_LINKER__drako-hid-test_Debug include\drako\system\CMakeFiles\drako-hid-test.dir\test\hid_app_test.cpp.obj | include\drako\system\drako-system.lib || include\drako\system\drako-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
-  LINK_LIBRARIES = include\drako\system\drako-native-sys.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\system\drako-system.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = include\drako\system\CMakeFiles\drako-hid-test.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -1431,6 +1843,17 @@ build include\drako\system\CMakeFiles\test.util: CUSTOM_COMMAND
 
 build include\drako\system\test: phony include\drako\system\CMakeFiles\test.util
 
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\system\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\system" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\system\edit_cache: phony include\drako\system\CMakeFiles\edit_cache.util
+
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
 # C:/Users/Edoardo Grassi/Source/Repos/drako_framework/CMakeLists.txt
@@ -1454,6 +1877,15 @@ build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_f
   TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\vulkan-forward-renderer.pdb
   TARGET_PDB = include\drako\graphics\vulkan-forward-renderer.pdb
 
+build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_memory_allocator.cpp.obj: CXX_COMPILER__vulkan-forward-renderer_Debug ..\..\..\include\drako\graphics\src\vulkan_memory_allocator.cpp || cmake_object_order_depends_target_vulkan-forward-renderer_Debug
+  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
+  OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
+  OBJECT_FILE_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src
+  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\vulkan-forward-renderer.pdb
+  TARGET_PDB = include\drako\graphics\vulkan-forward-renderer.pdb
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target vulkan-forward-renderer
@@ -1462,7 +1894,7 @@ build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_f
 #############################################
 # Link the static library include\drako\graphics\vulkan-forward-renderer.lib
 
-build include\drako\graphics\vulkan-forward-renderer.lib: CXX_STATIC_LIBRARY_LINKER__vulkan-forward-renderer_Debug include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_forward_renderer.cpp.obj
+build include\drako\graphics\vulkan-forward-renderer.lib: CXX_STATIC_LIBRARY_LINKER__vulkan-forward-renderer_Debug include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_forward_renderer.cpp.obj include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_memory_allocator.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
@@ -1471,89 +1903,6 @@ build include\drako\graphics\vulkan-forward-renderer.lib: CXX_STATIC_LIBRARY_LIN
   TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\vulkan-forward-renderer.pdb
   TARGET_FILE = include\drako\graphics\vulkan-forward-renderer.lib
   TARGET_PDB = include\drako\graphics\vulkan-forward-renderer.pdb
-
-
-#############################################
-# Utility command for edit_cache
-
-build include\drako\graphics\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\graphics" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
-  DESC = No interactive CMake dialog available...
-  restat = 1
-
-build include\drako\graphics\edit_cache: phony include\drako\graphics\CMakeFiles\edit_cache.util
-
-# =============================================================================
-# Object build statements for STATIC_LIBRARY target vulkan-gui-renderer
-
-
-#############################################
-# Order-only phony target for vulkan-gui-renderer
-
-build cmake_object_order_depends_target_vulkan-gui-renderer_Debug: phony || include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir
-
-build include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\src\vulkan_gui_renderer.cpp.obj: CXX_COMPILER__vulkan-gui-renderer_Debug ..\..\..\include\drako\graphics\src\vulkan_gui_renderer.cpp || cmake_object_order_depends_target_vulkan-gui-renderer_Debug
-  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
-  OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir
-  OBJECT_FILE_DIR = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\src
-  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\vulkan-gui-renderer.pdb
-  TARGET_PDB = include\drako\graphics\vulkan-gui-renderer.pdb
-
-
-# =============================================================================
-# Link build statements for STATIC_LIBRARY target vulkan-gui-renderer
-
-
-#############################################
-# Link the static library include\drako\graphics\vulkan-gui-renderer.lib
-
-build include\drako\graphics\vulkan-gui-renderer.lib: CXX_STATIC_LIBRARY_LINKER__vulkan-gui-renderer_Debug include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\src\vulkan_gui_renderer.cpp.obj
-  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64
-  OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-gui-renderer.dir\vulkan-gui-renderer.pdb
-  TARGET_FILE = include\drako\graphics\vulkan-gui-renderer.lib
-  TARGET_PDB = include\drako\graphics\vulkan-gui-renderer.pdb
-
-# =============================================================================
-# Object build statements for STATIC_LIBRARY target render-system
-
-
-#############################################
-# Order-only phony target for render-system
-
-build cmake_object_order_depends_target_render-system_Debug: phony || cmake_object_order_depends_target_vulkan-forward-renderer_Debug
-
-build include\drako\graphics\CMakeFiles\render-system.dir\src\render_system.cpp.obj: CXX_COMPILER__render-system_Debug ..\..\..\include\drako\graphics\src\render_system.cpp || cmake_object_order_depends_target_render-system_Debug
-  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd   /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
-  OBJECT_DIR = include\drako\graphics\CMakeFiles\render-system.dir
-  OBJECT_FILE_DIR = include\drako\graphics\CMakeFiles\render-system.dir\src
-  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\render-system.dir\render-system.pdb
-  TARGET_PDB = include\drako\graphics\render-system.pdb
-
-
-# =============================================================================
-# Link build statements for STATIC_LIBRARY target render-system
-
-
-#############################################
-# Link the static library include\drako\graphics\render-system.lib
-
-build include\drako\graphics\render-system.lib: CXX_STATIC_LIBRARY_LINKER__render-system_Debug include\drako\graphics\CMakeFiles\render-system.dir\src\render_system.cpp.obj || include\drako\graphics\vulkan-forward-renderer.lib
-  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64
-  OBJECT_DIR = include\drako\graphics\CMakeFiles\render-system.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\render-system.dir\render-system.pdb
-  TARGET_FILE = include\drako\graphics\render-system.lib
-  TARGET_PDB = include\drako\graphics\render-system.pdb
 
 
 #############################################
@@ -1579,12 +1928,27 @@ build include\drako\graphics\CMakeFiles\test.util: CUSTOM_COMMAND
 
 build include\drako\graphics\test: phony include\drako\graphics\CMakeFiles\test.util
 
+
+#############################################
+# Utility command for edit_cache
+
+build include\drako\graphics\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D "C:\Users\Edoardo Grassi\Source\Repos\drako_framework\out\build\x64-Debug\include\drako\graphics" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build include\drako\graphics\edit_cache: phony include\drako\graphics\CMakeFiles\edit_cache.util
+
 # =============================================================================
 # Target aliases.
 
 build build-utils-test1-exe: phony ..\..\..\build\build-utils-test1-exe.exe
 
 build build-utils-test1-exe.exe: phony ..\..\..\build\build-utils-test1-exe.exe
+
+build drako-audio: phony include\drako\audio\drako-audio.lib
+
+build drako-audio.lib: phony include\drako\audio\drako-audio.lib
 
 build drako-bmp: phony include\drako\file_formats\drako-bmp.lib
 
@@ -1610,6 +1974,10 @@ build drako-engine: phony ..\..\..\build\drako-engine.exe
 
 build drako-engine.exe: phony ..\..\..\build\drako-engine.exe
 
+build drako-format-wave: phony include\drako\file_formats\wave\drako-format-wave.lib
+
+build drako-format-wave.lib: phony include\drako\file_formats\wave\drako-format-wave.lib
+
 build drako-hid-test: phony ..\..\..\build\drako-hid-test.exe
 
 build drako-hid-test.exe: phony ..\..\..\build\drako-hid-test.exe
@@ -1622,21 +1990,33 @@ build drako-json: phony include\drako\file_formats\drako-json.lib
 
 build drako-json.lib: phony include\drako\file_formats\drako-json.lib
 
-build drako-native-sys: phony include\drako\system\drako-native-sys.lib
-
-build drako-native-sys.lib: phony include\drako\system\drako-native-sys.lib
-
 build drako-obj: phony include\drako\file_formats\wavefront\drako-obj.lib
 
-build drako-obj-importer: phony D$:\Desktop\drako_test_zone\drako-obj-importer.exe
+build drako-obj-viewer: phony D$:\Desktop\drako_test_zone\drako-obj-viewer.exe
 
-build drako-obj-importer.exe: phony D$:\Desktop\drako_test_zone\drako-obj-importer.exe
+build drako-obj-viewer.exe: phony D$:\Desktop\drako_test_zone\drako-obj-viewer.exe
 
 build drako-obj.lib: phony include\drako\file_formats\wavefront\drako-obj.lib
 
 build drako-physics: phony include\drako\physics\drako-physics.lib
 
 build drako-physics.lib: phony include\drako\physics\drako-physics.lib
+
+build drako-png: phony include\drako\file_formats\png\drako-png.lib
+
+build drako-png.lib: phony include\drako\file_formats\png\drako-png.lib
+
+build drako-runtime: phony include\drako\engine\drako-runtime.lib
+
+build drako-runtime.lib: phony include\drako\engine\drako-runtime.lib
+
+build drako-system: phony include\drako\system\drako-system.lib
+
+build drako-system.lib: phony include\drako\system\drako-system.lib
+
+build drako-wave-viewer: phony D$:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe
+
+build drako-wave-viewer.exe: phony D$:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe
 
 build drako_audio_test: phony ..\..\..\build\drako_audio_test.exe
 
@@ -1666,13 +2046,13 @@ build input-test-app: phony ..\..\..\build\input-test-app.exe
 
 build input-test-app.exe: phony ..\..\..\build\input-test-app.exe
 
-build render-system: phony include\drako\graphics\render-system.lib
+build render-system: phony include\drako\engine\render-system.lib
 
-build render-system.lib: phony include\drako\graphics\render-system.lib
+build render-system.lib: phony include\drako\engine\render-system.lib
 
-build sync-queue-test: phony ..\..\..\build\sync-queue-test.exe
+build test_io_1: phony ..\..\..\build\test_io_1.exe
 
-build sync-queue-test.exe: phony ..\..\..\build\sync-queue-test.exe
+build test_io_1.exe: phony ..\..\..\build\test_io_1.exe
 
 build uuid-test1-exe: phony ..\..\..\build\uuid-test1-exe.exe
 
@@ -1682,10 +2062,6 @@ build vulkan-forward-renderer: phony include\drako\graphics\vulkan-forward-rende
 
 build vulkan-forward-renderer.lib: phony include\drako\graphics\vulkan-forward-renderer.lib
 
-build vulkan-gui-renderer: phony include\drako\graphics\vulkan-gui-renderer.lib
-
-build vulkan-gui-renderer.lib: phony include\drako\graphics\vulkan-gui-renderer.lib
-
 # =============================================================================
 # Folder targets.
 
@@ -1694,14 +2070,21 @@ build vulkan-gui-renderer.lib: phony include\drako\graphics\vulkan-gui-renderer.
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug
 
-build all: phony ..\..\..\build\drako_threading_test.exe ..\..\..\build\drako_audio_test.exe ..\..\..\build\drako-engine.exe ..\..\..\build\drako_keyboard_test.exe ..\..\..\build\drako_mouse_test.exe ..\..\..\build\drako-cli-editor.exe ..\..\..\build\drako-builder.exe D$:\Desktop\drako_test_zone\drako-obj-importer.exe include\drako\core\all include\drako\concurrency\all include\drako\devel\all include\drako\file_formats\all include\drako\input\all include\drako\io\all include\drako\physics\all include\drako\system\all include\drako\graphics\all
+build all: phony ..\..\..\build\drako_threading_test.exe ..\..\..\build\drako-engine.exe ..\..\..\build\drako_keyboard_test.exe ..\..\..\build\drako_mouse_test.exe ..\..\..\build\drako-cli-editor.exe ..\..\..\build\drako-builder.exe include\drako\audio\all include\drako\core\all include\drako\concurrency\all include\drako\devel\all include\drako\engine\all include\drako\file_formats\all include\drako\input\all include\drako\io\all include\drako\physics\all include\drako\system\all include\drako\graphics\all
+
+# =============================================================================
+
+#############################################
+# Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/audio
+
+build include\drako\audio\all: phony include\drako\audio\drako-audio.lib ..\..\..\build\drako_audio_test.exe
 
 # =============================================================================
 
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/concurrency
 
-build include\drako\concurrency\all: phony ..\..\..\build\sync-queue-test.exe
+build include\drako\concurrency\all: phony
 
 # =============================================================================
 
@@ -1720,23 +2103,44 @@ build include\drako\devel\all: phony include\drako\devel\drako-devel.lib ..\..\.
 # =============================================================================
 
 #############################################
+# Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/engine
+
+build include\drako\engine\all: phony include\drako\engine\render-system.lib include\drako\engine\drako-runtime.lib
+
+# =============================================================================
+
+#############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats
 
-build include\drako\file_formats\all: phony include\drako\file_formats\drako-bmp.lib include\drako\file_formats\drako-json.lib include\drako\file_formats\drako-drakoson.lib include\drako\file_formats\wavefront\all
+build include\drako\file_formats\all: phony include\drako\file_formats\drako-bmp.lib include\drako\file_formats\drako-json.lib include\drako\file_formats\drako-drakoson.lib include\drako\file_formats\png\all include\drako\file_formats\wave\all include\drako\file_formats\wavefront\all
+
+# =============================================================================
+
+#############################################
+# Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/png
+
+build include\drako\file_formats\png\all: phony include\drako\file_formats\png\drako-png.lib
+
+# =============================================================================
+
+#############################################
+# Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/wave
+
+build include\drako\file_formats\wave\all: phony include\drako\file_formats\wave\drako-format-wave.lib D$:\Desktop\drako_test_zone\wave\drako-wave-viewer.exe
 
 # =============================================================================
 
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/wavefront
 
-build include\drako\file_formats\wavefront\all: phony include\drako\file_formats\wavefront\drako-obj.lib
+build include\drako\file_formats\wavefront\all: phony include\drako\file_formats\wavefront\drako-obj.lib D$:\Desktop\drako_test_zone\drako-obj-viewer.exe
 
 # =============================================================================
 
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/graphics
 
-build include\drako\graphics\all: phony include\drako\graphics\vulkan-forward-renderer.lib include\drako\graphics\vulkan-gui-renderer.lib include\drako\graphics\render-system.lib
+build include\drako\graphics\all: phony include\drako\graphics\vulkan-forward-renderer.lib
 
 # =============================================================================
 
@@ -1750,7 +2154,7 @@ build include\drako\input\all: phony include\drako\input\drako_input.lib include
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/io
 
-build include\drako\io\all: phony include\drako\io\drako-io.lib
+build include\drako\io\all: phony include\drako\io\drako-io.lib ..\..\..\build\test_io_1.exe
 
 # =============================================================================
 
@@ -1764,7 +2168,7 @@ build include\drako\physics\all: phony include\drako\physics\drako-physics.lib
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/system
 
-build include\drako\system\all: phony include\drako\system\drako-native-sys.lib ..\..\..\build\drako-hid-test.exe
+build include\drako\system\all: phony include\drako\system\drako-system.lib ..\..\..\build\drako-hid-test.exe
 
 # =============================================================================
 # Built-in targets
@@ -1787,14 +2191,14 @@ build C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | ..\..\..\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\wavefront\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\io\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.17.20032601-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\file_formats\wavefront\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\io\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.17.20032601-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build ..\..\..\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\wavefront\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\io\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.17.20032601-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeSystem.cmake: phony
+build ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\file_formats\wavefront\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\io\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt C$:\Users\Edoardo$ Grassi\Source\Repos\drako_framework\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.17\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.17.20032601-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.17.20032601-MSVC_2\CMakeSystem.cmake: phony
 
 
 #############################################

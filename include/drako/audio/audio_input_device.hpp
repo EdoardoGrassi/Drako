@@ -2,91 +2,64 @@
 #ifndef DRAKO_AUDIO_INPUT_DEVICE_HPP
 #define DRAKO_AUDIO_INPUT_DEVICE_HPP
 
-#include <chrono>
-#include <cstdlib>
-#include <memory>
-#include <system_error>
-#include <tuple>
-
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
-
-#include "drako/devel/assertion.hpp"
-#include "drako/devel/logging.hpp"
-
 #include "drako/audio/native_audio_api.hpp"
+#include "drako/core/preprocessor/platform_macros.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Audioclient.h>
+#include <Windows.h>
 #include <combaseapi.h>
 #include <mmdeviceapi.h>
 #endif
 
+#include <system_error>
+#include <tuple>
+#include <vector>
+
 namespace drako::audio
 {
-    // Unique id of an audio capture device.
-    //
-    class input_device_guid
+    /// @brief System-level unique id of an audio capture device.
+    class input_device_id
     {
     public:
 #if defined(DRAKO_PLT_WIN32)
+        using native_id_type = LPWSTR;
+#endif
 
-        explicit input_device_guid() noexcept
-            : _win_guid_str(nullptr, CoTaskMemFree)
+        explicit input_device_id() noexcept = default;
+        explicit input_device_id(native_id_type id) noexcept
+            : _guid(id)
         {
         }
 
-        explicit input_device_guid(LPWSTR guid) noexcept
-            : _win_guid_str(guid, CoTaskMemFree)
-        {
-        }
+        input_device_id(const input_device_id&) = default;
+        input_device_id& operator=(const input_device_id&) = default;
 
-        input_device_guid(const input_device_guid&) = delete;
-        input_device_guid& operator=(const input_device_guid&) = delete;
-
-        input_device_guid(input_device_guid&& other) noexcept
-            : _win_guid_str(std::move(other._win_guid_str))
-        {
-        }
-
-        input_device_guid& operator=(input_device_guid&& other) noexcept
-        {
-            if (this != &other)
-            {
-                _win_guid_str = std::move(other._win_guid_str);
-            }
-            return *this;
-        }
-
-        [[nodiscard]] DRAKO_FORCE_INLINE const LPWSTR native_guid() const noexcept { return _win_guid_str.get(); }
+        [[nodiscard]] native_id_type native_id() const noexcept { return (WCHAR*)nullptr; }
 
     private:
-        std::unique_ptr<WCHAR, decltype(&CoTaskMemFree)> _win_guid_str;
-
+#if defined(DRAKO_PLT_WIN32)
+        std::wstring _guid;
 #else
 #error Platform not supported
 #endif
     };
 
 
-    // Gets the guid of the default device used for audio capture as configured in the system.
-    //
-    [[nodiscard]] std::tuple<std::error_code, input_device_guid>
+    /// @brief Handle of the default device used for audio capture as configured in the system.
+    [[nodiscard]] std::tuple<std::error_code, input_device_id>
     default_input_device() noexcept;
 
-    // Lists all the active devices with an audio capture interface.
-    //
-    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_guid>>
+    /// @brief Lists all the active devices with an audio capture interface.
+    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_id>>
     query_input_devices() noexcept;
 
-    // Lists the active devices with an audio capture interface that satisfies the requirements.
-    //
-    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_guid>>
+    /// @brief Lists the active devices with an audio capture interface that satisfies the requirements.
+    [[nodiscard]] std::tuple<std::error_code, std::vector<input_device_id>>
     query_input_devices(const stream_format& format) noexcept;
 
 
-    // An input device that can provide audio data capture.
-    //
+    /// @brief Handle of a device that can capture audio data.
     class input_device
     {
     public:
@@ -96,37 +69,31 @@ namespace drako::audio
         {
         }
 
-        explicit input_device(IMMDevice* dev_, IAudioClient* acl_, IAudioCaptureClient* acc_) noexcept;
+        explicit input_device(IMMDevice* dev, IAudioClient* acl, IAudioCaptureClient* acc) noexcept;
 
 #endif
-
-        ~input_device() noexcept;
-
         input_device(const input_device&) = delete;
         input_device& operator=(const input_device&) = delete;
 
         input_device(input_device&&) noexcept;
         input_device& operator=(input_device&&) noexcept;
 
+        ~input_device() noexcept;
 
-        // Starts recording data on the audio stream.
-        //
+
+        /// @brief Starts recording data on the audio stream.
         [[nodiscard]] std::error_code enable() noexcept;
 
-        // Stops recording data on the audio stream.
-        //
+        /// @brief Stops recording data on the audio stream.
         [[nodiscard]] std::error_code disable() noexcept;
 
-        // Flushes the backing buffer and resets the audio stream state.
-        //
+        /// @brief Flushes the backing buffer and resets the audio stream state.
         [[nodiscard]] std::error_code reset() noexcept;
 
-        // Reads audio data from the backing buffer of the capture device.
-        //
+        /// @brief Reads audio data from the backing buffer of the capture device.
         [[nodiscard]] std::tuple<std::error_code, size_t> read(void* dst_, size_t frames_) noexcept;
 
-        // Returns an invalid device handle.
-        //
+        /// @brief Returns an invalid device handle.
         [[nodiscard]] static input_device invalid_device() noexcept;
 
     private:
@@ -145,12 +112,13 @@ namespace drako::audio
     // Creates an audio capture device with the device-specific default format.
     //
     [[nodiscard]] std::tuple<std::error_code, input_device>
-    open_device(input_device_guid device_, std::chrono::microseconds buffer_capacity_) noexcept;
+    open(const input_device_id& dev, std::chrono::microseconds buffer_capacity) noexcept;
 
     // Creates an audio capture device with the specified format.
     //
     [[nodiscard]] std::tuple<std::error_code, input_device>
-    open_device(input_device_guid device_, const stream_format& format_, std::chrono::microseconds buffer_capacity_) noexcept;
+    open(const input_device_id& dev, const stream_format& f, std::chrono::microseconds buffer_capacity) noexcept;
+
 } // namespace drako::audio
 
 #endif // !DRAKO_AUDIO_INPUT_DEVICE_HPP

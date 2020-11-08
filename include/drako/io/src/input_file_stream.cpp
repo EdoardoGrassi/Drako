@@ -8,17 +8,15 @@
 
 namespace drako::io
 {
-    constexpr input_file_stream::input_file_stream() noexcept
-        : _handle{ INVALID_HANDLE_VALUE }
-    {
-    }
+    using _this = input_file_stream;
 
-    constexpr input_file_stream::input_file_stream(native_handle_type handle) noexcept
-        : _handle{ handle }
-    {
-    }
+    constexpr _this::input_file_stream() noexcept
+        : _handle{ INVALID_HANDLE_VALUE } {}
 
-    input_file_stream::input_file_stream(const path_type& file)
+    constexpr _this::input_file_stream(native_handle_type handle) noexcept
+        : _handle{ handle } {}
+
+    _this::input_file_stream(const path_type& file)
     {
         _handle = ::CreateFileW(file.wstring().data(),
             GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -26,28 +24,28 @@ namespace drako::io
             throw std::system_error(::GetLastError(), std::system_category());
     }
 
-    input_file_stream::input_file_stream(input_file_stream&& other) noexcept
+    _this::input_file_stream(_this&& other) noexcept
         : _handle{ INVALID_HANDLE_VALUE }
     {
         using std::swap;
         swap(_handle, other._handle);
     }
 
-    input_file_stream& input_file_stream::operator=(input_file_stream&& other) noexcept
+    _this& _this::operator=(_this&& other) noexcept
     {
         using std::swap;
         swap(_handle, other._handle);
         return *this;
     }
 
-    input_file_stream::~input_file_stream() noexcept
+    _this::~input_file_stream() noexcept
     {
         if (_handle != INVALID_HANDLE_VALUE)
             if (::CloseHandle(_handle) == 0)
                 std::terminate(); // can't throw in destructor
     }
 
-    void input_file_stream::close()
+    void _this::close()
     {
         if (_handle != INVALID_HANDLE_VALUE)
         {
@@ -57,7 +55,7 @@ namespace drako::io
         }
     }
 
-    void input_file_stream::read(std::byte* dst, size_t bytes)
+    void _this::read(std::byte* dst, size_t bytes)
     {
         while (bytes > 0)
         {
@@ -70,8 +68,9 @@ namespace drako::io
         }
     }
 
-    input_file_stream::native_handle_type input_file_stream::native_handle() noexcept
+    _this::native_handle_type _this::native_handle() noexcept
     {
         return _handle;
     }
+
 } // namespace drako::io

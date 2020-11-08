@@ -2,10 +2,9 @@
 #ifndef DRAKO_VULKAN_SHADER_HPP
 #define DRAKO_VULKAN_SHADER_HPP
 
-#include "drako/devel/assertion.hpp"
-#include "drako/devel/logging.hpp"
 #include "drako/graphics/shader_types.hpp"
 
+#include <cassert>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
@@ -40,9 +39,9 @@ namespace drako::gpx::vulkan
 
     gpu_shader::gpu_shader(vk::Device device, const shader_source& source)
     {
-        DRAKO_ASSERT(device != vk::Device{ nullptr });
-        DRAKO_ASSERT(source.size() > 0);
-        DRAKO_ASSERT(source.size() % 4 == 0, "Required by Vulkan standard");
+        //assert(device != vk::Device{ nullptr });
+        assert(source.size() > 0);
+        assert(source.size() % 4 == 0); // required by Vulkan specification
 
         const vk::ShaderModuleCreateInfo shader_module{
             vk::ShaderModuleCreateFlags{},
@@ -53,6 +52,6 @@ namespace drako::gpx::vulkan
         _module = device.createShaderModuleUnique(shader_module);
     }
 
-} // namespace drako::gpx
+} // namespace drako::gpx::vulkan
 
 #endif // !DRAKO_VULKAN_SHADER_HPP

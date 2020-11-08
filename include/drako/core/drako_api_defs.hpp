@@ -44,7 +44,7 @@ namespace drako
         /// @brief Patch number.
         [[nodiscard]] constexpr uint16_t patch() const noexcept;
 
-        friend major_minor_patch_version from_string(const std::string&);
+        [[nodiscard]] static major_minor_patch_version from_string(const std::string&);
 
     private:
         //uint16_t _major;
@@ -112,13 +112,13 @@ namespace drako
     }
 
 
-
     [[nodiscard]] std::string to_string(major_minor_patch_version v)
     {
         return std::to_string(v.major()) + '.' + std::to_string(v.minor()) + '.' + std::to_string(v.patch());
     }
 
-    [[nodiscard]] major_minor_patch_version from_string(const std::string& s)
+
+    [[nodiscard]] major_minor_patch_version major_minor_patch_version::from_string(const std::string& s)
     {
         if (s.size() < 5) // at minimum 5 characters as the format is c.c.c
             throw std::invalid_argument{ DRAKO_STRINGIZE(s) };
@@ -143,10 +143,10 @@ namespace drako
         return major_minor_patch_version(major, minor, patch);
     }
 
-
     using api_version = major_minor_patch_version;
 
-    [[nodiscard]] constexpr const api_version build_api_version() noexcept
+    // TODO: change 'constexpr' to 'consteval' when is supported
+    [[nodiscard]] constexpr api_version build_api_version() noexcept
     {
         /* clang-format off */
         // TODO: configure from CMake

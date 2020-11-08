@@ -2,10 +2,8 @@
 #ifndef DRAKO_DEBUG_LOGGING_HPP
 #define DRAKO_DEBUG_LOGGING_HPP
 
-//
-// \brief   Lightweight runtime logging framework.
-// \author  Grassi Edoardo
-//
+/// @brief   Lightweight runtime logging framework.
+/// @author  Grassi Edoardo
 
 #include <cstdio>
 #include <iomanip>
@@ -32,7 +30,7 @@ namespace drako
         failure
     };
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const char* to_string(log_msg_priority prio) noexcept
+    [[nodiscard]] DRAKO_FORCE_INLINE constexpr const char* to_string(log_msg_priority prio) noexcept
     {
         switch (prio)
         {
@@ -65,13 +63,11 @@ namespace drako
     DRAKO_FORCE_INLINE void log(const char* msg, log_msg_priority prio, const char* file, int line) noexcept
     {
 #if defined(DRAKO_PLT_WIN32)
-
-        char buffer[1000];
+        char buffer[1024];
         std::snprintf(buffer, std::size(buffer), "[DRAKO] [%10s] %s : %d : %s\n", to_string(prio), file, line, msg);
         ::OutputDebugStringA(buffer);
 
 #else
-
         std::cout << file << ":" << line << ":" << msg << std::endl;
 
 #endif
@@ -100,6 +96,14 @@ namespace drako
 #define DRAKO_LOG_ERROR(...)
 
 #endif
+
+    // log error and exit program
+    [[noreturn]] DRAKO_FORCE_INLINE void log_and_exit(const std::string& msg)
+    {
+        DRAKO_LOG_ERROR(msg);
+        std::exit(EXIT_FAILURE);
+    }
+
 } // namespace drako
 
 #endif // !DRAKO_DEBUG_LOGGING_HPP

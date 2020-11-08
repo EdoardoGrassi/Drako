@@ -91,7 +91,7 @@ namespace drako::gpx::vulkan
     }
 
 
-    [[nodiscard]] vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w) noexcept
+    [[nodiscard]] vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w)
     {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
         const vk::Win32SurfaceCreateInfoKHR surface_create_info{
@@ -128,7 +128,6 @@ namespace drako::gpx::vulkan
             return true;
         }
 #else
-
 #error Platform not supported!
 #endif
     }

@@ -30,7 +30,7 @@ namespace drako
     };
 
 
-    enum class asset_type
+    enum class asset_type : std::uint8_t
     {
         mesh,
         texture
@@ -50,14 +50,36 @@ namespace drako
     class asset_load_info
     {
     public:
-        explicit asset_load_info(asset_bundle_id bundle, std::uint32_t bytes) noexcept
-            : _bundle_guid(bundle)
-            , _packed_size_bytes(bytes)
-            , _unpacked_size_bytes(bytes)
-            , _storage_flags(asset_storage_flags::uncompressed)
-            , _format_flags()
-        {
-        }
+
+        /// @brief Descriptor of an asset packaged uncompressed.
+        /// 
+        /// @param[in] offset Offset inside the full package as bytes.
+        /// @param[in] bytes  Size of the asset as bytes.
+        /// 
+        /// @return 
+        explicit asset_load_info(std::uint32_t offset, std::uint32_t bytes) noexcept
+            : _package_offset{ offset }
+            , _packed_size_bytes{ bytes }
+            , _unpacked_size_bytes{ bytes }
+            , _storage_flags{ asset_storage_flags::uncompressed }
+            , _format_flags{} {}
+
+        /// @brief Descriptor of a packaged asset.
+        /// 
+        /// @param[in] offset   Offset inside the full package as bytes.
+        /// @param[in] packed   Size of the asset before decompression as bytes.
+        /// @param[in] unpacked Size of the asset after decompression as bytes.
+        /// @param[in] s        Storage options.
+        /// @param[in] f        Format options.
+        /// 
+        /// @return 
+        explicit asset_load_info(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
+            asset_storage_flags s, asset_format_flags f) noexcept
+            : _package_offset{ offset }
+            , _packed_size_bytes{ packed }
+            , _unpacked_size_bytes{ unpacked }
+            , _storage_flags{ s }
+            , _format_flags{ f } {}
 
         // Identifier of the package.
         [[nodiscard]] size_t package_guid() const noexcept;
@@ -81,14 +103,13 @@ namespace drako
         std::uint32_t       _package_offset;
         std::uint32_t       _packed_size_bytes;
         std::uint32_t       _unpacked_size_bytes;
-        asset_bundle_id     _bundle_guid;
         asset_storage_flags _storage_flags;
         asset_format_flags  _format_flags;
     };
     static_assert(sizeof(asset_load_info) == 16 * sizeof(std::byte),
-        "Bad class layout: required internal padding bits");
+        "Unoptimized class layout: required internal padding bits");
     static_assert(alignof(asset_load_info) <= sizeof(asset_load_info),
-        "Bad class layout: required external padding bits");
+        "Unoptimized class layout: required external padding bits");
 
 
     /// @brief Metadata descriptor of an asset bundle.

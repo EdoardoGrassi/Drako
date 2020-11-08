@@ -2,12 +2,12 @@
 #ifndef DRAKO_ENGINE_RUNTIME_ASSET_MANAGER_HPP
 #define DRAKO_ENGINE_RUNTIME_ASSET_MANAGER_HPP
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/devel/asset_utils.hpp"
-
 #include "drako/graphics/mesh_types.hpp"
 
+#include <filesystem>
+#include <iosfwd>
 #include <vector>
 
 namespace drako::engine
@@ -22,26 +22,34 @@ namespace drako::engine
         _mesh_table mesh_table;
     };
 
-    struct bundle_soa
-    {
-        std::vector<asset_bundle_id>       guids;
-        std::vector<std::string>           names;
-        std::vector<std::filesystem::path> paths;
-    };
 
     //template <typename ...Assets>
     class runtime_asset_manager
     {
     public:
-        // explicit runtime_asset_manager(const std::vector<asset_bundle>& bundles);
+        struct bundle_manifest_soa
+        {
+            std::vector<asset_bundle_id>       ids;
+            std::vector<std::string>           names;
+            std::vector<std::filesystem::path> paths;
+        };
 
-        explicit runtime_asset_manager(const bundle_soa& bundles);
+        struct config
+        {
+            /// @brief Directory where asset bundles manifests are located.
+            std::filesystem::path bundle_manifest_directory;
+
+            /// @brief Directory where asset bundles data archives are located.
+            std::filesystem::path bundle_data_directory;
+        };
+
+        //using bundle_loaded_callback = void(*)();
+
+        explicit runtime_asset_manager(const bundle_manifest_soa&, const config&);
 
         runtime_asset_manager(const runtime_asset_manager&) = delete;
         runtime_asset_manager& operator=(const runtime_asset_manager&) = delete;
 
-        runtime_asset_manager(runtime_asset_manager&&) = delete;
-        runtime_asset_manager& operator=(runtime_asset_manager&&) = delete;
 
         /// @brief Loads the bundle into memory.
         [[nodiscard]] const asset_bundle& load_bundle(const asset_bundle_id id) noexcept;
@@ -58,8 +66,6 @@ namespace drako::engine
         void unload_bundle(const asset_bundle_id id) noexcept;
         void unload_bundle(const std::vector<asset_bundle_id>& ids) noexcept;
 
-        template <typename T>
-        [[nodiscard]] T load_asset(const asset_bundle_id bundle, const uuid& id) noexcept;
 
         void load_asset(const uuid& id) noexcept;
         void load_asset(const std::vector<uuid>& ids) noexcept;
@@ -73,25 +79,35 @@ namespace drako::engine
     private:
         struct _bundle_load_request
         {
-            asset_bundle_id bundle;
+            asset_bundle_id id;
         };
 
-        // TODO: vvv this needs to be threadsafe vvv
-        std::vector<_bundle_load_request> _bundle_load_requests;
-        // TODO: vvv this needs to be threadsafe vvv
-        std::vector<_bundle_load_request> _bundle_unload_requests;
+        struct _bundle_unload_request
+        {
+            asset_bundle_id id;
+        };
+
+        const config _config;
+
+        // TODO: vvv those needs to be threadsafe vvv
+
+        std::vector<_bundle_load_request>   _bundle_load_requests;
+        std::vector<_bundle_unload_request> _bundle_unload_requests;
+
+        // TODO: ^^^ those needs to be threadsafe ^^^
 
         struct _available_bundles_table
         {
-            std::vector<asset_bundle_id> guids;
-            std::vector<std::string>     names;
+            std::vector<asset_bundle_id> ids;
             std::vector<std::ifstream>   sources;
+            std::vector<std::size_t>     sizes;
+            std::vector<std::string>     names;
         };
         _available_bundles_table _available_bundles;
 
         struct _loaded_bundles_table
         {
-            std::vector<asset_bundle_id> guids;
+            std::vector<asset_bundle_id> ids;
             std::vector<asset_bundle>    bundles;
             std::vector<std::uint16_t>   refcount;
         };
@@ -99,61 +115,35 @@ namespace drako::engine
 
         struct _loaded_asset_table
         {
-            std::vector<uuid>          guids;
-            std::vector<std::uint16_t> refcount;
+            std::vector<uuid>                         ids;
+            std::vector<std::unique_ptr<std::byte[]>> data;
+            std::vector<std::uint16_t>                refcount;
         };
         _loaded_asset_table _loaded_assets;
+
+
 
         void _increment_ref_count(const asset_id asset) noexcept;
         void _decrement_ref_count(const asset_id asset) noexcept;
 
-        [[nodiscard]] std::tuple<bool, std::size_t>
-        _find_loaded_asset_index(const asset_id) noexcept;
+        struct _find_result
+        {
+            bool   found;
+            size_t index;
+        };
+        [[nodiscard]] _find_result _available_bundle_index(const asset_bundle_id) noexcept;
+        [[nodiscard]] _find_result _loaded_asset_index(const asset_id) noexcept;
+        [[nodiscard]] _find_result _loaded_bundle_index(const asset_bundle_id) noexcept;
 
-        [[nodiscard]] std::tuple<bool, std::size_t>
-        _find_loaded_bundle_index(const asset_bundle_id) noexcept;
-
-        void _load_bundle_metadata(std::ifstream&);
+        void _load_bundle_metadata(const asset_bundle_id);
 
         void _unload_bundle_metadata();
 
         [[nodiscard]] std::vector<std::byte>
         _load_raw_asset(const asset_load_info& info) noexcept;
 
-        void _execute_bundle_requests() noexcept;
+        void _dispatch_bundle_requests() noexcept;
     };
-
-    template <typename T>
-    T runtime_asset_manager::load_asset(const asset_bundle_id bundle, const uuid& id) noexcept
-    {
-        if (const auto [found, asset_index] = _find_loaded_asset_index(id); found)
-        {
-            ++_loaded_asset_refcount[asset_index];
-            return;
-        }
-
-        if (const auto [found, bundle_index] = _find_loaded_bundle_index(bundle); found)
-        {
-            const auto& bundle = _loaded_bundles[bundle_index];
-
-            if (const auto [asset_found, index] = find_asset_index(bundle, id); asset_found)
-            {
-                const auto& asset_load_info = bundle.asset_infos[index];
-                const auto  bytes           = _load_raw_asset(asset_load_info);
-                return T{ bytes };
-            }
-            else
-            {
-                DRAKO_LOG_ERROR("Can't locate asset in bundle");
-                std::exit(EXIT_FAILURE);
-            }
-        }
-        else
-        {
-            DRAKO_LOG_ERROR("Can't locate asset bundle with id " + std::to_string(bundle_id));
-            std::exit(EXIT_FAILURE);
-        }
-    }
 
 } // namespace drako::engine
 

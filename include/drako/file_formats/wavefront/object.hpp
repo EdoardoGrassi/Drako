@@ -8,74 +8,90 @@
 
 namespace drako::file_formats::obj
 {
-    struct vertex
+    using value = float;
+    using index = std::int32_t;
+
+    /// @brief Geometric vertex.
+    struct alignas(16) vertex
     {
-        float x;
-        float y;
-        float z;
-        float w;
+        explicit constexpr vertex(value x, value y, value z, value w) noexcept
+            : x{ x }, y{ y }, z{ z }, w{ w } {}
+
+        /// @brief X component.
+        value x;
+
+        /// @brief The y component.
+        value y;
+
+        /// @brief The z component.
+        value z;
+
+        /// @brief Vertex weight of the vector.
+        value w = 0.f;
     };
 
-    struct vertex_normal
+    struct alignas(16) normal
     {
-        float x;
-        float y;
-        float z;
+        explicit constexpr normal(value x, value y, value z) noexcept
+            : x{ x }, y{ y }, z{ z } {}
+
+        value x;
+        value y;
+        value z;
     };
 
-    struct vertex_texcoord
+    struct alignas(16) texcoord
     {
-        float u;
-        float v;
-        float w;
+        explicit constexpr texcoord(value u, value v, value w) noexcept
+            : u{ u }, v{ v }, w{ w } {}
+
+        value u;
+        value v = 0.f;
+        value w = 0.f;
     };
 
-    /// @brief A single mesh object.
-    class object
+
+    struct triplette
     {
-    public:
-        explicit object();
-
-        object(const object&) = delete;
-        object& operator=(const object&) = delete;
-
-        [[nodiscard]] size_t vertex_count() const noexcept
-        {
-            return std::size(_vertex_points) / 4;
-        }
-
-        [[nodiscard]] std::array<float, 4> vertex(size_t i) const noexcept
-        {
-            return { _vertex_points[i * 4],
-                _vertex_points[i * 4 + 1],
-                _vertex_points[i * 4 + 2],
-                _vertex_points[i * 4 + 3] };
-        }
-
-        [[nodiscard]] std::array<float, 3> normal(size_t i) const noexcept
-        {
-            return { _vertex_normals[i * 3], _vertex_normals[i * 3 + 1], _vertex_normals[i * 3 + 2] };
-        }
-
-        [[nodiscard]] std::array<float, 3> texcoord(size_t i) const noexcept
-        {
-            return { _vertex_texcoords_u[i], _vertex_texcoords_v[i], _vertex_texcoords_w[i] };
-        }
-
-        [[nodiscard]] std::array<uint32_t, 3> triangle(size_t i) const noexcept
-        {
-            return { _faces[i * 3], _faces[i * 3 + 1], _faces[i * 3 + 2] };
-        }
-
-    private:
-        std::string           _name;
-        std::vector<float>    _vertex_points;
-        std::vector<float>    _vertex_normals;
-        std::vector<float>    _vertex_texcoords_u;
-        std::vector<float>    _vertex_texcoords_v;
-        std::vector<float>    _vertex_texcoords_w;
-        std::vector<uint32_t> _faces;
+        index v, vt, vn;
     };
+
+
+    struct face
+    {
+        //std::array<index, 3> v;
+        //std::array<index, 3> vn;
+        //std::array<index, 3> vt;
+        std::array<triplette, 3> triplets;
+    };
+
+    /// @brief Mesh data from a whole .obj file.
+    struct mesh_data
+    {
+        std::vector<vertex>   v;
+        std::vector<normal>   vn;
+        std::vector<texcoord> vt;
+    };
+
+    /// @brief Group of element under the same group tag.
+    struct group
+    {
+        std::string name;
+        //std::vector<index> points;
+        //std::vector<index> lines;
+        std::vector<index> faces;
+    };
+
+    /// @brief Group of elements under the same object tag.
+    struct object
+    {
+        std::string name;
+        //std::vector<index> points;
+        //std::vector<index> lines;
+        std::vector<index> faces;
+    };
+
+
 } // namespace drako::file_formats::obj
 
 #endif // !DRAKO_FORMATS_WAVEFRONT_OBJECT_HPP

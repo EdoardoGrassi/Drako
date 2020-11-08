@@ -21,7 +21,7 @@ namespace drako::gpx::vulkan
             , _size(size)
         {
             const vk::BufferCreateInfo staging_buffer_info{
-                vk::BufferCreateFlagBits::eSparseBinding,
+                vk::BufferCreateFlagBits{},
                 size,
                 vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferSrc,
                 vk::SharingMode::eExclusive,
@@ -30,13 +30,12 @@ namespace drako::gpx::vulkan
             auto staging_buffer = _ldevice.createBuffer(staging_buffer_info);
 
             const vk::BufferCreateInfo vertex_buffer_info{
-                vk::BufferCreateFlagBits::eSparseBinding,
+                vk::BufferCreateFlagBits{},
                 size,
                 vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
                 vk::SharingMode::eExclusive,
                 0, nullptr /* Not needed for exclusive ownership */
             };
-
             auto vertex_buffer = _ldevice.createBuffer(vertex_buffer_info);
 
             const vk::MemoryAllocateInfo allocation{
@@ -177,7 +176,6 @@ namespace drako::gpx::vulkan
                 vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferSrc,
                 vk::SharingMode::eExclusive,
                 0, nullptr);
-
             auto staging_buffer = _ldevice.createBuffer(staging_buffer_info);
 
             const vk::BufferCreateInfo vertex_buffer_info(
@@ -186,7 +184,6 @@ namespace drako::gpx::vulkan
                 vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
                 vk::SharingMode::eExclusive,
                 0, nullptr);
-
             auto vertex_buffer = _ldevice.createBuffer(vertex_buffer_info);
 
             vk::DeviceMemory staging_memory;

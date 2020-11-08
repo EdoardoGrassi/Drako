@@ -4,7 +4,6 @@
 
 #include <cstdint>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/core/preprocessor/platform_macros.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -34,23 +33,23 @@ namespace drako::sys
 
     // Gets the CPU that is executing the current process.
     //
-    DRAKO_NODISCARD native_cpu_core current_process_cpu() noexcept;
+    [[nodiscard]] native_cpu_core current_process_cpu() noexcept;
 
     // Gets the number of processor cores currently available in the system.
     //
-    DRAKO_NODISCARD uint32_t cpu_logical_core_count() noexcept;
+    [[nodiscard]] uint32_t cpu_logical_core_count() noexcept;
 
     // Gets the byte size of a single page of memory.
     //
-    DRAKO_NODISCARD uint32_t cpu_memory_page_size() noexcept;
+    [[nodiscard]] uint32_t cpu_memory_page_size() noexcept;
 
     // Gets the current value of the CPU high-precision counter.
     //
-    DRAKO_NODISCARD int64_t cpu_counter_value() noexcept;
+    [[nodiscard]] int64_t cpu_counter_value() noexcept;
 
     // Gets the frequency of the CPU high-precision counter.
     //
-    DRAKO_NODISCARD int64_t cpu_counter_frequency() noexcept;
+    [[nodiscard]] int64_t cpu_counter_frequency() noexcept;
 
 
     // Platoform specific descriptor of a NUMA processor group.
@@ -72,7 +71,7 @@ namespace drako::sys
 
     // Returns the numa node of a logical processor.
     //
-    DRAKO_NODISCARD native_numa_node cpu_numa_node(native_cpu_core core) noexcept;
+    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core core) noexcept;
 } // namespace drako::sys
 
 #endif // !DRAKO_SYSTEM_INFO_HPP

@@ -1,17 +1,18 @@
-#pragma once
 #include "drako/devel/mesh_importers.hpp"
 
-#include "drako/file_formats/drakoson.hpp" // NOTE: for the time being we use Drakoson format
+#include "drako/file_formats/dson.hpp" // NOTE: for the time being we use Drakoson format
+#include "drako/file_formats/wavefront/object.hpp"
 
 #include <filesystem>
 #include <fstream>
 
 namespace drako::editor
 {
-    void import_obj_asset(const project_info& p, const _fs::path& src, const asset_import_context& ctx)
+    void import_obj_asset(const project_info& p, const std::filesystem::path& src, const asset_import_context& ctx)
     {
         namespace _obj = drako::file_formats::obj;
 
+        /*
         if (!_fs::exists(src) || !_fs::is_regular_file(src))
             throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
 
@@ -62,6 +63,8 @@ namespace drako::editor
                       << "[DRAKO] \terror " << e.value() << ": " << e.message() << '\n';
             return;
         }
+        */
+        throw std::runtime_error{ "Not implemented." };
     }
 
 } // namespace drako::editor

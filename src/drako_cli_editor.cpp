@@ -1,11 +1,8 @@
-#pragma once
-
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/devel/build_utils.hpp"
 #include "drako/devel/mesh_importers.hpp"
 #include "drako/devel/project_utils.hpp"
 #include "drako/devel/uuid.hpp"
-#include "drako/file_formats/wavefront_obj.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/mesh_utils.hpp"
 
@@ -106,7 +103,7 @@ int main(const int argc, const char* argv[])
         std::cout << "Name: " << proj_info.name << '\n';
 
         drako::editor::load_project(proj);
-        std::cout << "Located assets count: " << std::size(proj.asset_table.asset_guids) << '\n';
+        std::cout << "Located assets count: " << std::size(proj.assets.guids) << '\n';
     }
     catch (const std::exception& e)
     {
@@ -122,7 +119,7 @@ int main(const int argc, const char* argv[])
             const auto [cmd, args] = _tokenize_command_line(input);
             if (const auto it = commands.find(cmd); it != std::cend(commands))
             {
-                std::invoke(it->second, _cmd_params{ args } );
+                std::invoke(it->second, _cmd_params{ args });
             }
             else
             {

@@ -1,13 +1,12 @@
-#pragma once
 #include "drako/devel/project_utils.hpp"
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/project_types.hpp"
 #include "drako/devel/uuid.hpp"
 
-#include <exception>
+#include <cassert>
 #include <filesystem>
 #include <fstream>
+#include <stdexcept>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -21,8 +20,8 @@ namespace drako::editor
 
     void _create_project_info_file(const fs::path& where)
     {
-        project_info info;
         std::ofstream ofs{ where / "project.dkproj" };
+        throw std::runtime_error{ "Not implemented." };
     }
 
 
@@ -37,30 +36,29 @@ namespace drako::editor
         std::ifstream file{ metafile };
         project_info  info;
 
-        file >> info;
-        return info;
+        throw std::runtime_error{ "Not implemented." };
     }
 
     [[nodiscard]] internal_asset_info load_meta_info(const fs::path& metafile)
     {
-        DRAKO_ASSERT(fs::is_regular_file(metafile));
+        assert(fs::is_regular_file(metafile));
 
         if (!fs::exists(metafile))
             throw std::invalid_argument{ DRAKO_STRINGIZE(metafile) };
 
         std::ifstream       file{ metafile };
         internal_asset_info info;
-        file >> info;
+        load(file, info);
 
         if (!file)
-            return;
+            throw std::runtime_error{ "Failed deserialization." };
 
         return info;
     }
 
     void make_project_tree(const fs::path& root)
     {
-        DRAKO_ASSERT(fs::is_directory(root));
+        assert(fs::is_directory(root));
 
         if (fs::exists(root))
             throw std::invalid_argument{ DRAKO_STRINGIZE(root) };
@@ -72,7 +70,7 @@ namespace drako::editor
             fs::create_directory(root / project_cache_dir);
             fs::create_directory(root / project_meta_dir);
 
-            project_info info{};
+            project_info  info{};
             std::ofstream ofs{ root / project_config_file };
         }
         catch (const fs::filesystem_error&)
@@ -102,35 +100,38 @@ namespace drako::editor
         }
     }
 
-    void create_imported_asset(
-        const project_info&          project,
-        const std::vector<fs::path>& inputs,
-        const std::vector<fs::path>& outputs)
+    void create_imported_asset(const project& p,
+        const std::vector<fs::path>&          inputs,
+        const std::vector<fs::path>&          outputs)
     {
-        DRAKO_ASSERT(!std::empty(inputs));
-        DRAKO_ASSERT(!std::empty(outputs));
+        assert(!std::empty(inputs));
+        assert(!std::empty(outputs));
 
         const auto guid = make_uuid_version1();
 
         // TODO: end impl
     }
 
-    [[nodiscard]] load_importable_result load_imported_asset(const uuid& guid)
+
+    void create_asset(const project& p, const fs::path& asset)
     {
-        DRAKO_ASSERT(guid.has_value(), "Invalid UUID");
+        assert(fs::is_regular_file(asset));
+        const auto guid           = make_uuid_version1();
+        const auto meta_file_path = p.meta_directory() / to_string(guid);
 
-        // TODO: end impl
-    }
+        try
+        {
+            internal_asset_info info{};
+            std::ofstream       os{ meta_file_path };
 
-    void create_asset(const project_info& p, const fs::path& asset)
-    {
-        DRAKO_ASSERT(fs::is_regular_file(asset));
-
-        const auto          guid = make_uuid_version1();
-        internal_asset_info metainfo{};
-        std::ofstream       metafile{ p.cache_directory() / to_string(guid) };
-
-        metafile << metainfo;
+            save(os, info);
+            // TODO: also load asset in memory database
+        }
+        catch (...)
+        {
+            std::filesystem::remove(meta_file_path);
+            throw;
+        }
     }
 
 
@@ -139,7 +140,7 @@ namespace drako::editor
         if (!fs::is_directory(where))
             throw std::invalid_argument{ DRAKO_STRINGIZE(where) };
 
-        return project{};
+        return project{ where };
     }
 
     void load_project(project& p)
@@ -151,18 +152,18 @@ namespace drako::editor
             {
                 if (fs::is_regular_file(f) && f.path().extension() == ".dkmeta")
                 {
-
                     std::ifstream       ifs(f.path());
-                    internal_asset_info info = from_stream(ifs);
+                    internal_asset_info info;
 
-                    p.asset_table.asset_guids.push_back(info.guid());
-                    p.asset_table.asset_names.push_back(info.name());
-                    p.asset_table.asset_paths.push_back(info.path());
+                    load(ifs, info);
+                    p.assets.guids.push_back(info.uuid);
+                    p.assets.names.push_back(info.name);
+                    //p.assets.paths.push_back(info.path);
                 }
             }
             catch (const fs::filesystem_error& e)
             {
-                std::cout << "While loading meta files an error occurred:\n"
+                std::cout << "Error occurred while loading meta file:\n"
                           << '\t' << e.what() << '\n'
                           << "\twith path1: " << e.path1() << '\n'
                           << "\twith path2: " << e.path2() << '\n';

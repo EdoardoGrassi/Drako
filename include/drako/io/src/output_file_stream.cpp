@@ -11,17 +11,15 @@
 
 namespace drako::io
 {
-    constexpr output_file_stream::output_file_stream() noexcept
-        : _handle{ INVALID_HANDLE_VALUE }
-    {
-    }
+    using _this = output_file_stream;
 
-    constexpr output_file_stream::output_file_stream(native_handle_type handle) noexcept
-        : _handle{ handle }
-    {
-    }
+    constexpr _this::output_file_stream() noexcept
+        : _handle{ INVALID_HANDLE_VALUE } {}
 
-    output_file_stream::output_file_stream(const path_type& file, creation c = creation::if_needed)
+    constexpr _this::output_file_stream(native_handle_type handle) noexcept
+        : _handle{ handle } {}
+
+    _this::output_file_stream(const path_type& file, const creation c)
     {
         DWORD open_mode = OPEN_ALWAYS;
         if (c == creation::open_existing)
@@ -35,28 +33,28 @@ namespace drako::io
             throw std::system_error(::GetLastError(), std::system_category());
     }
 
-    output_file_stream::output_file_stream(output_file_stream&& other) noexcept
+    _this::output_file_stream(_this&& other) noexcept
         : _handle{ INVALID_HANDLE_VALUE }
     {
         using std::swap;
         swap(_handle, other._handle);
     }
 
-    output_file_stream& output_file_stream::operator=(output_file_stream&& other) noexcept
+    _this& _this::operator=(_this&& other) noexcept
     {
         using std::swap;
         swap(_handle, other._handle);
         return *this;
     }
 
-    output_file_stream::~output_file_stream() noexcept
+    _this::~output_file_stream() noexcept
     {
         if (_handle != INVALID_HANDLE_VALUE)
             if (::CloseHandle(_handle) == 0)
                 [[unlikely]] std::terminate(); // can't throw in destructor
     }
 
-    void output_file_stream::close()
+    void _this::close()
     {
         if (_handle != INVALID_HANDLE_VALUE)
         {
@@ -66,10 +64,19 @@ namespace drako::io
         }
     }
 
-    void output_file_stream::write(const std::byte* src, size_t bytes)
+    void _this::write(const std::byte* src, size_t bytes)
     {
+        if (bytes == 0)
+            return;
+
         DWORD written_bytes;
         if (::WriteFile(_handle, src, bytes, &written_bytes, NULL) == FALSE)
             throw std::system_error(::GetLastError(), std::system_category());
     }
+
+    [[nodiscard]] _this::native_handle_type _this::native_handle() noexcept
+    {
+        return _handle;
+    }
+
 } // namespace drako::io

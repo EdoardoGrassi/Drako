@@ -7,18 +7,18 @@
 #ifndef DRAKO_LOCKFREE_FIXED_QUEUE_HPP
 #define DRAKO_LOCKFREE_FIXED_QUEUE_HPP
 
+#include "drako/concurrency/lockfree_pool_allocator.hpp"
+
 #include <atomic>
+#include <cassert>
 #include <limits>
 #include <optional>
 #include <thread>
 #include <tuple>
 
-#include "drako/concurrency/lockfree_pool_allocator.hpp"
-#include "drako/devel/assertion.hpp"
-
-namespace drako
+namespace drako::lockfree
 {
-    template<typename T, typename Timestamp>
+    template <typename T, typename Timestamp>
     class atomic_stamped
     {
         static_assert(std::atomic<T>::is_always_lock_free);
@@ -28,28 +28,29 @@ namespace drako
 
 
     /// @brief Thread-safe linearizable container with FIFO policy and bounded capacity.
-    ///
-    /// @tparam T Type of the objects stored.
-    ///
-    template<typename T>
+    template <typename T>
     class lockfree_fixed_queue
     {
-        using node_id        = uint32_t;
-        using stamped_ref    = std::tuple<uint16_t, uint16_t>;
+        using node_id = uint32_t;
+        struct stamped_ref final
+        {
+            std::uint16_t counter;
+            std::uint16_t index;
+        };
 
         static constexpr const auto node_id_mask = (std::numeric_limits<node_id>::max() >> 1);
 
         static_assert(std::atomic<T*>::is_always_lock_free, "Can't guarantee atomicity");
 
     public:
+        using allocator = lockfree_object_pool<T>;
 
         /// @brief     Constructor.
         /// @param[in] capacity Max number of objects that can be stored inside the queue.
-        ///
-        explicit lockfree_fixed_queue(size_t capacity) noexcept
+        explicit lockfree_fixed_queue(const std::size_t capacity) noexcept(noexcept(allocator(capacity)))
             : _allocator(capacity)
         {
-            DRAKO_ASSERT(capacity > 0);
+            assert(capacity > 0);
         }
 
         lockfree_fixed_queue(const lockfree_fixed_queue&) noexcept = delete;
@@ -76,26 +77,26 @@ namespace drako
         /// @param[out] result   Dequeued object.
         /// @return              Returns true if the operation succeeded, false otherwise.
         ///
-        [[nodiscard]] auto deque() noexcept;
+        [[nodiscard]] std::tuple<bool, T> deque() noexcept;
         // DRAKO_NODISCARD auto deque(T& result) noexcept;
 
     private:
-
         struct node final
         {
-            const T value;                      // Object stored.
-            std::atomic<node*> next = nullptr;  // Pointer to the next node in the queue.
+            const T            value;          // Object stored.
+            std::atomic<node*> next = nullptr; // Pointer to the next node in the queue.
 
-            explicit node(const T& data) : value(data) {}
+            explicit node(const T& data)
+                : value(data) {}
         };
 
-        lockfree_object_pool<T> _allocator; // lockfree allocator for the queue nodes
+        allocator                _allocator;      // lockfree allocator for the queue nodes
         std::atomic<stamped_ref> _head = nullptr; // pointer to first node
         std::atomic<stamped_ref> _tail = nullptr; // pointer to last node
     };
 
 
-    template<typename T>
+    template <typename T>
     inline bool lockfree_fixed_queue<T>::enque(const T& value) noexcept
     {
         node* new_node = new (_allocator.allocate(sizeof(node))) node(value);
@@ -118,8 +119,8 @@ namespace drako
     }
 
 
-    template<typename T>
-    inline auto lockfree_fixed_queue<T>::deque() noexcept
+    template <typename T>
+    inline std::tuple<bool, T> lockfree_fixed_queue<T>::deque() noexcept
     {
         node* const first = _head.load();
         for (;;)
@@ -143,6 +144,6 @@ namespace drako
         }
     }
 
-} // namespace drako
+} // namespace drako::lockfree
 
 #endif // !DRAKO_LOCKFREE_FIXED_QUEUE_HPP

@@ -14,9 +14,6 @@
 
 namespace drako
 {
-    // forward declarations
-    class mat4x4;
-
     /// @brief Hamilton quaternion.
     class alignas(sizeof(float) * 4) quat
     {
@@ -39,7 +36,7 @@ namespace drako
         friend constexpr quat operator*(quat lhs, quat rhs) noexcept;
 
         // Computes the norm of the quaternion.
-        [[nodiscard]] constexpr friend float norm(quat q) noexcept
+        [[nodiscard]] friend float norm(quat q) noexcept
         {
             return norm(q._xyzw);
         }
@@ -118,12 +115,12 @@ namespace drako
         }
 
         // Spherical interpolation between quaternions.
-        [[nodiscard]] friend constexpr uquat v_slerp(uquat q1, uquat q2, float t) noexcept
+        /*[[nodiscard]] friend uquat v_slerp(uquat q1, uquat q2, float t) noexcept;
         {
             const float O    = std::acos(dot(q1._xyzw, q2._xyzw));
             const float sinO = std::sin(O);
             return (std::sin(O * (1 - t)) / sinO) * q1 + (std::sin(O * t) / sinO) * q2;
-        }
+        }*/
 
     private:
         vec4 _xyzw;

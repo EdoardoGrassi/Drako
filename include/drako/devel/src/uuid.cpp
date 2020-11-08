@@ -1,11 +1,11 @@
-#pragma once
 #include "drako/devel/uuid.hpp"
 
-#include "drako/devel/assertion.hpp"
+#include "drako/devel/src/uuid_defs.hpp"
 
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <iostream>
 #include <random>
 #include <string>
@@ -13,41 +13,12 @@
 
 namespace drako
 {
-    const std::byte UUID_RFC_4122_VARIANT_1_MASK{ 0b1001'1111 };
-
-    const std::byte UUID_RFC_4122_VERSION_1_MASK{ 0b0001'1111 };
-    const std::byte UUID_RFC_4122_VERSION_2_MASK{ 0b0010'1111 };
-    const std::byte UUID_RFC_4122_VERSION_3_MASK{ 0b0011'1111 };
-    const std::byte UUID_RFC_4122_VERSION_4_MASK{ 0b0100'1111 };
-    const std::byte UUID_RFC_4122_VERSION_5_MASK{ 0b0101'1111 };
-
-    // lenght of a UUID in byte array form
-    const size_t UUID_BYTE_SIZE = sizeof(uuid);
-
-    // lenght of a UUID in ASCII string form
-    const size_t UUID_STRING_SIZE = sizeof(uuid) * 2 + sizeof('-') * 4;
-
-    const size_t UUID_HYPEN_1_OFFSET = 8;
-    const size_t UUID_HYPEN_2_OFFSET = 8 + 1 + 4;
-    const size_t UUID_HYPEN_3_OFFSET = 8 + 1 + 4 + 1 + 4;
-    const size_t UUID_HYPEN_4_OFFSET = 8 + 1 + 4 + 1 + 4 + 1 + 4;
-
-    const size_t UUID_TIME_FIELD_SIZE   = sizeof(uint64_t); // 64 bits
-    const size_t UUID_TIME_FIELD_OFFSET = 0;
-
-    const size_t UUID_CLOCK_FIELD_SIZE   = sizeof(uint16_t); // 16 bits
-    const size_t UUID_CLOCK_FIELD_OFFSET = UUID_TIME_FIELD_SIZE;
-
-    const size_t UUID_NODE_FIELD_SIZE   = 6; // 48 bits
-    const size_t UUID_NODE_FIELD_OFFSET = UUID_TIME_FIELD_SIZE + UUID_CLOCK_FIELD_SIZE;
-
-
     // memory layout of canonical (network byte order) byte representation for UUIDs
     struct _uuid_byte_layout
     {
-        uint64_t _time;
-        uint16_t _clock;
-        uint8_t  _node[6];
+        std::uint64_t _time;
+        std::uint16_t _clock;
+        std::uint8_t  _node[6];
     };
     static_assert(sizeof(_uuid_byte_layout) == sizeof(uuid),
         "Size mismatch between reference layout and metadata format");
@@ -142,27 +113,6 @@ namespace drako
         return std::byte{ _msb << 4 } | std::byte{ _lsb };
     }
 
-    /*
-    DRAKO_NODISCARD constexpr bool
-    uuid::operator==(const uuid& other) const noexcept
-    {
-        return (_time_low == other._time_low) &
-               (_time_mid == other._time_hi_and_version) &
-               (_clock_seq_hi_and_reserved == other._clock_seq_hi_and_reserved) &
-               (_clock_seq_low == other._clock_seq_low) &
-               (_node == other._node);
-        //return std::memcmp(this, &other, sizeof(uuid)) == 0;
-    }
-    */
-
-    /*
-    DRAKO_NODISCARD constexpr bool
-    uuid::operator!=(const uuid& other) const noexcept
-    {
-        // return std::memcmp(this, &other, sizeof(uuid)) != 0;
-    }
-    */
-
     std::istream& operator>>(std::istream& is, uuid& u)
     {
         return is.read(reinterpret_cast<char*>(&u), sizeof(uuid));
@@ -186,28 +136,28 @@ namespace drako
 
         // time-low = 8 hex-digits ;
         for (auto i = 0; i < 4; i += 2)
-            _to_hex_chars(u._data[i], &buffer[i]);
+            _to_hex_chars(u._bytes[i], &buffer[i]);
         buffer[4] = UUID_STRING_SEPARATOR;
 
         // time-mid = 4 hex-digits ;
-        _to_hex_chars(u._data[8], &buffer[5 /* bytes 5, 6 */]);
-        _to_hex_chars(u._data[9], &buffer[7 /* bytes 7, 8 */]);
+        _to_hex_chars(u._bytes[8], &buffer[5 /* bytes 5, 6 */]);
+        _to_hex_chars(u._bytes[9], &buffer[7 /* bytes 7, 8 */]);
         buffer[9] = UUID_STRING_SEPARATOR;
 
         // time-high-and-version = 4 hex-digits ;
-        _to_hex_chars(u._data[10], &buffer[10 /* bytes 10, 11 */]);
-        _to_hex_chars(u._data[11], &buffer[12 /* bytes 12, 13 */]);
+        _to_hex_chars(u._bytes[10], &buffer[10 /* bytes 10, 11 */]);
+        _to_hex_chars(u._bytes[11], &buffer[12 /* bytes 12, 13 */]);
         buffer[14] = UUID_STRING_SEPARATOR;
 
         // clock-seq-and-reserved = 2 hex-digits ;
-        _to_hex_chars(u._data[12], &buffer[15 /* bytes 15, 16 */]);
+        _to_hex_chars(u._bytes[12], &buffer[15 /* bytes 15, 16 */]);
         // clock-seq-low = 2 hex-digits ;
-        _to_hex_chars(u._data[13], &buffer[17 /* bytes 17, 18 */]);
+        _to_hex_chars(u._bytes[13], &buffer[17 /* bytes 17, 18 */]);
         buffer[19] = UUID_STRING_SEPARATOR;
 
         // node = 12 hex-digits ;
-        for (auto i = 0; i < 12; i += 2)
-            _to_hex_chars(u._data[i], &buffer[20 + i]);
+        for (size_t i = 0; i < 12; i += 2)
+            _to_hex_chars(u._bytes[i], &buffer[20 + i]);
 
         return buffer;
     }
@@ -232,49 +182,37 @@ namespace drako
         return rng();
     }
 
-    uuid make_uuid_version1()
+    [[nodiscard]] uuid uuid::parse(const std::string_view s)
     {
-        const uint8_t UUID_RESERVED = 0b1000'0000u;
+        // accepted canonical format: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+        const char hypen = '-';
 
-        const static uint64_t        node           = _init_node_sequence();
-        static std::atomic<uint16_t> curr_clock_seq = _init_clock_sequence();
+        std::array<std::byte, 16> bytes;
+        if (std::size(s) != (32 + 4))
+            throw std::invalid_argument{ "Argument is not a UUID." };
+        if ((s[UUID_HYPEN_1_OFFSET] != hypen) || (s[UUID_HYPEN_2_OFFSET] != hypen) ||
+            (s[UUID_HYPEN_3_OFFSET] != hypen) || (s[UUID_HYPEN_4_OFFSET] != hypen))
+            throw std::invalid_argument{ "Argument is not a UUID." };
 
-        const auto     clock = curr_clock_seq.fetch_add(1, std::memory_order_relaxed);
-        const uint64_t time  = std::chrono::system_clock::now().time_since_epoch().count();
+        for (size_t i = 0, j = 0; i < UUID_STRING_SIZE; i += 2, ++j)
+        {
+            if (s[i] == UUID_HYPEN_1_OFFSET || s[i] == UUID_HYPEN_2_OFFSET ||
+                s[i] == UUID_HYPEN_3_OFFSET || s[i] == UUID_HYPEN_4_OFFSET) // skip '-' separator
+                ++i;
 
-        // time-low
-        //const uint32_t time_low = static_cast<uint32_t>(time & UINT32_MAX);
-        // time-mid
-        //const uint16_t time_mid = static_cast<uint16_t>((time >> 32) & UINT16_MAX);
-        // time-hi-and-version
-        //const uint16_t time_hi_and_version = static_cast<uint16_t>((time >> 48) & UINT16_MAX);
-        //time_hi_and_version |= UUID_VERSION_1;
-
-        // clock-seq-low
-        //const uint8_t clock_seq_low = static_cast<uint8_t>(clock & UINT8_MAX);
-        // clock-seq-hi-and-reserved
-        //const uint8_t clock_seq_hi_and_reserved = static_cast<uint8_t>(clock >> 8);
-        //clock_seq_hi_and_reserved |= UUID_RESERVED;
-
-        std::array<std::byte, sizeof(_uuid_byte_layout)> bytes;
-        for (auto i = 0; i < sizeof(_uuid_byte_layout::_time); ++i)
-            bytes[offsetof(_uuid_byte_layout, _time) + i] = std::byte{ (time >> (i * 8)) & 0xff };
-        bytes[6] |= UUID_RFC_4122_VERSION_1_MASK;
-
-        for (auto i = 0; i < sizeof(_uuid_byte_layout::_clock); ++i)
-            bytes[offsetof(_uuid_byte_layout, _clock) + i] = std::byte{ (clock >> (i * 8)) & 0xff };
-        bytes[8] |= UUID_RFC_4122_VARIANT_1_MASK;
-
-        for (auto i = 0; i < sizeof(_uuid_byte_layout::_node); ++i)
-            bytes[offsetof(_uuid_byte_layout, _node) + i] = std::byte{ (node >> (i * 8)) & 0xff };
+            const auto most_significant_bits = static_cast<unsigned char>(s[i]);
+            const auto less_significant_bits = static_cast<unsigned char>(s[i + 1]);
+            if (!std::isxdigit(most_significant_bits) || !std::isxdigit(less_significant_bits))
+                throw std::invalid_argument{ "Argument is not a UUID." };
+            bytes[j] = _from_hex_chars(most_significant_bits, less_significant_bits);
+        }
 
         return uuid{ bytes };
     }
 
     std::variant<uuid, std::error_code> try_parse(const std::string_view s) noexcept
     {
-        // accepted canonical format:
-        //      xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+        // accepted canonical format: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
 
         const char HYPEN = '-';
 
@@ -285,18 +223,18 @@ namespace drako
             return std::make_error_code(std::errc::invalid_argument);
 
         std::array<std::byte, sizeof(_uuid_byte_layout)> bytes;
-        for (int_fast8_t i = 0, j = 0; i < 4; i += 2, ++j) // time-low { 8 hex-digits }
+        for (size_t i = 0, j = 0; i < UUID_STRING_SIZE; i += 2, ++j)
         {
             if (s[i] == UUID_HYPEN_1_OFFSET || s[i] == UUID_HYPEN_2_OFFSET ||
                 s[i] == UUID_HYPEN_3_OFFSET || s[i] == UUID_HYPEN_4_OFFSET) // skip '-' separator
                 ++i;
 
-            const auto chl = static_cast<unsigned char>(s[i]);
-            const auto chr = static_cast<unsigned char>(s[i + 1]);
-            if (!std::isxdigit(chl) || !std::isxdigit(chr))
+            const auto most_significant_bits = static_cast<unsigned char>(s[i]);
+            const auto less_significant_bits = static_cast<unsigned char>(s[i + 1]);
+            if (!std::isxdigit(most_significant_bits) || !std::isxdigit(less_significant_bits))
                 return std::make_error_code(std::errc::invalid_argument);
 
-            bytes[j] = _from_hex_chars(chl, chr);
+            bytes[j] = _from_hex_chars(most_significant_bits, less_significant_bits);
         }
         return uuid{ bytes };
     }

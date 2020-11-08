@@ -1,13 +1,13 @@
 #pragma once
-#ifndef DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP_
-#define DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP_
+#ifndef DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP
+#define DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 #include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/graphics/vulkan_utils.hpp"
 
 #include <array>
+#include <span>
 #include <vector>
 
 #include <vulkan/vulkan.hpp>
@@ -26,9 +26,9 @@ namespace drako::gpx::vulkan
         global_allocator& operator=(global_allocator&&) = delete;
 
 
-        void bind_non_sparse(vk::Buffer desc) noexcept;
+        void bind_non_sparse(vk::Buffer desc);
 
-        void bind_non_sparse(vk::Buffer desc, vk::MemoryPropertyFlags flags) noexcept;
+        void bind_non_sparse(vk::Buffer desc, vk::MemoryPropertyFlags flags);
 
     private:
         const vk::PhysicalDevice _pdevice;
@@ -42,27 +42,25 @@ namespace drako::gpx::vulkan
     global_allocator::global_allocator(const context& ctx)
         : _pdevice(ctx.physical_device), _ldevice(ctx.logical_device.get())
     {
-        /*
         const auto properties = _pdevice.getMemoryProperties();
-        for (uint32_t i = 0; i < properties.memoryHeapCount; ++i)
+        for (uint32_t heap_index = 0; heap_index < properties.memoryHeapCount; ++heap_index)
         {
-            const auto heap = properties.memoryHeaps[i];
+            const auto heap = properties.memoryHeaps[heap_index];
 
             const vk::MemoryAllocateInfo alloc_info{
                 vk::DeviceSize{ heap.size / 2 }, // reserve half of heap capacity
-                heap
+                heap_index
             };
-            const auto mem = _ldevice.allocateMemoryUnique(alloc_info);
+            _mem_pools[heap_index] = _ldevice.allocateMemoryUnique(alloc_info);
         }
-        */
     }
 
     void global_allocator::bind_non_sparse(vk::Buffer desc)
     {
         /*
         const auto buffer_mem_req = _ldevice.getBufferMemoryRequirements(desc);
-        DRAKO_ASSERT(buffer_mem_req.memoryTypeBits != 0, "Required by Vulkan standard");
-        DRAKO_ASSERT(buffer_mem_req.alignment % 2 == 0, "Required by Vulkan standard");
+        assert(buffer_mem_req.memoryTypeBits != 0, "Required by Vulkan standard");
+        assert(buffer_mem_req.alignment % 2 == 0, "Required by Vulkan standard");
 
         for (uint32_t mem_type_index = 0; mem_type_index < sizeof(decltype(buffer_mem_req.memoryTypeBits)) * 4;)
         {
@@ -82,7 +80,7 @@ namespace drako::gpx::vulkan
     class device_local_allocator
     {
     public:
-        explicit device_local_allocator(const context& ctx, size_t bytes);
+        explicit device_local_allocator(const context& ctx, size_t bytes, const std::span<uint32_t> queue_families);
 
         device_local_allocator(const device_local_allocator&) = delete;
         device_local_allocator& operator=(const device_local_allocator&) = delete;
@@ -91,11 +89,10 @@ namespace drako::gpx::vulkan
         device_local_allocator operator=(device_local_allocator&&) = delete;
 
 
-        void allocate(vk::Buffer buffer);
-        void allocate(const std::vector<vk::Buffer>& buffers);
+        [[nodiscard]] std::byte* allocate(vk::Buffer buffer);
+        //std::byte* allocate(const std::vector<vk::Buffer>& buffers);
 
-        void deallocate(vk::Buffer buffer);
-        void deallocate(const std::vector<vk::Buffer>& buffers);
+        void deallocate(std::byte*);
 
     private:
         const vk::Device       _device;
@@ -103,10 +100,11 @@ namespace drako::gpx::vulkan
         vk::UniqueBuffer       _buffer;
     };
 
-    device_local_allocator::device_local_allocator(const context& ctx, size_t bytes) noexcept
+    device_local_allocator::device_local_allocator(
+        const context& ctx, size_t bytes, const std::span<std::uint32_t> queue_families)
         : _device{ ctx.logical_device.get() }
     {
-        DRAKO_ASSERT(bytes > 0);
+        assert(bytes > 0);
 
         // prototype of typical ubo use case
         const vk::BufferCreateInfo buffer_info{
@@ -114,8 +112,8 @@ namespace drako::gpx::vulkan
             vk::DeviceSize{ bytes },
             vk::BufferUsageFlagBits::eUniformBuffer | vk::BufferUsageFlagBits::eTransferDst,
             vk::SharingMode::eConcurrent,
-            static_cast<uint32_t>(std::size(queues)),
-            queues.data()
+            static_cast<uint32_t>(std::size(queue_families)),
+            queue_families.data()
         };
         _buffer = _device.createBufferUnique(buffer_info);
 
@@ -127,7 +125,7 @@ namespace drako::gpx::vulkan
         _memory = _device.allocateMemoryUnique(device_alloc_info);
     }
 
-    void device_local_allocator::allocate(vk::Buffer buffer)
+    [[nodiscard]] std::byte* device_local_allocator::allocate(vk::Buffer buffer)
     {
         const auto specs = _device.getBufferMemoryRequirements(buffer);
 
@@ -135,72 +133,27 @@ namespace drako::gpx::vulkan
     }
 
 
-
-    struct allocation
-    {
-        vk::DeviceMemory memory;
-        vk::DeviceSize   offset;
-    };
-
-
     // Allocator for buffers with frequent host (CPU) access
-    class host_mapped_allocator
+    class host_stack_allocator
     {
     public:
-        explicit host_mapped_allocator(const context& ctx, size_t bytes) noexcept;
+        explicit host_stack_allocator(const context&, const vk::MemoryAllocateInfo&);
 
-        host_mapped_allocator(const host_mapped_allocator&) = delete;
-        host_mapped_allocator& operator=(const host_mapped_allocator&) = delete;
+        host_stack_allocator(const host_stack_allocator&) = delete;
+        host_stack_allocator& operator=(const host_stack_allocator&) = delete;
 
-        host_mapped_allocator(host_mapped_allocator&&) = delete;
-        host_mapped_allocator& operator=(host_mapped_allocator&&) = delete;
-
-        ~host_mapped_allocator() noexcept;
+        ~host_stack_allocator() noexcept;
 
         [[nodiscard]] void* allocate(vk::Buffer b) noexcept;
 
         void deallocate(void* ptr) noexcept;
 
     private:
-        const vk::Device _device;
-        vk::DeviceMemory _device_memory;
-        void*            _mapped_memory;
-        size_t           _offset;
+        const vk::Device       _device;
+        vk::UniqueDeviceMemory _memory;
+        std::byte*             _buffer;
+        size_t                 _offset;
     };
-
-    host_mapped_allocator::host_mapped_allocator(const context& ctx, size_t bytes) noexcept
-        : _device{ ctx.logical_device.get() }
-    {
-        DRAKO_ASSERT(bytes > 0);
-
-        const vk::MemoryAllocateInfo device_alloc_info{
-            vk::DeviceSize{ bytes },
-        };
-        _device_memory = _device.allocateMemory(device_alloc_info);
-
-        const auto ptr = _device.mapMemory(_device_memory, vk::DeviceSize{ 0 }, vk::DeviceSize{ VK_WHOLE_SIZE }, {});
-    }
-
-    host_mapped_allocator::~host_mapped_allocator()
-    {
-        _device.freeMemory(_device_memory);
-    }
-
-    [[nodiscard]] void* host_mapped_allocator::allocate(vk::Buffer buffer) noexcept
-    {
-        DRAKO_ASSERT(buffer != VK_NULL_HANDLE);
-        const auto specs = _device.getBufferMemoryRequirements(buffer);
-
-        // TODO: change allocation algorithm, this is only for prototyping
-
-        _offset += specs.size;
-        return _mapped_memory + _offset;
-    }
-
-    void host_mapped_allocator::deallocate(void* ptr) noexcept
-    {
-        _device.unmapMemory()
-    }
 
 
 
@@ -209,26 +162,7 @@ namespace drako::gpx::vulkan
     {
     public:
         explicit fixed_host_ubo(
-            const context& ctx, size_t size, host_mapped_allocator& a) noexcept
-            : _device(ctx.logical_device.get()), _alloc(a), _size(size)
-        {
-            vk::BufferCreateInfo buffer_create_info{
-                {},
-                vk::DeviceSize{ size },
-                vk::BufferUsageFlagBits::eUniformBuffer,
-                vk::SharingMode::eConcurrent,
-                static_cast<uint32_t>(std::size(queues)),
-                queues.data()
-            };
-            _buffer = _device.createBufferUnique(buffer_create_info);
-            _memory = _alloc.allocate(_buffer.get());
-            _device.bindBufferMemory(_buffer.get(), )
-        }
-
-        ~fixed_host_ubo() noexcept
-        {
-            _alloc.deallocate(_memory);
-        }
+            const context& ctx, size_t size, host_mapped_allocator& a) noexcept;
 
     private:
         const vk::Device       _device;
@@ -245,4 +179,4 @@ namespace drako::gpx::vulkan
 
 } // namespace drako::gpx::vulkan
 
-#endif // !DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP_
+#endif // !DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP

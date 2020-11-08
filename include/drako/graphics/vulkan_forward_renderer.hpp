@@ -31,14 +31,22 @@ namespace drako::gpx::vulkan
             return _renderpass.get();
         }
 
-        void draw(const material_pipeline& pipeline,
-            const std::vector<mat4x4>&     mvp,
-            const std::vector<mesh_view>&  mesh) noexcept;
+        struct draw_batch_soa
+        {
+            material_pipeline   pipeline;
+            std::vector<mat4x4> mvps;
+            std::vector<mesh>   meshes;
+        };
+        void draw(const draw_batch_soa&) noexcept;
 
-        void draw(const material_pipeline&        pipeline,
-            const std::vector<mat4x4>&            mvps,
-            const std::vector<mesh_view>&         meshes,
-            const std::vector<material_instance>& materials) noexcept;
+        struct draw_batch_mtl_soa
+        {
+            material_pipeline              pipeline;
+            std::vector<mat4x4>            mvps;
+            std::vector<mesh>              meshes;
+            std::vector<material_instance> materials;
+        };
+        void draw(const draw_batch_mtl_soa&) noexcept;
 
     private:
         struct frame_attachments
@@ -73,7 +81,7 @@ namespace drako::gpx::vulkan
 
         vk::CommandBuffer _command_buffer;
 
-        std::vector<frame_attachments> _frame_attachments;
+        std::vector<frame_attachments> _attachments;
     };
 
 } // namespace drako::gpx::vulkan

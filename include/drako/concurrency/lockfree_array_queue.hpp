@@ -2,31 +2,25 @@
 #ifndef DRAKO_LOCKFREE_ARRAY_QUEUE
 #define DRAKO_LOCKFREE_ARRAY_QUEUE
 
-//
-// @brief   Thread-safe queue based on lockfree algorithms.
-// @author  Grassi Edoardo
-// @date    13/05/2019
-//
+/// @brief   Thread-safe queue based on lockfree algorithms.
+/// @author  Grassi Edoardo
+/// @date    13/05/2019
+
+#include "drako/concurrency/lockfree_pool_allocator.hpp"
 
 #include <atomic>
-
-#include "core/compiler_macros.hpp"
-#include "core/lockfree_pool_allocator.hpp"
-
-#if DRKAPI_DEBUG
-#   include "development/assertion.hpp"
-#endif
+#include <cassert>
 
 #define QUEUE_SIZE 100
 
-namespace drako::concurrency::lockfree
+namespace drako::lockfree
 {
+    /// @brief Thread-safe lockfree queue
     template <typename T>
     class array_queue final
     {
     public:
-
-        explicit array_queue(const size_t count) noexcept;
+        explicit array_queue(const std::size_t count) noexcept;
         ~array_queue() noexcept;
 
         array_queue(const array_queue&) = delete;
@@ -42,40 +36,38 @@ namespace drako::concurrency::lockfree
 
 
     private:
+        using _gen = uint32_t;
 
-        using entry_gen = uint32_t;
-
-        struct entry
+        struct _entry
         {
-            T* data;
-            entry_gen gen;
+            T*   data;
+            _gen gen;
 
-            bool is_data(entry_gen curr_gen) noexcept
+            bool is_data(_gen current) noexcept
             {
-                return (this->data != nullptr) && (this->gen == curr_gen);
+                return (data != nullptr) && (gen == current);
             }
 
-            bool is_free(entry_gen curr_gen) noexcept
+            bool is_free(_gen current) noexcept
             {
-                return (this->data == nullptr) && (this->gen == curr_gen);
+                return (data == nullptr) && (this->gen == current);
             }
 
-            bool is_head(entry_gen curr_gen) noexcept
+            bool is_head(_gen current) noexcept
             {
-                return this->data != nullptr && this->gen == curr_gen;
+                return (data != nullptr) && (gen == current);
             }
 
-            bool is_tail(entry_gen curr_gen) noexcept
+            bool is_tail(_gen current) noexcept
             {
-                return (this->data == nullptr) ?
-                    this->gen == curr_gen : this->gen < curr_gen;
+                return (data == nullptr) ? gen == current : gen < current;
             }
         };
 
-        struct index
+        struct _index
         {
             uint32_t idx;
-            uint32_t gen;
+            _gen     gen;
 
             index& operator++() noexcept
             {
@@ -85,80 +77,85 @@ namespace drako::concurrency::lockfree
             }
         };
 
-        std::atomic<index> head_hint = {};
-        std::atomic<index> tail_hint = {};
+        std::atomic<_index> head_hint = {};
+        std::atomic<_index> tail_hint = {};
 
-        std::atomic<entry> buffer[QUEUE_SIZE];
-        size_t buffer_size;
+        std::atomic<_entry> buffer[QUEUE_SIZE];
+        std::size_t        buffer_size;
 
-        memory::lockfree_object_pool<T> allocator;
+        lockfree::object_pool<T> allocator;
 
 
-        index find_tail(index hint) noexcept
+        _index find_tail(_index hint) noexcept
         {
-            while (!this->buffer[hint.idx].load(std::memory_order_relaxed).is_tail(hint.gen)) { hint++; }
+            while (!buffer[hint.idx].load(std::memory_order_relaxed).is_tail(hint.gen))
+            {
+                hint++;
+            }
             return hint;
         }
     };
 
 
-    template<typename T>
+    template <typename T>
     inline array_queue<T>::array_queue(const size_t count) noexcept
         : buffer_size(count), allocator(count)
     {
-        DRAKO_PRECON(count > 0);
+        assert(count > 0);
 
-        this->buffer = static_cast<std::atomic<entry>*>(std::malloc(sizeof(T) * count));
-        if (this->buffer == nullptr) { std::exit(EXIT_FAILURE); }
+        buffer = static_cast<std::atomic<_entry>*>(std::malloc(sizeof(T) * count));
+        if (this->buffer == nullptr)
+        {
+            std::exit(EXIT_FAILURE);
+        }
 
-        for (auto i = 0; i < this->buffer_size; i++)
+        for (auto i = 0; i <buffer_size; i++)
         {
             this->buffer[i] = nullptr;
         }
     }
 
-    template<typename T>
+    template <typename T>
     inline array_queue<T>::~array_queue() noexcept
     {
-        DRAKO_ASSERT(this->buffer != nullptr);
-        std::free(this->buffer);
+        assert(buffer != nullptr);
+        std::free(buffer);
     }
 
-    template<typename T>
+    template <typename T>
     inline bool array_queue<T>::enque(const T& in) noexcept
     {
-        T* obj = new (this->allocator.allocate(sizeof(T))) T(in);
+        T* obj = new (allocator.allocate(sizeof(T))) T(in);
 
-        entry new_item;
-        index pos = this->tail_hint.load(std::memory_order_relaxed);
+        _entry new_item;
+        _index pos = tail_hint.load(std::memory_order_relaxed);
 
         do
         {
             pos = find_tail(pos);
-        }
-        while (!this->buffer[pos.idx].compare_exchange_strong(nullptr, new_item));
+        } while (!buffer[pos.idx].compare_exchange_strong(nullptr, new_item));
 
-        this->tail_hint.store(++pos, std::memory_order_relaxed);
+        tail_hint.store(++pos, std::memory_order_relaxed);
         return true;
     }
 
     template <typename T>
     inline bool array_queue<T>::deque(T& out) noexcept
     {
-        auto curr_head = this->head_hint.load();
-        auto curr_tail = this->tail_hint.load();
+        auto curr_head = head_hint.load();
+        auto curr_tail = tail_hint.load();
 
         for (size_t i = curr_head; i != curr_tail; i++)
         {
-            auto obj = ;// get object
+            auto obj = ; // get object
 
             out = std::move(obj);
-            this->allocator.deallocate(obj);
+            allocator.deallocate(obj);
         }
 
         return false;
     }
 
-} // namespace drako::concurrency::lockfree
+} // namespace drako::lockfree
 
 #endif // !DRAKO_LOCKFREE_ARRAY_QUEUE

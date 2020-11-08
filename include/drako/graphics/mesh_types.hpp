@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_MESH_TYPES_HPP_
-#define DRAKO_MESH_TYPES_HPP_
+#ifndef DRAKO_MESH_TYPES_HPP
+#define DRAKO_MESH_TYPES_HPP
 
 #include "drako/core/meta/encoding.hpp"
 #include "drako/system/memory_stream.hpp"
@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <iostream>
 #include <span>
+#include <string>
 #include <type_traits>
 
 namespace drako

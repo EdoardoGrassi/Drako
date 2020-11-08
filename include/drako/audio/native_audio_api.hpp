@@ -2,17 +2,8 @@
 #ifndef DRAKO_NATIVE_AUDIO_API_HPP
 #define DRAKO_NATIVE_AUDIO_API_HPP
 
-#include <chrono>
-#include <cstdlib>
-#include <memory>
-#include <system_error>
-#include <tuple>
-#include <vector>
-
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/core/preprocessor/platform_macros.hpp"
-
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -20,6 +11,12 @@
 #include <combaseapi.h>
 #include <mmdeviceapi.h>
 #endif
+
+#include <chrono>
+#include <memory>
+#include <system_error>
+#include <tuple>
+#include <vector>
 
 namespace drako::audio
 {
@@ -44,29 +41,29 @@ namespace drako::audio
 
     enum channel_mode : uint8_t
     {
-        DK_MONO   = 1, // 1-channel mode
-        DK_STEREO = 2  // 2-channels mode
+        mono   = 1, // 1-channel mode
+        stereo = 2  // 2-channels mode
     };
 
     enum sample_frequency : uint32_t
     {
-        DK_8000_HZ  = 8'000,
-        DK_16000_HZ = 16'000,
-        DK_32000_HZ = 32'000,
-        DK_44100_HZ = 44'100,
-        DK_48000_HZ = 48'000
+        hz_8000  = 8'000,
+        hz_16000 = 16'000,
+        hz_32000 = 32'000,
+        hz_44100 = 44'100,
+        hz_48000 = 48'000
     };
 
     enum sample_bitdepth : uint8_t
     {
-        DK_8BIT_INT,  // 8-bit integer
-        DK_16BIT_INT, // 16-bit integer
-        DK_24BIT_INT, // 24-bit integer
-        DK_32BIT_INT, // 32-bit integer
-        DK_32BIT_FLT  // 32-bit floating point
+        int_8bit,   // 8-bit integer
+        int_16bit,  // 16-bit integer
+        int_24bit,  // 24-bit integer
+        int_32bit,  // 32-bit integer
+        float_32bit // 32-bit floating point
     };
 
-    struct stream_format
+    class stream_format
     {
     public:
         explicit constexpr stream_format(uint32_t sample_rate, uint8_t sample_bitdepth, uint8_t channels) noexcept

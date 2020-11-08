@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_MATERIAL_TYPES_HPP_
-#define DRAKO_MATERIAL_TYPES_HPP_
+#ifndef DRAKO_MATERIAL_TYPES_HPP
+#define DRAKO_MATERIAL_TYPES_HPP
 
 #include <cstdint>
 

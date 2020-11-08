@@ -8,7 +8,6 @@
 /// @date   Last update: 03-09-2019
 
 #include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
 #include "drako/math/vector4.hpp"
 
 #if defined(DRAKO_API_SIMD)
@@ -69,7 +68,7 @@ namespace drako
         DRAKO_FORCE_INLINE constexpr friend bool operator==(const _cmm4&, const _cmm4&) noexcept;
         DRAKO_FORCE_INLINE constexpr friend bool operator!=(const _cmm4&, const _cmm4&) noexcept;
 
-        [[nodiscard]] DRAKO_FORCE_INLINE constexpr float* operator[](size_t idx) noexcept;
+        [[nodiscard]] DRAKO_FORCE_INLINE constexpr float*       operator[](size_t idx) noexcept;
         [[nodiscard]] DRAKO_FORCE_INLINE constexpr const float* operator[](size_t idx) const noexcept;
 
         /// @brief Computes the determinant of the matrix.
