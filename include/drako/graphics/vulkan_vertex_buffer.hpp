@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     // Uniform buffer on gpu side specialized for vertex attributes.
     class vk_vertex_buffer
@@ -187,7 +187,7 @@ namespace drako::gpx::vulkan
             auto vertex_buffer = _ldevice.createBuffer(vertex_buffer_info);
 
             vk::DeviceMemory staging_memory;
-            const auto ptr = _ldevice.mapMemory(
+            const auto       ptr = _ldevice.mapMemory(
                 staging_memory,
                 0,
                 buffer_size_,
@@ -304,6 +304,6 @@ namespace drako::gpx::vulkan
         }
     }
 
-} // namespace drako::gpx
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_VERTEX_BUFFER_HPP

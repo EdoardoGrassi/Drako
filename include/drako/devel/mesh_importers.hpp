@@ -21,9 +21,9 @@ namespace drako::editor
     };
 
 
-    mesh_import_info load_mesh_import(const std::filesystem::path& file)
+    [[nodiscard]] inline mesh_import_info load_mesh_import(const std::filesystem::path& file)
     {
-        file_formats::dson::object serialized{};
+        dson::object serialized{};
         {
             std::ifstream ifs{ file };
             ifs >> serialized;
@@ -36,9 +36,9 @@ namespace drako::editor
         return info;
     }
 
-    void save_mesh_import(const mesh_import_info& info, const std::filesystem::path& file)
+    inline void save_mesh_import(const mesh_import_info& info, const std::filesystem::path& file)
     {
-        file_formats::dson::object serialized;
+        dson::object serialized;
         serialized.set("guid", to_string(info.guid));
         serialized.set("name", info.name);
         serialized.set("path", info.path.string());

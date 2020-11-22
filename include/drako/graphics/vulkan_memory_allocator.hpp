@@ -12,7 +12,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     class global_allocator
     {
@@ -156,20 +156,8 @@ namespace drako::gpx::vulkan
     };
 
 
-
-
     class fixed_host_ubo
     {
-    public:
-        explicit fixed_host_ubo(
-            const context& ctx, size_t size, host_mapped_allocator& a) noexcept;
-
-    private:
-        const vk::Device       _device;
-        host_mapped_allocator& _alloc;
-        void*                  _memory;
-        size_t                 _size;
-        vk::UniqueBuffer       _buffer;
     };
 
 
@@ -177,6 +165,6 @@ namespace drako::gpx::vulkan
     {
     };
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_MEMORY_ALLOCATOR_HPP

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <vector>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     VKAPI_ATTR VkBool32 VKAPI_CALL _debug_message_callback(
         VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
@@ -252,6 +252,6 @@ namespace drako::gpx::vulkan
         }
     }
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_RUNTIME_CONTEXT_HPP

@@ -39,14 +39,6 @@ add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
 add_subdirectory("include/drako/graphics")
 
-add_executable(${PROJECT_NAME}_threading_test "./test/main_thread_test.cpp")
-
-add_executable(drako_mouse_test WIN32 "./test/main_mouse_test.cpp")
-target_link_libraries(drako_mouse_test PRIVATE drako::system)
-
-add_executable(drako_keyboard_test WIN32 "./test/keyboard_app_test.cpp")
-target_link_libraries(drako_keyboard_test PRIVATE drako::system)
-
 
 # Experimental Drako engine with forward renderer
 add_executable(drako-engine WIN32 "./src/vulkan_engine_win32.cpp")
@@ -55,8 +47,9 @@ target_link_libraries(drako-engine PRIVATE drako::vulkan-forward-renderer)
 
 # Console interface for Drako projects
 add_executable(drako-cli-editor "./src/drako_cli_editor.cpp")
-set_target_properties(drako-cli-editor PROPERTIES OUTPUT_NAME "drako-cli-editor")
-
+set_target_properties(drako-cli-editor PROPERTIES
+    OUTPUT_NAME "drako-cli-editor"
+    RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects")
 target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 
 
@@ -117,7 +110,7 @@ else()
     endforeach()
 
     add_custom_target(
-        format
+        clang-format
         COMMAND clang-format -i -style=LLVM ${DRAKO_ALL_TARGETS_SOURCES}
     )
 endif()

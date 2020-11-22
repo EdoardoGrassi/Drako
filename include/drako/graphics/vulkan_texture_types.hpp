@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     // Texture resource hosted on GPU memory that can be accessed by shaders.
     class gpu_tex2d
@@ -35,6 +35,6 @@ namespace drako::gpx::vulkan
         vk::UniqueImageView _view;
     };
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_TEXTURE_TYPES_HPP

@@ -1,5 +1,5 @@
-#include "drako/io/input_file_stream.hpp"
-#include "drako/io/output_file_stream.hpp"
+#include "drako/io/input_file_handle.hpp"
+#include "drako/io/output_file_handle.hpp"
 
 #include <algorithm>
 #include <array>
@@ -20,12 +20,12 @@ int main()
     std::copy(original.cbegin(), original.cend(), result.begin());
 
     {
-        drako::io::output_file_stream ofs{ fullpath };
+        drako::io::output_file_handle ofs{ fullpath };
         ofs.write(original.data(), original.size());
     }
 
     {
-        drako::io::input_file_stream ifs{ fullpath };
+        drako::io::input_file_handle ifs{ fullpath };
         ifs.read(result.data(), result.size());
     }
 

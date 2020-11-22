@@ -13,7 +13,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     forward_renderer::forward_renderer(
         const context& ctx, uint32_t width, uint32_t height)
@@ -336,4 +336,4 @@ namespace drako::gpx::vulkan
         _present_queue.waitIdle();
     }
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan

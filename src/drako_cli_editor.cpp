@@ -62,55 +62,50 @@ struct _cmd_params
     const std::vector<std::string_view> args;
 };
 
-void _exit(_cmd_params params)
+void cli_exit(_cmd_params params)
 {
     std::exit(EXIT_SUCCESS);
 }
 
-void _create_project_cmd(_cmd_params params)
+void cli_create_project(_cmd_params params)
 {
-}
+    using namespace drako::editor;
 
+    const auto& name  = params.args[0];
+    const auto& where = params.args[1];
 
-int main(const int argc, const char* argv[])
-{
-    using _cmd_fun = std::function<void(_cmd_params)>;
-
-    const std::unordered_map<std::string_view, drako::editor::asset_import_function> importers{
-        { ".obj", drako::editor::import_obj_asset }
-    };
-
-    const std::unordered_map<std::string_view, _cmd_fun> commands = {
-        { "create", _create_project_cmd }
-    };
-
-    if (argc == 1)
-    {
-        std::cout << PROGRAM_HEADER << '\n';
-        std::exit(EXIT_SUCCESS);
-    }
-
-    if (argc == 2 && argv[1] == "--help")
-    { // print program help
-        std::cout << PROGRAM_HELPER << '\n';
-        std::exit(EXIT_SUCCESS);
-    }
-
-    drako::editor::project proj{ argv[1] };
+    std::cout << "Creating project " << name << " at " << where << '\n';
     try
     {
-        const auto proj_info = drako::editor::load_project_info(argv[1]);
+        make_project_tree(name, where);
+        std::cout << "Project created\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "Error: " << e.what() << '\n';
+        std::cout << "Project creation failed\n";
+    }
+}
+
+void cli_open_project(const std::filesystem::path& dir)
+{
+    using namespace drako::editor;
+
+    project proj{ dir };
+    try
+    {
+        const auto proj_info = load_project_info(dir);
         std::cout << "Name: " << proj_info.name << '\n';
 
-        drako::editor::load_project(proj);
+        load_project(proj);
         std::cout << "Located assets count: " << std::size(proj.assets.guids) << '\n';
     }
     catch (const std::exception& e)
     {
-        std::cout << e.what() << '\n';
-        std::exit(EXIT_FAILURE);
+        std::cout << "Error: " << e.what() << '\n';
     }
 
+    /*
     for (std::string input;;)
     {
         std::cin >> input;
@@ -130,5 +125,37 @@ int main(const int argc, const char* argv[])
         {
             std::cout << e.what() << '\n';
         }
+    }
+    */
+}
+
+
+int main(const int argc, const char* argv[])
+{
+    using _cmd_fun = std::function<void(_cmd_params)>;
+
+    const std::unordered_map<std::string_view, drako::editor::asset_import_function> importers{
+        { ".obj", drako::editor::import_obj_asset }
+    };
+
+    const std::unordered_map<std::string_view, _cmd_fun> commands = {
+        { "create", cli_create_project }
+    };
+
+    if (argc == 1)
+    {
+        std::cout << PROGRAM_HEADER << '\n';
+        std::exit(EXIT_SUCCESS);
+    }
+
+    if (argc == 2 && argv[1] == "--help")
+    { // print program help
+        std::cout << PROGRAM_HELPER << '\n';
+        std::exit(EXIT_SUCCESS);
+    }
+
+    if (argc == 3 && argv[1] == "open")
+    {
+        cli_open_project(argv[2]);
     }
 }

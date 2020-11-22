@@ -35,8 +35,9 @@ int main()
         assert(!(a != b));
     }
     {
-        const uuid a = make_uuid_version1();
-        const uuid b = make_uuid_version1();
+        uuid_v1_engine gen{};
+        const uuid     a = gen();
+        const uuid     b = gen();
 
         assert(a.has_value());
         assert(b.has_value());
@@ -53,10 +54,10 @@ int main()
         std::vector<uuid> v;
         v.reserve(iters);
 
-        uuid_v1_engine generator{};
+        uuid_v1_engine gen{};
         for (auto i = 0; i < iters; ++i)
         {
-            const auto u = generator();
+            const auto u = gen();
             assert(std::find(std::cbegin(v), std::cend(v), u) == std::cend(v));
             v.push_back(u);
         }

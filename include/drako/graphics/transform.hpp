@@ -2,7 +2,7 @@
 #ifndef DRAKO_TRANSFORM_HPP
 #define DRAKO_TRANSFORM_HPP
 
-#include "drako/graphics/camera.hpp"
+#include "drako/graphics/camera_types.hpp"
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/quaternion.hpp"
 #include "drako/math/vector3.hpp"

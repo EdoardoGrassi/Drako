@@ -4,11 +4,6 @@
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <vector>
-
 // #include <fileapi.h>
 // #include <handleapi.h>
 
@@ -20,9 +15,13 @@
 #include <hidpi.h>
 #include <hidsdi.h>
 
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <vector>
 
 #if !defined(DRAKO_PLT_WIN32)
-#error This source file should be included only on Windows builds
+#error This source file should be included only in Windows builds.
 #endif
 
 namespace drako::sys::hid
@@ -268,36 +267,32 @@ namespace drako::sys::hid
         return std::error_code{};
     }
 
+    /*
     std::error_code device::control_pipe_read() noexcept
     {
-        /*
         std::byte buffer[64];
         ::HidP_InitializeReportForID();
 
         ::HidD_GetInputReport(_handle, buffer, );
-        */
     }
 
     std::error_code device::control_pipe_write() noexcept
     {
-        /*
         std::byte buffer[64];
         ::HidP_InitializeReportForID();
 
         ::HidD_SetOutputReport(_handle, buffer, );
-        */
     }
 
     std::error_code device::interrupt_pipe_read() noexcept
     {
-        /*
         DWORD      buffer_bytes_read;
         OVERLAPPED overlapped = {};
         if (::ReadFile(_handle, buffer, _input_buffer_bytes, &buffer_bytes_read, nullptr) != TRUE)
         {
         }
-        */
     }
+    */
 
     //std::error_code hid_device::interrupt_pipe_write() noexcept;
 
@@ -320,6 +315,5 @@ namespace drako::sys::hid
             if (::HidP_GetValueCaps(HidP_Input, buffer.get(), &size, _preparsed) != HIDP_STATUS_SUCCESS)
                 return { std::error_code(::GetLastError(), std::system_category()), {} };
         }
-
     }
 } // namespace drako::sys::hid

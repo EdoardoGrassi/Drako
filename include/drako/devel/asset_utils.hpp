@@ -3,8 +3,8 @@
 #define DRAKO_ASSET_UTILS_HPP_
 
 #include "drako/devel/asset_types.hpp"
-#include "drako/io/input_file_stream.hpp"
-#include "drako/io/output_file_stream.hpp"
+#include "drako/io/input_file_handle.hpp"
+#include "drako/io/output_file_handle.hpp"
 
 #include <iostream>
 #include <limits>

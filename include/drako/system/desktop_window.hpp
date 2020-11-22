@@ -2,14 +2,14 @@
 #ifndef DRAKO_DESKTOP_WINDOW_HPP
 #define DRAKO_DESKTOP_WINDOW_HPP
 
-#include <string_view>
-
 #include "drako/core/preprocessor/platform_macros.hpp"
 #include "drako/devel/assertion.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Windows.h>
 #endif
+
+#include <string_view>
 
 namespace drako::sys
 {
@@ -23,7 +23,7 @@ namespace drako::sys
         using native_context_type = HINSTANCE;
 #endif
 
-        explicit desktop_window(std::wstring_view title) noexcept;
+        explicit desktop_window(std::wstring_view title);
         ~desktop_window() noexcept;
 
         desktop_window(const desktop_window&) = delete;

@@ -1,104 +1,104 @@
 # ninja log v5
-3139	5627	626537889	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	a15bdd38f2df33fe
-20	2828	626537886	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_input_device_win32.cpp.obj	a90be946674f1721
-2	41	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-0	1796	625337984	include/drako/io/CMakeFiles/drako-io.dir/src/aio_file_stream.cpp.obj	5f04a0b735343dc2
-27	1749	626537885	CMakeFiles/drako_threading_test.dir/test/main_thread_test.cpp.obj	dc66fb57f10f858d
-1749	3171	626537886	../../../build/drako_threading_test.exe	dc9e5f0d348ae26c
-37	747	626537328	build.ninja	1bf7807df443872a
-14	2543	626537886	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_output_device_win32.cpp.obj	23e98d8292a41ad2
-2828	3139	626537886	include/drako/audio/drako-audio.lib	474cd6fd846d7c16
-3057	6501	625414113	CMakeFiles/drako-obj-importer.dir/src/drako_obj_importer.cpp.obj	682fbfa65cf26199
-19	3466	626280713	CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	7c1ea60c4534b02f
-36	3325	626278602	CMakeFiles/drako_audio_test.dir/include/drako/audio/audio_input_device_win.cpp.obj	648a43b6584ddebf
-17	2140	626537885	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_engine_win32.cpp.obj	8c4145b54e6419bd
-24	3593	626537887	include/drako/audio/CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	152b4efd651ff929
-2544	5294	626537888	CMakeFiles/drako_keyboard_test.dir/test/keyboard_app_test.cpp.obj	46a26e4b8e7fa2f
-2140	5538	626537889	CMakeFiles/drako_mouse_test.dir/test/main_mouse_test.cpp.obj	cfdcdbe46f048119
-3593	5029	626537888	../../../build/drako_audio_test.exe	becfce282938cba5
-5627	6672	626537890	../../../build/drako-builder.exe	bec10340aa5ec978
-3171	6473	626537890	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	a2ad8d9d11f19150
-5295	7663	626537891	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	53b5c27e09fb6301
-5029	7395	626537891	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	332f6e0d26e2a543
-5538	7029	626537890	include/drako/devel/CMakeFiles/uuid-test1-exe.dir/test/uuid_test1.cpp.obj	7fad831e67d9fe4b
-1	533	626543422	include/drako/file_formats/wave/CMakeFiles/drako-format-wave.dir/src/wave.cpp.obj	c76f24c467e5ce2a
-533	642	626543422	include/drako/file_formats/wave/drako-format-wave.lib	8806e31ce4efb79e
-2	80	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-1	718	626543471	include/drako/file_formats/wave/CMakeFiles/drako-format-wave.dir/src/wave.cpp.obj	c76f24c467e5ce2a
-718	762	626543471	include/drako/file_formats/wave/drako-format-wave.lib	8806e31ce4efb79e
-2	37	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-0	24	0	clean	4b52aa8ad9c61460
-2	35	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-31	1753	626547224	CMakeFiles/drako_threading_test.dir/test/main_thread_test.cpp.obj	dc66fb57f10f858d
-14	2578	626547225	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_engine_win32.cpp.obj	8c4145b54e6419bd
-19	2703	626547225	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_output_device_win32.cpp.obj	23e98d8292a41ad2
-17	3149	626547225	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_input_device_win32.cpp.obj	a90be946674f1721
-1754	3195	626547225	../../../build/drako_threading_test.exe	dc9e5f0d348ae26c
-3149	3342	626547225	include/drako/audio/drako-audio.lib	474cd6fd846d7c16
-27	3632	626547226	include/drako/audio/CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	152b4efd651ff929
-3632	4651	626547226	../../../build/drako_audio_test.exe	becfce282938cba5
-2578	5407	626547227	CMakeFiles/drako_keyboard_test.dir/test/keyboard_app_test.cpp.obj	46a26e4b8e7fa2f
-3196	5833	626547228	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	a15bdd38f2df33fe
-2703	6015	626547228	CMakeFiles/drako_mouse_test.dir/test/main_mouse_test.cpp.obj	cfdcdbe46f048119
-3342	6543	626547229	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	a2ad8d9d11f19150
-5834	7324	626547229	../../../build/drako-builder.exe	bec10340aa5ec978
-4651	7633	626547230	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	332f6e0d26e2a543
-6015	7910	626547230	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	48b85484a6ead3f7
-5408	8166	626547230	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	53b5c27e09fb6301
-6543	8504	626547231	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	ffdf426e7767547a
-4	53	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	38	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+31	4432	627751566	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	ce6c07a25c6251cc
+20	3563	627751565	include/drako/audio/CMakeFiles/audio.dir/src/audio_output_device_win32.cpp.obj	b5ba4038807ee622
+7	3098	627752366	include/drako/io/CMakeFiles/dk-io.dir/src/output_file_handle.cpp.obj	2137b8556eac8ea5
+23	4586	627751566	include/drako/audio/CMakeFiles/audio_test.dir/test/main_audio_test.cpp.obj	19e1dc1e00697d92
+3503	8322	627751570	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	d3a1dd78cac812f4
+13	3503	627751565	include/drako/audio/CMakeFiles/audio.dir/src/audio_engine_win32.cpp.obj	52fc04493a972bbc
+24	4066	627594405	include/drako/devel/CMakeFiles/uuid-test1-exe.dir/src/uuid_engine.cpp.obj	3eae2cf3d02b98d3
+23	4668	627594426	include/drako/devel/CMakeFiles/build-utils-test1-exe.dir/src/uuid_engine.cpp.obj	9b42611ca70659f4
+61	943	627747121	build.ninja	1bf7807df443872a
+1	3103	627752848	include/drako/io/CMakeFiles/dk-io.dir/test/input_output_test.cpp.obj	a1ef0bb132ade597
+17	4095	627751566	include/drako/audio/CMakeFiles/audio.dir/src/audio_input_device_win32.cpp.obj	27f51432746e4816
+4095	4655	627751566	include/drako/audio/audio.lib	f03522f6369d1e84
+4433	6476	627751568	../../../build/drako-builder.exe	6af0bd5c3794faef
+4656	6447	627751568	../../../build/audio_test.exe	367fddebf3365d83
+3564	7875	627751569	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	6d9cc654ceeb6e67
+6476	9621	627751571	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	5825f1b9f2f8e55b
+4586	9888	627751571	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_types.cpp.obj	f456882bdcc17830
+6447	10483	627751572	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	24eb82b43f7df41b
+8323	11994	627751574	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	dfddf5f7e5522239
+7875	11753	627751573	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid_engine.cpp.obj	6ca1cfc1110a8cd8
+9621	12603	627751574	include/drako/devel/CMakeFiles/build-utils-test1-exe.dir/test/build_utils_test1.cpp.obj	20b57155e18f05f6
+17	3120	627752366	include/drako/io/CMakeFiles/dk-io.dir/src/vio_file_handle.cpp.obj	1abc568a9946a519
+14	3823	627752367	include/drako/io/CMakeFiles/dk-io.dir/src/aio_file_handle.cpp.obj	12b9f56439385c35
+1	37	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+37	792	627753465	build.ninja	1bf7807df443872a
+1	34	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
 0	26	0	clean	4b52aa8ad9c61460
-2	36	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-17	2715	626552801	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_engine_win32.cpp.obj	8c4145b54e6419bd
-33	2723	626552801	CMakeFiles/drako_threading_test.dir/test/main_thread_test.cpp.obj	dc66fb57f10f858d
-20	3251	626552802	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_output_device_win32.cpp.obj	23e98d8292a41ad2
-14	3322	626552802	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_input_device_win32.cpp.obj	a90be946674f1721
-3322	3767	626552802	include/drako/audio/drako-audio.lib	474cd6fd846d7c16
-27	3816	626552803	include/drako/audio/CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	152b4efd651ff929
-2723	4278	626552803	../../../build/drako_threading_test.exe	dc9e5f0d348ae26c
-3817	4514	626552803	../../../build/drako_audio_test.exe	becfce282938cba5
-2715	5809	626552805	CMakeFiles/drako_keyboard_test.dir/test/keyboard_app_test.cpp.obj	46a26e4b8e7fa2f
-3252	6522	626552805	CMakeFiles/drako_mouse_test.dir/test/main_mouse_test.cpp.obj	cfdcdbe46f048119
-3768	6541	626552805	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	a15bdd38f2df33fe
-6541	7314	626552806	../../../build/drako-builder.exe	bec10340aa5ec978
-4514	7503	626552806	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	332f6e0d26e2a543
-4279	7569	626552806	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	a2ad8d9d11f19150
-5809	8239	626552807	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	ffdf426e7767547a
-2	45	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-0	31	0	clean	4b52aa8ad9c61460
+1	37	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+14	3085	627753468	include/drako/audio/CMakeFiles/audio.dir/src/audio_engine_win32.cpp.obj	52fc04493a972bbc
+17	3737	627753469	include/drako/audio/CMakeFiles/audio.dir/src/audio_output_device_win32.cpp.obj	b5ba4038807ee622
+20	3984	627753469	include/drako/audio/CMakeFiles/audio.dir/src/audio_input_device_win32.cpp.obj	27f51432746e4816
+24	4084	627753469	include/drako/audio/CMakeFiles/audio_test.dir/test/main_audio_test.cpp.obj	19e1dc1e00697d92
+3984	4457	627753470	include/drako/audio/audio.lib	f03522f6369d1e84
+31	4686	627753470	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	ce6c07a25c6251cc
+4686	5692	627753471	../../../build/drako-builder.exe	6af0bd5c3794faef
+4457	5814	627753471	../../../build/audio_test.exe	367fddebf3365d83
+3085	7894	627753473	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	d3a1dd78cac812f4
+4084	8486	627753474	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	6d9cc654ceeb6e67
+5692	9984	627753475	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	24eb82b43f7df41b
+3738	10023	627753475	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_types.cpp.obj	f456882bdcc17830
+5814	10152	627753475	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	dfddf5f7e5522239
+8487	10872	627753476	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	5825f1b9f2f8e55b
+7895	11121	627753476	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid_engine.cpp.obj	6ca1cfc1110a8cd8
+3	46	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+6	4319	627758696	include/drako/io/CMakeFiles/dk-io.dir/src/vio_file_handle.cpp.obj	1abc568a9946a519
+17	4767	627758697	include/drako/io/CMakeFiles/dk-io.dir/test/input_output_test.cpp.obj	a1ef0bb132ade597
+2	5106	627758697	include/drako/io/CMakeFiles/dk-io.dir/src/aio_file_handle.cpp.obj	12b9f56439385c35
+1	38	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+1	1540	627759094	include/drako/io/CMakeFiles/dk-io.dir/src/core_win32.cpp.obj	bab9d8fa59478cb9
+1540	1655	627759094	include/drako/io/dk-io.lib	2c2ff4ff4aae33b
+2	50	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+0	28	0	clean	4b52aa8ad9c61460
+3	43	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+17	3215	627759384	include/drako/audio/CMakeFiles/audio.dir/src/audio_engine_win32.cpp.obj	52fc04493a972bbc
+20	3688	627759384	include/drako/audio/CMakeFiles/audio.dir/src/audio_output_device_win32.cpp.obj	b5ba4038807ee622
+25	4442	627759385	include/drako/audio/CMakeFiles/audio.dir/src/audio_input_device_win32.cpp.obj	27f51432746e4816
+35	4704	627759385	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	ce6c07a25c6251cc
+28	4924	627759385	include/drako/audio/CMakeFiles/audio_test.dir/test/main_audio_test.cpp.obj	19e1dc1e00697d92
+4442	4976	627759385	include/drako/audio/audio.lib	f03522f6369d1e84
+4704	6544	627759387	../../../build/drako-builder.exe	6af0bd5c3794faef
+4977	6582	627759387	../../../build/audio_test.exe	367fddebf3365d83
+3215	8470	627759389	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	d3a1dd78cac812f4
+3689	8578	627759389	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	24eb82b43f7df41b
+8470	11785	627759392	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	5825f1b9f2f8e55b
+6544	11888	627759392	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	6d9cc654ceeb6e67
+4925	12101	627759393	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_types.cpp.obj	f456882bdcc17830
+6583	12333	627759393	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid_engine.cpp.obj	6ca1cfc1110a8cd8
+8578	12746	627759393	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	dfddf5f7e5522239
+11785	13320	627759394	include/drako/devel/CMakeFiles/uuid-test1-exe.dir/test/uuid_test1.cpp.obj	981b1da5b1bd9a46
+1	37	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+2	44	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+5	1133	627760161	include/drako/file_formats/wavefront/CMakeFiles/drako-obj.dir/src/object.cpp.obj	bb354d241bacea10
+1	2063	627760162	include/drako/file_formats/wavefront/CMakeFiles/drako-obj.dir/src/parser.cpp.obj	595cc42104bcb874
+2063	2184	627760162	include/drako/file_formats/wavefront/drako-obj.lib	2ef359101cad200a
+2	40	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+4	2330	627760178	include/drako/system/CMakeFiles/drako-system.dir/src/system_info_win32.cpp.obj	eb9ec5c0e7c1e271
+11	2345	627760178	include/drako/system/CMakeFiles/drako-system.dir/src/keyboard_device_win32.cpp.obj	ba592a7d09a5d0ca
+8	2832	627760178	include/drako/system/CMakeFiles/drako-system.dir/src/mouse_device_win32.cpp.obj	2fa8d1d27a33b5f6
 2	42	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-39	2416	626553058	CMakeFiles/drako_threading_test.dir/test/main_thread_test.cpp.obj	dc66fb57f10f858d
-17	3262	626553059	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_engine_win32.cpp.obj	8c4145b54e6419bd
-22	3769	626553059	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_output_device_win32.cpp.obj	23e98d8292a41ad2
-26	4197	626553060	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_input_device_win32.cpp.obj	a90be946674f1721
-30	4420	626553060	include/drako/audio/CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	152b4efd651ff929
-4197	4492	626553060	include/drako/audio/drako-audio.lib	474cd6fd846d7c16
-2416	4711	626553060	../../../build/drako_threading_test.exe	dc9e5f0d348ae26c
-4492	5633	626553061	../../../build/drako_audio_test.exe	becfce282938cba5
-3262	6956	626553062	CMakeFiles/drako_keyboard_test.dir/test/keyboard_app_test.cpp.obj	46a26e4b8e7fa2f
-3769	7453	626553063	CMakeFiles/drako_mouse_test.dir/test/main_mouse_test.cpp.obj	cfdcdbe46f048119
-4711	7728	626553063	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	a15bdd38f2df33fe
-4420	8432	626553064	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	a2ad8d9d11f19150
-5633	8653	626553064	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	332f6e0d26e2a543
-7729	8868	626553064	../../../build/drako-builder.exe	bec10340aa5ec978
-7453	9111	626553065	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	48b85484a6ead3f7
-6956	9544	626553065	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	ffdf426e7767547a
+4	1436	627760387	include/drako/file_formats/CMakeFiles/dson.dir/src/dson.cpp.obj	147f7bdcd761f209
+1436	1518	627760387	include/drako/file_formats/dson.lib	5a7ca25b6df914f4
+1518	1650	627760387	include/drako/devel/drako-devel.lib	161977cbd1c0cac0
 2	37	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-0	22	0	clean	4b52aa8ad9c61460
-1	36	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
-31	1383	626553646	CMakeFiles/drako_threading_test.dir/test/main_thread_test.cpp.obj	dc66fb57f10f858d
-19	2405	626553647	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_engine_win32.cpp.obj	8c4145b54e6419bd
-13	2742	626553647	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_input_device_win32.cpp.obj	a90be946674f1721
-16	2815	626553647	include/drako/audio/CMakeFiles/drako-audio.dir/src/audio_output_device_win32.cpp.obj	23e98d8292a41ad2
-2816	3085	626553648	include/drako/audio/drako-audio.lib	474cd6fd846d7c16
-1383	3171	626553647	../../../build/drako_threading_test.exe	dc9e5f0d348ae26c
-27	3731	626553648	include/drako/audio/CMakeFiles/drako_audio_test.dir/test/main_audio_test.cpp.obj	152b4efd651ff929
-2742	5461	626553650	CMakeFiles/drako_keyboard_test.dir/test/keyboard_app_test.cpp.obj	46a26e4b8e7fa2f
-3731	5465	626553650	../../../build/drako_audio_test.exe	becfce282938cba5
-2405	5546	626553650	CMakeFiles/drako_mouse_test.dir/test/main_mouse_test.cpp.obj	cfdcdbe46f048119
-3085	5672	626553650	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	a15bdd38f2df33fe
-3171	6689	626553651	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	a2ad8d9d11f19150
-5672	6816	626553651	../../../build/drako-builder.exe	bec10340aa5ec978
-5465	6935	626553652	include/drako/devel/CMakeFiles/uuid-test1-exe.dir/test/uuid_test1.cpp.obj	7fad831e67d9fe4b
-5461	7539	626553652	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	332f6e0d26e2a543
-5546	7645	626553652	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	53b5c27e09fb6301
+0	29	0	clean	4b52aa8ad9c61460
+1	35	0	C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	9c29d93e4dfad776
+17	3251	627760413	include/drako/audio/CMakeFiles/audio.dir/src/audio_engine_win32.cpp.obj	52fc04493a972bbc
+21	3257	627760413	include/drako/audio/CMakeFiles/audio.dir/src/audio_output_device_win32.cpp.obj	b5ba4038807ee622
+14	3397	627760413	include/drako/audio/CMakeFiles/audio.dir/src/audio_input_device_win32.cpp.obj	27f51432746e4816
+3397	3773	627760413	include/drako/audio/audio.lib	f03522f6369d1e84
+24	4080	627760414	include/drako/audio/CMakeFiles/audio_test.dir/test/main_audio_test.cpp.obj	19e1dc1e00697d92
+31	5224	627760415	CMakeFiles/drako-cli-editor.dir/src/drako_cli_editor.cpp.obj	d3a1dd78cac812f4
+4081	5688	627760415	../../../build/audio_test.exe	367fddebf3365d83
+3252	7744	627760417	CMakeFiles/drako-builder.dir/src/drako_resource_compiler.cpp.obj	ce6c07a25c6251cc
+3773	8539	627760418	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_utils.cpp.obj	6d9cc654ceeb6e67
+5224	9266	627760419	include/drako/devel/CMakeFiles/drako-devel.dir/src/build_utils.cpp.obj	24eb82b43f7df41b
+7744	9291	627760419	../../../build/drako-builder.exe	6af0bd5c3794faef
+3257	9789	627760419	include/drako/devel/CMakeFiles/drako-devel.dir/src/project_types.cpp.obj	f456882bdcc17830
+5688	9880	627760420	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid_engine.cpp.obj	6ca1cfc1110a8cd8
+9789	12074	627760422	include/drako/devel/CMakeFiles/uuid-test1-exe.dir/test/uuid_test1.cpp.obj	981b1da5b1bd9a46
+9266	12148	627760422	include/drako/devel/CMakeFiles/drako-devel.dir/src/uuid.cpp.obj	5825f1b9f2f8e55b
+8540	12327	627760422	include/drako/devel/CMakeFiles/drako-devel.dir/src/mesh_importers.cpp.obj	dfddf5f7e5522239
+9292	12684	627760422	include/drako/devel/CMakeFiles/build-utils-test1-exe.dir/test/build_utils_test1.cpp.obj	20b57155e18f05f6

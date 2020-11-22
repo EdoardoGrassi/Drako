@@ -1,6 +1,7 @@
 #include "drako/core/intrinsics.hpp"
 
 #include <array>
+#include <bit>
 #include <cassert>
 #include <limits>
 
@@ -30,15 +31,8 @@ inline void validate_intrinsics()
     assert(count_leading_ones(MAX) == (sizeof(T) * 8));
     for (auto i = 0; i <= 32; ++i)
     {
-        assert(count_leading_ones((~MAX) >> i)) == i);
+        assert(count_leading_ones((~MAX) >> i) == i);
     }
-}
-
-
-template <typename T>
-void validate_byteswap()
-{
-    const T native = 100;
 }
 
 
@@ -73,11 +67,17 @@ int main()
     //validate_intrinsics<uint32_t>();
     //validate_intrinsics<uint64_t>();
 
-    const std::array<std::byte, 4> b1 = {};
+    const std::uint16_t u16 = 0xaabb;
+    const std::uint32_t u32 = 0xaabbccdd;
+    const std::uint64_t u64 = 0xaabbccdd00112233;
 
-    validate_byteswap<std::int16_t>();
-    validate_byteswap<std::int32_t>();
-    validate_byteswap<std::int64_t>();
+    assert(byte_swap(u16) == 0xbbaa);
+    assert(byte_swap(u32) == 0xddccbbaa);
+    assert(byte_swap(u64) == 0x33221100ddccbbaa);
+
+    assert(byte_swap(byte_swap(u16)) == u16);
+    assert(byte_swap(byte_swap(u32)) == u32);
+    assert(byte_swap(byte_swap(u64)) == u64);
 
     return EXIT_SUCCESS;
 }

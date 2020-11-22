@@ -11,7 +11,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     class forward_renderer
     {
@@ -84,6 +84,6 @@ namespace drako::gpx::vulkan
         std::vector<frame_attachments> _attachments;
     };
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_FORWARD_RENDERER_HPP

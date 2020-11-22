@@ -10,7 +10,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     inline const std::size_t DRAKO_MAX_DESCRIPTOR_SETS = 4;
 
@@ -19,6 +19,6 @@ namespace drako::gpx::vulkan
         vk::DescriptorSet material_descriptor_set[DRAKO_MAX_DESCRIPTOR_SETS];
     };
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_MATERIAL_TYPES_HPP

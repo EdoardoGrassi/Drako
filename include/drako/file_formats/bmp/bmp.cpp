@@ -1,5 +1,7 @@
 #include "drako/file_formats/bmp/bmp.hpp"
 
+#include "drako/core/byte_utils.hpp"
+
 #include <array>
 #include <cstddef>
 #include <type_traits>
@@ -28,9 +30,9 @@ namespace drako::file_formats::bmp
     struct _file_header final
     {
         explicit _file_header(const _file_header_bytes& h)
-            : file_type{ from_little_endian_bytes(h.file_type) }
-            , file_size_bytes{ from_little_endian_bytes(h.file_size_bytes) }
-            , data_offset_bytes{ from_little_endian_bytes(h.data_offset_bytes) }
+            : file_type{ from_le_bytes<std::uint16_t>(h.file_type) }
+            , file_size_bytes{ from_le_bytes<std::uint32_t>(h.file_size_bytes) }
+            , data_offset_bytes{ from_le_bytes<std::uint32_t>(h.data_offset_bytes) }
         {
         }
 

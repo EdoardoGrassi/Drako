@@ -12,22 +12,19 @@ namespace drako::editor
 {
     namespace _fs = std::filesystem;
 
-    std::istream& operator>>(std::istream& is, project_info& info)
+    dson::object& operator>>(dson::object& is, project_info& info)
     {
-        file_formats::dson::object serialized{};
-        info.version = api_version::from_string(serialized.get("version"));
-        info.name    = serialized.get("name");
-        info.author  = serialized.get("author");
+        from_string(is.get("version"), info.version);
+        info.name   = is.get("name");
+        info.author = is.get("author");
         return is;
     }
 
-    std::ostream& operator<<(std::ostream& os, const project_info& info)
+    dson::object& operator<<(dson::object& os, const project_info& info)
     {
-        file_formats::dson::object serialized{};
-        serialized.set("version", to_string(info.version));
-        serialized.set("name", info.name);
-        serialized.set("author", info.author);
-        os << serialized;
+        os.set("version", to_string(info.version));
+        os.set("name", info.name);
+        os.set("author", info.author);
         return os;
     }
 
@@ -80,17 +77,17 @@ namespace drako::editor
 
     std::istream& load(std::istream& is, internal_asset_info& inter)
     {
-        drako::file_formats::dson::object serialized{};
+        dson::object serialized{};
         is >> serialized;
-        inter.uuid    = uuid::parse(serialized.get("uuid"));
-        inter.name    = serialized.get("name");
-        inter.version = api_version::from_string(serialized.get("version"));
+        inter.uuid = uuid::parse(serialized.get("uuid"));
+        inter.name = serialized.get("name");
+        from_string(serialized.get("version"), inter.version);
         return is;
     }
 
     std::ostream& save(std::ostream& os, const internal_asset_info& inter)
     {
-        drako::file_formats::dson::object serialized{};
+        dson::object serialized{};
         serialized.set("uuid", to_string(inter.uuid));
         serialized.set("name", inter.name);
         serialized.set("version", to_string(inter.version));
@@ -98,22 +95,55 @@ namespace drako::editor
         return os;
     }
 
+    dson::object& operator>>(dson::object& is, internal_asset_info& inter)
+    {
+        inter.uuid = uuid::parse(is.get("uuid"));
+        inter.name = is.get("name");
+        from_string(is.get("version"), inter.version);
+        return is;
+    }
+
+    dson::object& operator<<(dson::object& os, const internal_asset_info& inter)
+    {
+        os.set("uuid", to_string(inter.uuid));
+        os.set("name", inter.name);
+        os.set("version", to_string(inter.version));
+        return os;
+    }
+
+
     std::istream& load(std::istream& is, external_asset_info& ext)
     {
-        drako::file_formats::dson::object serialized{};
+        dson::object serialized{};
         is >> serialized;
-        ext.uuid    = uuid::parse(serialized.get("uuid"));
-        ext.path    = serialized.get("path");
-        ext.version = api_version::from_string(serialized.get("version"));
+        ext.uuid = uuid::parse(serialized.get("uuid"));
+        ext.path = serialized.get("path");
+        from_string(serialized.get("version"), ext.version);
         return is;
     }
 
     std::ostream& save(std::ostream& os, const external_asset_info& ext)
     {
-        drako::file_formats::dson::object serialized{};
+        dson::object serialized{};
         serialized.set("uuid", to_string(ext.uuid));
         serialized.set("path", ext.path.string());
         serialized.set("version", to_string(ext.version));
+        return os;
+    }
+
+    dson::object& operator>>(dson::object& is, external_asset_info& ext)
+    {
+        ext.uuid = uuid::parse(is.get("uuid"));
+        ext.path = is.get("path");
+        from_string(is.get("version"), ext.version);
+        return is;
+    }
+
+    dson::object& operator<<(dson::object& os, const external_asset_info& ext)
+    {
+        os.set("uuid", to_string(ext.uuid));
+        os.set("path", ext.path.string());
+        os.set("version", to_string(ext.version));
         return os;
     }
 

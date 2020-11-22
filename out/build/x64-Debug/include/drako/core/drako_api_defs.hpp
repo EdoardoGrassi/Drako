@@ -8,10 +8,11 @@
 
 #include "drako/core/preprocessor/platform_macros.hpp"
 
+#include <charconv>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
-
+#include <type_traits>
 
 // Drako base namespace.
 //#define DRAKO_HPP_NAMESPACE drako
@@ -26,25 +27,46 @@ namespace drako
     class major_minor_patch_version
     {
     public:
-        constexpr explicit major_minor_patch_version(uint16_t major, uint16_t minor, uint32_t patch) noexcept;
+        using _this = major_minor_patch_version;
 
-        [[nodiscard]] constexpr bool operator==(const major_minor_patch_version&) noexcept;
-        [[nodiscard]] constexpr bool operator!=(const major_minor_patch_version&) noexcept;
-        [[nodiscard]] constexpr bool operator>(const major_minor_patch_version&) noexcept;
-        [[nodiscard]] constexpr bool operator<(const major_minor_patch_version&) noexcept;
-        [[nodiscard]] constexpr bool operator>=(const major_minor_patch_version&) noexcept;
-        [[nodiscard]] constexpr bool operator<=(const major_minor_patch_version&) noexcept;
+        constexpr explicit major_minor_patch_version(
+            uint16_t major, uint16_t minor, uint32_t patch) noexcept
+            //: _major{ major }, _minor{ minor }, _patch{ patch }
+            : _maj_min_pat{ (static_cast<uint64_t>(major) << 48) |
+                            (static_cast<uint64_t>(minor) << 32) |
+                            static_cast<uint64_t>(patch) }
+        {
+        }
+
+        major_minor_patch_version(const _this&) noexcept = default;
+        _this& operator=(const _this&) noexcept = default;
+
+        [[nodiscard]] friend constexpr bool operator==(_this, _this) noexcept = default;
+        [[nodiscard]] friend constexpr bool operator!=(_this, _this) noexcept = default;
+        [[nodiscard]] friend constexpr bool operator>(_this, _this) noexcept  = default;
+        [[nodiscard]] friend constexpr bool operator<(_this, _this) noexcept  = default;
+        [[nodiscard]] friend constexpr bool operator>=(_this, _this) noexcept = default;
+        [[nodiscard]] friend constexpr bool operator<=(_this, _this) noexcept = default;
 
         /// @brief Major number.
-        [[nodiscard]] constexpr uint16_t major() const noexcept;
+        [[nodiscard]] constexpr uint16_t major() const noexcept
+        {
+            return (_maj_min_pat & 0xffff000000000000) >> 48;
+        }
 
         /// @brief Minor number.
-        [[nodiscard]] constexpr uint16_t minor() const noexcept;
+        [[nodiscard]] constexpr uint16_t minor() const noexcept
+        {
+            //return _minor;
+            return (_maj_min_pat & 0x0000ffff00000000) >> 32;
+        }
 
         /// @brief Patch number.
-        [[nodiscard]] constexpr uint16_t patch() const noexcept;
-
-        [[nodiscard]] static major_minor_patch_version from_string(const std::string&);
+        [[nodiscard]] constexpr uint16_t patch() const noexcept
+        {
+            //return _patch;
+            return (_maj_min_pat & 0x00000000ffffffff);
+        }
 
     private:
         //uint16_t _major;
@@ -53,100 +75,57 @@ namespace drako
         uint64_t _maj_min_pat;
     };
 
+    using api_version = major_minor_patch_version;
 
-    constexpr major_minor_patch_version::major_minor_patch_version(
-        uint16_t major, uint16_t minor, uint32_t patch) noexcept
-        //: _major{ major }, _minor{ minor }, _patch{ patch }
-        : _maj_min_pat{ (static_cast<uint64_t>(major) << 48) |
-                        (static_cast<uint64_t>(minor) << 32) |
-                        static_cast<uint64_t>(patch) }
-    {
-    }
 
-    constexpr uint16_t major_minor_patch_version::major() const noexcept
+    /// @brief Constructs a string with the format [major].[minor].[patch]
+    [[nodiscard]] inline std::string to_string(api_version v)
     {
-        //return _major;
-        return (_maj_min_pat & 0xffff000000000000) >> 48;
-    }
-
-    constexpr uint16_t major_minor_patch_version::minor() const noexcept
-    {
-        //return _minor;
-        return (_maj_min_pat & 0x0000ffff00000000) >> 32;
-    }
-
-    constexpr uint16_t major_minor_patch_version::patch() const noexcept
-    {
-        //return _patch;
-        return (_maj_min_pat & 0x00000000ffffffff);
-    }
-
-    constexpr bool major_minor_patch_version::operator==(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat == v._maj_min_pat;
-    }
-
-    constexpr bool major_minor_patch_version::operator!=(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat != v._maj_min_pat;
-    }
-
-    constexpr bool major_minor_patch_version::operator>(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat > v._maj_min_pat;
-    }
-
-    constexpr bool major_minor_patch_version::operator<(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat < v._maj_min_pat;
-    }
-
-    constexpr bool major_minor_patch_version::operator>=(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat >= v._maj_min_pat;
-    }
-
-    constexpr bool major_minor_patch_version::operator<=(const major_minor_patch_version& v) noexcept
-    {
-        return _maj_min_pat <= v._maj_min_pat;
+        return std::to_string(v.major()) +
+               '.' + std::to_string(v.minor()) +
+               '.' + std::to_string(v.patch());
     }
 
 
-    [[nodiscard]] std::string to_string(major_minor_patch_version v)
+    [[nodiscard]] inline void from_string(std::string_view s, api_version& v)
     {
-        return std::to_string(v.major()) + '.' + std::to_string(v.minor()) + '.' + std::to_string(v.patch());
-    }
-
-
-    [[nodiscard]] major_minor_patch_version major_minor_patch_version::from_string(const std::string& s)
-    {
-        if (s.size() < 5) // at minimum 5 characters as the format is c.c.c
-            throw std::invalid_argument{ DRAKO_STRINGIZE(s) };
-        if (std::count(s.begin(), s.end(), '.') != 2) // exactly two dots
-            throw std::invalid_argument{ DRAKO_STRINGIZE(s) };
+        if (std::size(s) < 5) // at minimum 5 characters as the format is c.c.c
+            throw std::runtime_error{ "Malformed version number." };
+        if (std::count(std::cbegin(s), std::cend(s), '.') != 2) // exactly two dots
+            throw std::runtime_error{ "Malformed version number." };
 
         const auto minor_dot = s.find('.');
         const auto patch_dot = s.rfind('.');
 
-        const auto major = std::stoul(s.substr(0, minor_dot - 1));
-        if (major > std::numeric_limits<uint16_t>::max())
-            throw std::overflow_error{ "Overflow in major version number." };
+        std::uint16_t major{};
+        {
+            const auto first = std::data(s);
+            const auto last  = std::data(s) + minor_dot - 1;
+            if (const auto r = std::from_chars(first, last, major); r.ec != std::errc{})
+                throw std::runtime_error{ "Malformed <major> version number." };
+        }
 
-        const auto minor = std::stoul(s.substr(minor_dot + 1, patch_dot - 1));
-        if (minor > std::numeric_limits<uint16_t>::max())
-            throw std::overflow_error{ "Overflow in minor version number." };
+        std::uint16_t minor{};
+        {
+            const auto first = std::data(s) + minor_dot + 1;
+            const auto last  = std::data(s) + patch_dot - 1;
+            if (const auto r = std::from_chars(first, last, minor); r.ec != std::errc{})
+                throw std::runtime_error{ "Malformed <minor> version number." };
+        }
 
-        const auto patch = std::stoul(s.substr(patch_dot + 1));
-        if (patch > std::numeric_limits<uint32_t>::max())
-            throw std::overflow_error{ "Overflow in patch version number." };
+        std::uint32_t patch{};
+        {
+            const auto first = std::data(s) + patch_dot + 1;
+            const auto last  = std::data(s) + std::size(s);
+            if (const auto r = std::from_chars(first, last, patch); r.ec != std::errc{})
+                throw std::runtime_error{ "Malformed <patch> version number." };
+        }
 
-        return major_minor_patch_version(major, minor, patch);
+        v = api_version{ major, minor, patch };
     }
 
-    using api_version = major_minor_patch_version;
-
     // TODO: change 'constexpr' to 'consteval' when is supported
-    [[nodiscard]] constexpr api_version build_api_version() noexcept
+    [[nodiscard]] inline constexpr api_version current_api_version() noexcept
     {
         /* clang-format off */
         // TODO: configure from CMake

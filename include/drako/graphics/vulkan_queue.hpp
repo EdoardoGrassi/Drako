@@ -11,7 +11,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     using vulkan_queue_index  = std::uint32_t;
     using vulkan_queue_family = std::uint32_t;
@@ -125,6 +125,6 @@ namespace drako::gpx::vulkan
         return p.createDeviceUnique(device_create_info);
     }
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_QUEUE_HPP

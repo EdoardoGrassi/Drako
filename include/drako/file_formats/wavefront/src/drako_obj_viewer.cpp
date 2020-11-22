@@ -1,6 +1,6 @@
 #include "drako/core/preprocessor/compiler_macros.hpp"
 #include "drako/file_formats/wavefront/parser.hpp"
-#include "drako/io/input_file_stream.hpp"
+#include "drako/io/input_file_handle.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -58,7 +58,7 @@ int main(const int argc, const char* argv[])
         try
         {
             const std::filesystem::path  path{ argv[i] };
-            drako::io::input_file_stream src{ path };
+            drako::io::input_file_handle src{ path };
 
             const auto file_size = static_cast<size_t>(std::filesystem::file_size(path));
 

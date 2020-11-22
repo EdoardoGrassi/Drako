@@ -19,7 +19,8 @@ namespace drako
         constexpr uuid() noexcept = default;
 
         /// @brief Constructs an UUID from a byte array.
-        explicit constexpr uuid(const std::array<std::byte, 16>&) noexcept;
+        explicit constexpr uuid(const std::array<std::byte, 16>& bytes) noexcept
+            : _bytes{ bytes } {}
 
         /// @brief Construct an UUID from a string representation.
         explicit uuid(const std::string_view);
@@ -34,16 +35,15 @@ namespace drako
         friend bool operator>=(const uuid&, const uuid&) noexcept;
         friend bool operator<=(const uuid&, const uuid&) noexcept;
 
-        // Reset to invalid UUID.
-        void reset() noexcept;
+        /// @brief Resets to null UUID.
+        void clear() noexcept;
 
-        // Check if UUID is valid.
+        /// @brief Checks if the UUID is valid.
         [[nodiscard]] bool has_value() const noexcept;
 
-        friend std::istream& operator>>(std::istream&, uuid&);
-        friend std::ostream& operator<<(std::ostream&, const uuid&);
-
-        friend uuid make_uuid_version1();
+        /// @brief Returns a pointer to the underlying representation.
+        [[nodiscard]] std::byte*       data() noexcept { return std::data(_bytes); }
+        [[nodiscard]] const std::byte* data() const noexcept { return std::data(_bytes); }
 
         friend std::string to_string(const uuid&);
 
@@ -52,53 +52,49 @@ namespace drako
     private:
         std::array<std::byte, 16> _bytes = {};
     };
-    static_assert(sizeof(uuid) == 16, "Required by RFC specs");
-    static_assert(alignof(uuid) == 16, "Required by SIMD implementation");
+    static_assert(sizeof(uuid) == 16, "Bad class layout: internal padding bytes.");
+    static_assert(alignof(uuid) == 16, "Bad class layout: external padding bytes.");
 
 
-    constexpr uuid::uuid(const std::array<std::byte, 16>& bytes) noexcept
-        : _bytes{ bytes } {}
-
-
-    [[nodiscard]] bool uuid::has_value() const noexcept
+    [[nodiscard]] inline bool uuid::has_value() const noexcept
     {
-        return std::all_of(_bytes.cbegin(), _bytes.cend(),
+        return std::all_of(std::cbegin(_bytes), std::cend(_bytes),
             [](auto x) { return x == std::byte{ 0 }; });
     }
 
-    [[nodiscard]] bool operator==(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator==(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) == 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) == 0;
     }
 
-    [[nodiscard]] bool operator!=(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator!=(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) != 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) != 0;
     }
 
-    [[nodiscard]] bool operator>(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator>(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) > 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) > 0;
     }
 
-    [[nodiscard]] bool operator<(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator<(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) < 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) < 0;
     }
 
-    [[nodiscard]] bool operator>=(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator>=(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) >= 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) >= 0;
     }
 
-    [[nodiscard]] bool operator<=(const uuid& lhs, const uuid& rhs) noexcept
+    [[nodiscard]] inline bool operator<=(const uuid& lhs, const uuid& rhs) noexcept
     {
-        return std::memcmp(lhs._bytes.data(), rhs._bytes.data(), sizeof(uuid::_bytes)) <= 0;
+        return std::memcmp(std::data(lhs), std::data(rhs), sizeof(uuid)) <= 0;
     }
 
-    void uuid::reset() noexcept
+    void inline uuid::clear() noexcept
     {
-        std::memset(this, 0, sizeof(uuid::_bytes));
+        std::memset(data(), 0, sizeof(_bytes));
     }
 
     [[nodiscard]] std::variant<uuid, std::error_code> try_parse(const std::string_view s) noexcept;

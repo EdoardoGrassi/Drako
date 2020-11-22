@@ -5,11 +5,11 @@
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 
-#include "drako/graphics/vulkan_gpu_shader.hpp"
+#include "drako/graphics/vulkan_shader_types.hpp"
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     struct graphics_pipeline
     {
@@ -30,7 +30,7 @@ namespace drako::gpx::vulkan
     }
 
     [[nodiscard]] graphics_pipeline make_wireframe_pipeline(
-        const vk::Device& device, const gpu_shader& vert, const vk::RenderPass& renderpass)
+        const vk::Device& device, const shader& vert, const vk::RenderPass& renderpass)
     {
         /*vvv create pipeline layout vvv*/
         const vk::DescriptorSetLayout descriptor_set_layouts[] = {
@@ -202,6 +202,6 @@ namespace drako::gpx::vulkan
         return { .pipeline = std::move(pipeline), .layout = std::move(layout) };
     }
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_WIREFRAME_PIPELINE_HPP

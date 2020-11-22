@@ -2,7 +2,7 @@
 #ifndef DRAKO_AUDIO_TYPES_HPP
 #define DRAKO_AUDIO_TYPES_HPP
 
-#include "drako/core/intrinsics.hpp"
+#include "drako/core/byte_utils.hpp"
 
 #include <cstdint>
 #include <span>
@@ -12,8 +12,13 @@ namespace drako::audio
 {
     struct format
     {
+        /// @brief Samples per seconds (Hz).
         std::uint32_t sample_rate;
+
+        /// @brief Number of bit of storage of each sample.
         std::uint16_t sample_depth;
+
+        /// @brief Number of audio channels.
         std::uint16_t channels;
     };
 
@@ -21,7 +26,8 @@ namespace drako::audio
     {
         clip(const std::span<std::byte> bytes)
         {
-            std::memcpy(reinterpret_cast<std::byte*>(&format), bytes.data(), sizeof(decltype(format)));
+            std::memcpy(reinterpret_cast<std::byte*>(&format),
+                bytes.data(), sizeof(decltype(format)));
             buffer = bytes.subspan(sizeof(decltype(format)));
         }
 
@@ -29,7 +35,7 @@ namespace drako::audio
         std::span<std::byte> buffer; // raw audio data
     };
 
-    [[nodiscard]] std::vector<std::byte> as_bytes(const clip& c)
+    [[nodiscard]] inline std::vector<std::byte> as_bytes(const clip& c)
     {
         std::vector<std::byte> bytes;
         bytes.resize(sizeof(clip::format) + c.buffer.size_bytes());

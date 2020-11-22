@@ -7,8 +7,8 @@
 #include "drako/core/memory/unsync_linear_allocator.hpp"
 #include "drako/devel/logging.hpp"
 #include "drako/devel/uuid.hpp"
+#include "drako/engine/asset_manager.hpp"
 #include "drako/engine/render_system.hpp"
-#include "drako/engine/runtime_asset_manager.hpp"
 #include "drako/graphics/material_types.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/shader_types.hpp"
@@ -34,30 +34,30 @@ using _g_alloc = unsync_linear_allocator;
 _g_alloc g_allocator{ 1'000'000 };
 
 
-const std::vector<asset_bundle_id> bundles_guids = { 1 };
+const std::vector<asset_bundle_id> bundles_guids = { asset_bundle_id{ 1 } };
 const std::vector<std::string>     bundles_names = { "main" };
 const std::vector<_fs::path>       bundles_paths = { "./bundles/main.dkbundle" };
-const engine::bundle_manifest_soa  bundles{ bundles_guids, bundles_names, bundles_paths };
-engine::runtime_asset_manager      g_asset_manager{ bundles, {} };
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-    const auto bundle = g_asset_manager.load_bundle("main");
+    engine::asset_manager am{ { bundles_guids, bundles_names, bundles_paths }, {} };
 
-    sys::desktop_window render_window(L"Drako engine");
+    am.load_bundle_async(asset_bundle_id{ 1 });
+
+    sys::desktop_window render_window(L"Drako Engine");
     render_window.show();
 
     mat4x4 m = transform(vec3(1, 1, 1), uquat::identity(), vec3(1));
     mat4x4 v = transform(vec3(0, 0, 0), uquat::identity(), vec3(1));
     mat4x4 p = ortographic(10, 10, 10, 10, 0, 1000);
 
-    const auto vert_source = gpx::make_from_stream(std::ifstream(VERT_SOURCE, std::ios::binary));
-    const auto frag_source = gpx::make_from_stream(std::ifstream(FRAG_SOURCE, std::ios::binary));
+    //const auto vert_source = make_from_stream(std::ifstream(VERT_SOURCE, std::ios::binary));
+    //const auto frag_source = make_from_stream(std::ifstream(FRAG_SOURCE, std::ios::binary));
 
 
-    const gpx::vulkan::context context{ render_window };
-    gpx::vulkan::debug_print_all_queue_families(context);
+    const vulkan::context context{ render_window };
+    vulkan::debug_print_all_queue_families(context);
 
     render_system render_system{ context };
 
@@ -66,9 +66,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     //render_system.create(1, vert_source);
     //render_system.create(2, frag_source);
 
-    const handle<renderable> renderables[] = { 1, 2 };
+    /*
+    const render_id renderables[] = { 1, 2 };
     for (auto r : renderables)
-        render_system.instantiate(r, {});
+        render_system.create(r, {});
 
     const mat4x4 models[] = { translate(vec3(1, 1, 1)) };
 
@@ -81,4 +82,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
         //render_system.update();
     }
+    */
 }

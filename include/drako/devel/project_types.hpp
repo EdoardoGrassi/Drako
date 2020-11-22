@@ -5,6 +5,7 @@
 #include "drako/core/drako_api_defs.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/devel/uuid.hpp"
+#include "drako/file_formats/dson.hpp"
 
 #include <filesystem>
 #include <iosfwd>
@@ -35,7 +36,7 @@ namespace drako::editor
 
     struct project_info
     {
-        api_version version = build_api_version();
+        api_version version = current_api_version();
         std::string name;
         std::string author;
         //_fs::file_time_type last_project_scan;
@@ -43,6 +44,9 @@ namespace drako::editor
 
     std::istream& operator>>(std::istream&, project_info&);
     std::ostream& operator<<(std::ostream&, const project_info&);
+
+    dson::object& operator>>(dson::object&, project_info&);
+    dson::object& operator<<(dson::object&, const project_info&);
 
 
     class project
@@ -99,14 +103,24 @@ namespace drako::editor
     ///
     struct internal_asset_info
     {
-        uuid        uuid;
-        asset_type  type;
+        /// @brief Globally unique identifier of the asset.
+        uuid uuid = {};
+
+        /// @brief Type of content.
+        asset_type type;
+
+        /// @brief Human readable name of the asset.
         std::string name;
-        api_version version = build_api_version();
+
+        /// @brief Version of the editor used for the serialization.
+        api_version version = current_api_version();
     };
 
-    std::istream& load(std::istream&, internal_asset_info&);
-    std::ostream& save(std::ostream&, const internal_asset_info&);
+    //std::istream& load(std::istream&, internal_asset_info&);
+    //std::ostream& save(std::ostream&, const internal_asset_info&);
+
+    dson::object& operator>>(dson::object&, internal_asset_info&);
+    dson::object& operator<<(dson::object&, const internal_asset_info&);
 
 
     /// @ brief External asset descriptor.
@@ -115,13 +129,16 @@ namespace drako::editor
     ///
     struct external_asset_info
     {
-        uuid                  uuid;
+        uuid                  uuid = {};
         std::filesystem::path path;
-        api_version           version = build_api_version();
+        api_version           version = current_api_version();
     };
 
     std::istream& load(std::istream&, external_asset_info&);
     std::ostream& save(std::ostream&, const external_asset_info&);
+
+    dson::object& operator>>(dson::object&, external_asset_info&);
+    dson::object& operator<<(dson::object&, const external_asset_info&);
 
 
     struct asset_import_context

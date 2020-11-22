@@ -3,6 +3,7 @@
 #define DRAKO_ASSET_TYPES_HPP
 
 #include "drako/core/drako_api_defs.hpp"
+#include "drako/core/typed_handle.hpp"
 #include "drako/devel/uuid.hpp"
 
 #include <cstddef>
@@ -15,10 +16,9 @@
 
 namespace drako
 {
-    using asset_id        = std::uint32_t;
-    using asset_bundle_id = std::uint16_t;
+    DRAKO_DEFINE_TYPED_ID(asset_id, std::uint32_t);
+    DRAKO_DEFINE_TYPED_ID(asset_bundle_id, std::uint32_t);
 
-    [[nodiscard]] bool constexpr valid(const asset_bundle_id id) noexcept { return id != 0; }
 
     /// @brief Single item of an asset manifest.
     struct asset_manifest_entry
@@ -50,13 +50,12 @@ namespace drako
     class asset_load_info
     {
     public:
-
         /// @brief Descriptor of an asset packaged uncompressed.
-        /// 
+        ///
         /// @param[in] offset Offset inside the full package as bytes.
         /// @param[in] bytes  Size of the asset as bytes.
-        /// 
-        /// @return 
+        ///
+        /// @return
         explicit asset_load_info(std::uint32_t offset, std::uint32_t bytes) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ bytes }
@@ -65,14 +64,14 @@ namespace drako
             , _format_flags{} {}
 
         /// @brief Descriptor of a packaged asset.
-        /// 
+        ///
         /// @param[in] offset   Offset inside the full package as bytes.
         /// @param[in] packed   Size of the asset before decompression as bytes.
         /// @param[in] unpacked Size of the asset after decompression as bytes.
         /// @param[in] s        Storage options.
         /// @param[in] f        Format options.
-        /// 
-        /// @return 
+        ///
+        /// @return
         explicit asset_load_info(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
             asset_storage_flags s, asset_format_flags f) noexcept
             : _package_offset{ offset }
@@ -106,10 +105,10 @@ namespace drako
         asset_storage_flags _storage_flags;
         asset_format_flags  _format_flags;
     };
-    static_assert(sizeof(asset_load_info) == 16 * sizeof(std::byte),
-        "Unoptimized class layout: required internal padding bits");
+    static_assert(sizeof(asset_load_info) == 16,
+        "Bad class layout: required internal padding bits.");
     static_assert(alignof(asset_load_info) <= sizeof(asset_load_info),
-        "Unoptimized class layout: required external padding bits");
+        "Bad class layout: required external padding bits.");
 
 
     /// @brief Metadata descriptor of an asset bundle.
@@ -141,13 +140,13 @@ namespace drako
 
 
     /// @brief Manifest file name of an asset bundle.
-    [[nodiscard]] std::filesystem::path manifest_filename(asset_bundle_id bundle)
+    [[nodiscard]] inline std::filesystem::path manifest_filename(asset_bundle_id bundle)
     {
         return "bundle_" + std::to_string(bundle) + ".manifest.drako";
     }
 
     /// @brief Storage file name of an asset bundle.
-    [[nodiscard]] std::filesystem::path storage_filename(asset_bundle_id bundle)
+    [[nodiscard]] inline std::filesystem::path storage_filename(asset_bundle_id bundle)
     {
         return "bundle_" + std::to_string(bundle) + ".storage.drako";
     }

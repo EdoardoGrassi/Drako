@@ -2,18 +2,15 @@
 #ifndef DRAKO_MATERIAL_TYPES_HPP
 #define DRAKO_MATERIAL_TYPES_HPP
 
+#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/graphics/shader_types.hpp"
+
 #include <cstdint>
 
 #include <vulkan/vulkan.hpp>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/graphics/shader_types.hpp"
-#include "drako/system/memory_stream.hpp"
-
-namespace drako::gpx
+namespace drako
 {
-    using material_template_id = std::uint16_t;
-
     enum class material_data_type : std::uint8_t
     {
         inline_data,
@@ -43,9 +40,6 @@ namespace drako::gpx
     public:
         explicit constexpr material_template(const std::vector<material_data_binding>& bindings);
 
-        template <typename Allocator>
-        explicit material_template(memory_stream<Allocator>& ms);
-
         friend std::istream& operator>>(std::istream&, material_template&);
         friend std::ostream& operator<<(std::ostream&, const material_template&);
 
@@ -67,7 +61,7 @@ namespace drako::gpx
     struct material_instance
     {
     public:
-        explicit material_instance(material_template_id id, void* data, size_t bytes) noexcept;
+        //explicit material_instance(material_template_id id, void* data, size_t bytes) noexcept;
 
         /*
         DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr const void* data() const noexcept
@@ -88,6 +82,6 @@ namespace drako::gpx
         std::size_t size;
     };
 
-} // namespace drako::gpx
+} // namespace drako
 
-#endif // !DRAKO_MATERIAL_TYPES_HPP_
+#endif // !DRAKO_MATERIAL_TYPES_HPP

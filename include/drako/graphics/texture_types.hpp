@@ -2,12 +2,10 @@
 #ifndef DRAKO_TEXTURE_TYPES_HPP
 #define DRAKO_TEXTURE_TYPES_HPP
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
 
 namespace drako
 {
@@ -97,9 +95,9 @@ namespace drako
         explicit texture_2d(const texture_desc& d, const std::byte* data, Alloc& al = Alloc())
             : _alloc(al)
             , _size(d.width * d.height * d.depth * d.stride)
-            , _data(std::allocator_traits<Alloc>::allocate(a, _size))
+            , _data(std::allocator_traits<Alloc>::allocate(al, _size))
         {
-            DRAKO_ASSERT(data != nullptr);
+            assert(data != nullptr);
 
             if (data == nullptr)
                 std::exit(EXIT_FAILURE); // TODO: will never happen, std::allocator_traits<>::allocate throws on failure
@@ -114,9 +112,9 @@ namespace drako
         texture_2d& operator=(texture_2d&& rhs);
 
         [[nodiscard]] constexpr auto data() const noexcept { return _data; }
-        [[nodiscard]] constexpr auto   width() const noexcept { return _width; }
-        [[nodiscard]] constexpr auto   height() const noexcept { return _height; }
-        [[nodiscard]] constexpr auto   mipmap_levels() const noexcept { return _mipmap_levels; }
+        [[nodiscard]] constexpr auto width() const noexcept { return _width; }
+        [[nodiscard]] constexpr auto height() const noexcept { return _height; }
+        [[nodiscard]] constexpr auto mipmap_levels() const noexcept { return _mipmap_levels; }
 
     private:
         Alloc&     _alloc;
@@ -200,12 +198,12 @@ namespace drako
         {
         }
 
-        [[nodiscard]] DRAKO_FORCE_INLINE const std::byte* data() const noexcept
+        [[nodiscard]] const std::byte* data() const noexcept
         {
             return _data;
         }
 
-        [[nodiscard]] DRAKO_FORCE_INLINE constexpr const texture_desc& meta() const noexcept
+        [[nodiscard]] constexpr const texture_desc& meta() const noexcept
         {
             return _meta;
         }
@@ -216,38 +214,32 @@ namespace drako
     };
 
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    width(const texture_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t width(const texture_view& t) noexcept
     {
         return t.meta().width;
     }
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    width(const texture_2d_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t width(const texture_2d_view& t) noexcept
     {
         return t.meta().width;
     }
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    height(const texture_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t height(const texture_view& t) noexcept
     {
         return t.meta().height;
     }
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    height(const texture_2d_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t height(const texture_2d_view& t) noexcept
     {
         return t.meta().height;
     }
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    mipmap_levels(const texture_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t mipmap_levels(const texture_view& t) noexcept
     {
         return t.meta().mipmap_levels;
     }
 
-    [[nodiscard]] DRAKO_FORCE_INLINE constexpr uint32_t
-    mipmap_levels(const texture_2d_view& t) noexcept
+    [[nodiscard]] constexpr uint32_t mipmap_levels(const texture_2d_view& t) noexcept
     {
         return t.meta().mipmap_levels;
     }

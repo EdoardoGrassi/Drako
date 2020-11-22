@@ -50,7 +50,7 @@ namespace drako::sys
         return ERROR_SUCCESS;
     }
 
-    desktop_window::desktop_window(std::wstring_view title) noexcept
+    desktop_window::desktop_window(std::wstring_view title)
         : _instance(::GetModuleHandleW(nullptr))
     {
         DRAKO_ASSERT(!std::empty(title));
@@ -61,16 +61,16 @@ namespace drako::sys
         wc.cbSize        = sizeof(WNDCLASSEXW);
         wc.lpfnWndProc   = _window_message_handler;
         wc.hInstance     = _instance;
-        wc.lpszMenuName  = title.data();
-        wc.lpszClassName = CLASS_NAME.data();
+        wc.lpszMenuName  = std::data(title);
+        wc.lpszClassName = std::data(CLASS_NAME);
 
         ::RegisterClassExW(&wc);
 
         _window = ::CreateWindowExW(
-            0,                   // optional window styles
-            CLASS_NAME.data(),   // window class
-            title.data(),        // window title
-            WS_OVERLAPPEDWINDOW, // window style
+            0,                     // optional window styles
+            std::data(CLASS_NAME), // window class
+            std::data(title),      // window title
+            WS_OVERLAPPEDWINDOW,   // window style
 
             // window size and position
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
@@ -81,7 +81,7 @@ namespace drako::sys
             nullptr    // additional application data
         );
         if (_window == NULL)
-            throw std::system_error(::GetLastError(), std::system_category());
+            [[unlikely]] throw std::system_error(::GetLastError(), std::system_category());
     }
 
     desktop_window::~desktop_window() noexcept

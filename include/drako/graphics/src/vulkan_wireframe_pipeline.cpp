@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx
+namespace drako::vulkan
 {
 
-} // namespace drako::gpx
+} // namespace drako::vulkan

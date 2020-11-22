@@ -5,8 +5,8 @@
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 #include "drako/graphics/material_types.hpp"
-#include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_material_types.hpp"
+#include "drako/graphics/vulkan_shader_types.hpp"
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 
@@ -15,7 +15,7 @@
 #include <vector>
 
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     /*
     const uint32_t MVP_MATRIX_BINDING_NUMBER = 0;
@@ -91,7 +91,7 @@ namespace drako::gpx::vulkan
 
         std::vector<vk::DescriptorSet> _descriptor_sets{ 100 };
 
-        void setup_pipeline(const gpu_shader& vert, const gpu_shader& frag) noexcept;
+        void setup_pipeline(const shader& vert, const shader& frag) noexcept;
     };
 
     material_pipeline::material_pipeline(
@@ -164,7 +164,7 @@ namespace drako::gpx::vulkan
         // TODO: end impl
     }
 
-    void material_pipeline::setup_pipeline(const gpu_shader& vert, const gpu_shader& frag) noexcept
+    void material_pipeline::setup_pipeline(const shader& vert, const shader& frag) noexcept
     {
         const vk::PipelineShaderStageCreateInfo shader_stages[] = {
             // vertex shader stage
@@ -353,9 +353,9 @@ namespace drako::gpx::vulkan
     }
 
     [[nodiscard]] material_instance compile_material(
-        const gpx::material_template& mt,
-        const gpx::material_instance& mi,
-        const material_pipeline&      p) noexcept
+        const material_template& mt,
+        const material_instance& mi,
+        const material_pipeline& p) noexcept
     {
         material_instance instance;
 
@@ -378,6 +378,6 @@ namespace drako::gpx::vulkan
         return instance;
     }
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_MATERIAL_PIPELINE_HPP

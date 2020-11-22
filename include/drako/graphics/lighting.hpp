@@ -4,20 +4,20 @@
 
 #include "drako/math/vector3.hpp"
 
-namespace drako::gpx
+namespace drako
 {
-    struct directed_light_src
+    struct directed_light_source
     {
         vec3 direction;
         vec3 color;
     };
 
-    struct point_light_src
+    struct point_light_source
     {
         vec3 position;
         vec3 color;
     };
 
-} // namespace drako::gpx
+} // namespace drako
 
 #endif // !DRAKO_LIGHTING_HPP

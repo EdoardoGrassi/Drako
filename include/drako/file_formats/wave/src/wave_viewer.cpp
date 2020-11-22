@@ -8,11 +8,17 @@ int main(const int argc, const char* argv[])
 {
     namespace _fs = std::filesystem;
 
+    if (argc == 1)
+    {
+        std::cout << "Usage: drako-wave-viewer [FILE...]" << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     for (auto i = 1; i < argc; ++i)
     {
         try
         {
-            std::cout << "Processing file " << argv[i] << '...\n';
+            std::cout << "Processing file " << argv[i] << '...' << std::endl;
 
             const _fs::path file_path{ argv[i] };
             std::ifstream   file{ file_path };
@@ -22,14 +28,21 @@ int main(const int argc, const char* argv[])
             file.read(reinterpret_cast<char*>(buffer.get()), file_size);
 
             const auto wav = drako::file_formats::wave::parse({ buffer.get(), file_size });
-            std::cout << "\tChannels:         " << wav.format.channels << '\n'
-                      << "\tSample depth:     " << wav.format.sample_depth << '\n'
-                      << "\tSample rate:      " << wav.format.sample_rate << '\n'
-                      << "\tRaw data (bytes): " << wav.data.size() << '\n';
+            std::cout << "\tAudio format: " << wav.meta.audio_format
+                      << " (1=PCM, 6=mulaw, 7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM)\n"
+                      << "\tChannels:     " << wav.meta.channels << '\n'
+                      << "\tSample depth: " << wav.meta.sample_depth << " (bits)\n"
+                      << "\tSample rate:  " << wav.meta.sample_rate << " (Hz)\n"
+                      << "\tByte rate:    " << wav.meta.byte_rate << " (byte/s)\n"
+                      << "\tBlock align:  " << wav.meta.block_align << '\n'
+                      << '\n'
+                      << "\tRaw data:     " << wav.data.size() << " (bytes)\n"
+                      << '\n'
+                      << "\tInfo:         " << wav.info << std::endl;
         }
         catch (const std::exception& e)
         {
-            std::cout << e.what() << '\n';
+            std::cout << "Error:\t" << e.what() << std::endl;
         }
     }
 }

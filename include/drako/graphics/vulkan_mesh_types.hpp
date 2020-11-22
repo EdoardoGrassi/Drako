@@ -7,7 +7,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     class mesh
     {
@@ -54,6 +54,6 @@ namespace drako::gpx::vulkan
         const size_t     _i_buffer_size;
     };
 
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_MESH_TYPES_HPP

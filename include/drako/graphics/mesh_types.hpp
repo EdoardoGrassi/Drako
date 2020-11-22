@@ -2,8 +2,7 @@
 #ifndef DRAKO_MESH_TYPES_HPP
 #define DRAKO_MESH_TYPES_HPP
 
-#include "drako/core/meta/encoding.hpp"
-#include "drako/system/memory_stream.hpp"
+#include "drako/core/encoding.hpp"
 
 #include <cstddef>
 #include <iostream>
@@ -13,15 +12,6 @@
 
 namespace drako
 {
-    // Uniquely identifies a mesh resource.
-    enum class mesh_id : std::uint32_t;
-
-    [[nodiscard]] std::string to_string(mesh_id id)
-    {
-        return std::to_string(static_cast<std::underlying_type_t<mesh_id>>(id));
-    }
-
-
     enum class vertex_attribute : std::uint8_t
     {
         position,
@@ -38,14 +28,8 @@ namespace drako
         std::uint8_t     dimension;
 
         constexpr vertex_attribute_descriptor(
-            meta::format     format,
-            vertex_attribute attribute,
-            std::uint8_t     dimension) noexcept
-            : format(format)
-            , attribute(attribute)
-            , dimension(dimension)
-        {
-        }
+            meta::format f, vertex_attribute va, std::uint8_t dimension) noexcept
+            : format(f), attribute(va), dimension(dimension) {}
     };
 
 
@@ -61,21 +45,6 @@ namespace drako
     // Structure specifying format and layout of the data stored by a mesh asset.
     struct mesh_desc_t
     {
-    public:
-        explicit constexpr mesh_desc_t(
-            std::uint32_t vertex_count,
-            std::uint8_t  vertex_stride_bytes,
-            std::uint32_t index_count,
-            std::uint8_t  index_stride_bytes,
-            mesh_topology topology) noexcept
-            : vertex_count{ vertex_count }
-            , index_count{ index_count }
-            , vertex_size_bytes{ vertex_stride_bytes }
-            , index_size_bytes{ index_stride_bytes }
-            , topology{ topology }
-        {
-        }
-
         // Number of vertices in the mesh vertex buffer.
         std::uint32_t vertex_count = 0;
 
@@ -92,111 +61,62 @@ namespace drako
         mesh_topology topology = mesh_topology::undefined;
     };
 
-    [[nodiscard]] size_t vertex_buffer_size_bytes(const mesh_desc_t& desc) noexcept
-    {
-        return static_cast<size_t>(desc.vertex_count) * static_cast<size_t>(desc.vertex_size_bytes);
-    }
-
-    [[nodiscard]] size_t index_buffer_size_bytes(const mesh_desc_t& desc) noexcept
-    {
-        return static_cast<size_t>(desc.index_count) * static_cast<size_t>(desc.index_size_bytes);
-    }
-
-
     class mesh_view
     {
     public:
         explicit constexpr mesh_view() noexcept = default;
 
         explicit constexpr mesh_view(
-            const std::span<std::byte> vertex_data,
-            const std::span<std::byte> index_data) noexcept
-            : _verts{ vertex_data }, _index{ index_data }
-        {
-        }
+            std::span<const std::byte> verts,
+            std::span<const std::byte> index) noexcept
+            : _verts{ verts }, _index{ index } {}
 
         mesh_view(const mesh_view&) noexcept = default;
         mesh_view& operator=(const mesh_view&) noexcept = default;
 
-        [[nodiscard]] const std::span<std::byte> vertex_buffer() const noexcept { return _verts; }
+        [[nodiscard]] std::span<const std::byte> vertex_buffer() const noexcept { return _verts; }
 
-        [[nodiscard]] const std::span<std::byte> index_buffer() const noexcept { return _index; }
+        [[nodiscard]] std::span<const std::byte> index_buffer() const noexcept { return _index; }
 
     private:
-        //const std::byte* _verts_data;
-        //const std::byte* _index_data;
-        //const size_t     _verts_size;
-        //const size_t     _index_size;
-
-        std::span<std::byte> _verts;
-        std::span<std::byte> _index;
+        std::span<const std::byte> _verts; // mesh vertices raw data
+        std::span<const std::byte> _index; // mesh indices raw data
     };
 
 
 
-    // Mesh asset.
+    /// @brief Mesh asset.
     class mesh
     {
     public:
-        explicit constexpr mesh() noexcept
-            : _meta{ 0, 0, 0, 0, mesh_topology::undefined }
-            , _verts{ nullptr }
-            , _index{ nullptr }
-        {
-        }
+        explicit constexpr mesh() noexcept = default;
 
         explicit mesh(const mesh_desc_t& meta,
-            const std::span<std::byte>   vertex_data,
-            const std::span<std::byte>   index_data) noexcept
-            : _meta{ meta }
-            , _verts{ vertex_data.data() }
-            , _index{ index_data.data() }
-        {
-        }
+            std::span<const std::byte>   verts,
+            std::span<const std::byte>   index) noexcept
+            : _meta{ meta }, _verts{ verts }, _index{ index } {}
 
         mesh(const mesh&) = delete;
         mesh& operator=(const mesh&) = delete;
 
-        constexpr mesh(mesh&& other) noexcept;
-        constexpr mesh& operator=(mesh&& other) noexcept;
-
+        /*
         [[nodiscard]] explicit operator mesh_view() const noexcept
         {
             return mesh_view{ vertex_buffer(), index_buffer() };
         }
+        */
 
-        [[nodiscard]] std::span<std::byte>       vertex_buffer() noexcept;
-        [[nodiscard]] const std::span<std::byte> vertex_buffer() const noexcept;
+        //[[nodiscard]] std::span<const std::byte> vertex_buffer() noexcept { return _verts; }
+        [[nodiscard]] std::span<const std::byte> vertex_buffer() const noexcept { return _verts; }
 
-        [[nodiscard]] std::span<std::byte>       index_buffer() noexcept;
-        [[nodiscard]] const std::span<std::byte> index_buffer() const noexcept;
+        //[[nodiscard]] std::span<const std::byte> index_buffer() noexcept { return _index; }
+        [[nodiscard]] std::span<const std::byte> index_buffer() const noexcept { return _index; }
 
     private:
-        mesh_desc_t _meta;
-        std::byte*  _verts;
-        std::byte*  _index;
+        mesh_desc_t                _meta;
+        std::span<const std::byte> _verts; // mesh vertices raw data
+        std::span<const std::byte> _index; // mesh indices raw data
     };
-
-
-    std::span<std::byte> mesh::vertex_buffer() noexcept
-    {
-        return { _verts, vertex_buffer_size_bytes(_meta) };
-    }
-
-    const std::span<std::byte> mesh::vertex_buffer() const noexcept
-    {
-        return { _verts, vertex_buffer_size_bytes(_meta) };
-    }
-
-    std::span<std::byte> mesh::index_buffer() noexcept
-    {
-        return { _index, index_buffer_size_bytes(_meta) };
-    }
-
-    const std::span<std::byte> mesh::index_buffer() const noexcept
-    {
-        return { _index, index_buffer_size_bytes(_meta) };
-    }
 
 } // namespace drako
 

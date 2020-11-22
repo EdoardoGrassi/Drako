@@ -3,7 +3,7 @@ enable_testing()
 
 
 
-add_library(drako-runtime STATIC "src/runtime_asset_manager.cpp")
+add_library(drako-runtime STATIC "src/asset_manager.cpp")
 add_library(drako::runtime ALIAS drako-runtime)
 
 

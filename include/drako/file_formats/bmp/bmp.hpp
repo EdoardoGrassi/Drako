@@ -10,20 +10,6 @@
 
 namespace drako::file_formats::bmp
 {
-    [[nodiscard]] constexpr std::uint16_t from_little_endian_bytes(std::array<std::byte, 2> bytes) noexcept
-    {
-        return (std::to_integer<std::uint16_t>(bytes[0])) |
-               (std::to_integer<std::uint16_t>(bytes[1]) << 8);
-    }
-
-    [[nodiscard]] constexpr std::uint32_t from_little_endian_bytes(std::array<std::byte, 4> bytes) noexcept
-    {
-        return (std::to_integer<std::uint32_t>(bytes[0])) |
-               (std::to_integer<std::uint32_t>(bytes[1]) << 8) |
-               (std::to_integer<std::uint32_t>(bytes[2]) << 16) |
-               (std::to_integer<std::uint32_t>(bytes[3]) << 24);
-    }
-
     struct rgba
     {
         std::uint8_t r, g, b, a;
@@ -60,7 +46,6 @@ namespace drako::file_formats::bmp
         std::size_t              _width;
         std::size_t              _height;
     };
-
 
 
     [[nodiscard]] parse_result parse(const std::span<std::byte> data);

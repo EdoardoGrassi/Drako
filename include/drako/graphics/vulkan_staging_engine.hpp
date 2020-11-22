@@ -12,14 +12,107 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
-    struct memory_transfer_info
+    struct memory_transfer
     {
         std::span<const std::byte> source;
         vk::Buffer                 destination;
         std::size_t                offset;
     };
+
+
+    class stack_allocator
+    {
+    public:
+        stack_allocator() = default;
+
+        stack_allocator(std::byte* memory, std::size_t bytes) noexcept
+            : _memory{ memory }, _bytes{ bytes }
+        {
+            assert(memory);
+            assert(bytes > 0);
+
+            assert(used_bytes() == 0);
+            assert(free_bytes() == bytes);
+        }
+
+        [[nodiscard]] std::byte* allocate(std::size_t bytes) noexcept
+        {
+            if (const auto end = _memory + _bytes;
+                std::distance(_free, end) >= bytes)
+            {
+                auto ptr = _free;
+                _free += bytes;
+                return ptr;
+            }
+            else
+                return nullptr;
+        }
+
+        // Amount of bytes currently allocated.
+        [[nodiscard]] std::size_t used_bytes() const noexcept
+        {
+            return std::distance(_memory, _free);
+        }
+
+        // Amount of bytes currently not allocated.
+        [[nodiscard]] std::size_t free_bytes() const noexcept
+        {
+            return std::distance(_free, _memory + _bytes);
+        }
+
+        // Convert an allocated pointer into an offset in the original memory buffer.
+        [[nodiscard]] std::size_t offset(std::byte* allocation) const noexcept
+        {
+            assert(allocation >= _memory);
+            return std::distance(_memory, allocation);
+        }
+
+        void reset() noexcept
+        {
+            _free = _memory;
+        }
+
+    private:
+        std::size_t _bytes;  // managed bytes
+        std::byte*  _memory; // managed memory
+        std::byte*  _free;   // first free byte
+    };
+
+
+    class block_allocator
+    {
+    public:
+        block_allocator() = default;
+
+        block_allocator(std::byte* memory, std::size_t bytes, std::size_t bsize)
+            : _memory{ memory }, _bbytes{ bytes }
+        {
+            assert(memory);
+            assert(bytes > 0);
+            assert(bsize > 0);
+
+            const auto blockcount = bytes / bsize;
+            _blocks.resize(blockcount);
+            for (auto i = 0; i < blockcount; ++i)
+                _blocks[i] = i;
+        }
+
+        [[nodiscard]] std::byte* allocate();
+
+        void deallocate(std::byte*);
+
+        [[nodiscard]] std::size_t free_blocks() noexcept { return std::size(_blocks); }
+
+    private:
+        std::vector<std::uint16_t> _blocks; // free blocks
+        const std::size_t          _bbytes; // byte size of a single block
+        std::byte* const           _memory; // managed memory
+    };
+
+
+    const std::size_t BLOCK_SIZE = 1024;
 
     class staging_engine
     {
@@ -34,8 +127,8 @@ namespace drako::gpx::vulkan
 
         ~staging_engine() noexcept;
 
-        void submit_for_transfer(const memory_transfer_info&) noexcept;
-        void submit_for_transfer(const memory_transfer_info&, transfer_completed_callback) noexcept;
+        void submit_for_transfer(const memory_transfer&) noexcept;
+        void submit_for_transfer(const memory_transfer&, transfer_completed_callback) noexcept;
 
         void update() noexcept;
 
@@ -48,12 +141,14 @@ namespace drako::gpx::vulkan
         std::span<std::byte>     _host_memory;
         vk::MemoryPropertyFlags  _staging_memory_specs;
 
+        stack_allocator _allocator;
+
         vk::UniqueCommandPool   _transfer_cmd_pool;
         vk::UniqueCommandBuffer _transfer_cmd_buffer;
         vk::Queue               _transfer_queue;
         vk::UniqueFence         _transfer_completed;
 
-        std::vector<memory_transfer_info>        _wait_for_submit_transfers;
+        std::vector<memory_transfer>             _wait_for_submit_transfers;
         std::vector<transfer_completed_callback> _wait_for_submit_callbacks;
         std::vector<transfer_completed_callback> _wait_for_completition_callbacks;
 
@@ -103,7 +198,7 @@ namespace drako::gpx::vulkan
             _ldevice.bindBufferMemory(_staging_buffer.get(), _device_memory.get(), vk::DeviceSize{ 0 });
 
             const auto ptr = _ldevice.mapMemory(_device_memory.get(), 0, VK_WHOLE_SIZE, {});
-            _host_memory   = { static_cast<std::byte*>(ptr), bytes };
+            _allocator     = stack_allocator{ static_cast<std::byte*>(ptr), bytes };
         }
 
         {
@@ -137,13 +232,13 @@ namespace drako::gpx::vulkan
     }
 
     void staging_engine::submit_for_transfer(
-        const memory_transfer_info& info) noexcept
+        const memory_transfer& info) noexcept
     {
         _wait_for_submit_transfers.push_back(info);
     }
 
     void staging_engine::submit_for_transfer(
-        const memory_transfer_info& info, transfer_completed_callback cb) noexcept
+        const memory_transfer& info, transfer_completed_callback cb) noexcept
     {
         assert(cb != nullptr);
 
@@ -171,37 +266,40 @@ namespace drako::gpx::vulkan
 
         _transfer_cmd_buffer.get().begin({ vk::CommandBufferUsageFlagBits::eOneTimeSubmit, nullptr });
 
-        /*
-        auto curr_alloc = _host_memory.data();
-        for (size_t batch_size = 0, last_request_index = 0; batch_size < _host_memory.size_bytes(); ++last_request_index)
+
+        _allocator.reset();
+        for (auto i = 0; i < std::size(_wait_for_submit_transfers); ++i)
         {
-            const auto& transfer = _wait_for_submit_transfers[last_request_index];
-            std::memcpy(_host_memory.data(), transfer.source.data(), transfer.source.size_bytes());
-            curr_alloc += transfer.source.size_bytes();
+            const auto t       = _wait_for_submit_transfers[i];
+            const auto staging = _allocator.allocate(t.source.size_bytes());
+            if (staging == nullptr)
+                break;
+
+            std::memcpy(staging, t.source.data(), t.source.size_bytes());
+            const auto offset = _allocator.offset(staging);
 
             vk::BufferCopy region{};
-            region.size      = transfer.source.size_bytes();
-            region.srcOffset = transfer.batch_size;
-            region.dstOffset = transfer.offset;
-            _transfer_cmd_buffer.get().copyBuffer(_staging_buffer.get(), transfer.destination, 1, &region);
-        }*/
+            region.size      = t.source.size_bytes();
+            region.srcOffset = offset;
+            region.dstOffset = t.offset;
+            _transfer_cmd_buffer.get().copyBuffer(_staging_buffer.get(), t.destination, 1, &region);
+        }
 
         _transfer_cmd_buffer.get().end();
 
-        const auto FLUSH_NOT_REQUIRED = vk::MemoryPropertyFlagBits::eHostCoherent |
+        const auto flush_not_required = vk::MemoryPropertyFlagBits::eHostCoherent |
                                         vk::MemoryPropertyFlagBits::eDeviceCoherentAMD;
-        if (!(_staging_memory_specs & FLUSH_NOT_REQUIRED))
+        if (!(_staging_memory_specs & flush_not_required))
         { // request explicit flush
             const vk::MappedMemoryRange range{
                 _device_memory.get(),
                 0,
-                vk::DeviceSize{ batch_size }
+                vk::DeviceSize{ _allocator.used_bytes() }
             };
-            DRAKO_VK_CHECK_SUCCESS(_ldevice.flushMappedMemoryRanges(1, &range));
+            _ldevice.flushMappedMemoryRanges(1, &range);
         }
 
         _ldevice.resetFences(1, &_transfer_completed.get());
-
         {
             vk::SubmitInfo job{};
             job.commandBufferCount = 1;
@@ -209,6 +307,6 @@ namespace drako::gpx::vulkan
             _transfer_queue.submit(1, &job, _transfer_completed.get());
         }
     }
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan
 
 #endif // !DRAKO_VULKAN_STAGING_ALLOCATOR_HPP

@@ -3,11 +3,13 @@
 #include "drako/devel/src/uuid_defs.hpp"
 
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <span>
 #include <string>
 #include <variant>
 
@@ -45,57 +47,21 @@ namespace drako
         "Required for correct behaviour of offsetof() macro (standard C++17)");
 
 
-    void _to_hex_chars(std::byte value, char* dst) noexcept
+    void _to_hex_chars(std::span<const std::byte> src, std::span<char> dst) noexcept
     {
-        const char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+        assert(std::data(src));
+        assert(std::data(dst));
+        assert(std::size(src) == 2 * std::size(dst));
 
-        dst[0] = HEX[std::to_integer<std::uint8_t>(value) >> 4];
-        dst[1] = HEX[std::to_integer<std::uint8_t>(value) & 0x0f];
+        const char hex[] = "0123456789abcdef";
+        static_assert(sizeof(hex) == 16 + 1);
+
+        for (std::size_t i = 0; i < std::size(src); ++i)
+        {
+            dst[2 * i]     = hex[std::to_integer<uint8_t>(src[i] >> 4)];
+            dst[2 * i + 1] = hex[std::to_integer<uint8_t>(src[i + 1]) & 0x0f];
+        }
     }
-
-    void _to_hex_chars(std::uint8_t value, char* dst) noexcept
-    {
-        const char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-        dst[0] = HEX[value >> 4];
-        dst[1] = HEX[value & 0x0f];
-    }
-
-    void _to_hex_chars(std::uint16_t value, char* dst) noexcept
-    {
-        const char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-        static_assert(sizeof(HEX) == 16);
-
-        dst[0] = HEX[(value >> 12) & 0x000f];
-        dst[1] = HEX[(value >> 8) & 0x000f];
-        dst[2] = HEX[(value >> 4) & 0x000f];
-        dst[3] = HEX[value & 0x000f];
-    }
-
-    void _to_hex_chars(std::uint32_t value, char* dst) noexcept
-    {
-        const char HEX[] = { '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-        static_assert(sizeof(HEX) == 16);
-
-        const std::uint32_t MASK = 0xf;
-
-        dst[0] = HEX[(value >> 28) & MASK];
-        dst[1] = HEX[(value >> 24) & MASK];
-        dst[2] = HEX[(value >> 20) & MASK];
-        dst[3] = HEX[(value >> 16) & MASK];
-        dst[4] = HEX[(value >> 12) & MASK];
-        dst[5] = HEX[(value >> 8) & MASK];
-        dst[6] = HEX[(value >> 4) & MASK];
-        dst[7] = HEX[value & MASK];
-    }
-
-    // avoid implicit conversions of other integers types
-    template <typename T>
-    void _to_hex_chars(T, char*) = delete;
 
 
     [[nodiscard]] std::byte _from_hex_chars(unsigned char msb, unsigned char lsb) noexcept
@@ -105,22 +71,25 @@ namespace drako
         // [ 0b 0110 0001 = a ... 0b 0110 0110 = f ]
 
         // extracts value 1 if [A..F] or [a..f], bit 0 if [0..9]
-        const uint8_t hex_alpha_bit = 0b0100'0000;
+        const std::uint8_t hex_alpha_bit{ 0b0100'0000 };
 
-        const uint8_t _msb = ((msb & hex_alpha_bit) >> 6) * 9 + (msb & 0x0f);
-        const uint8_t _lsb = ((lsb & hex_alpha_bit) >> 6) * 9 + (lsb & 0x0f);
+        const std::uint8_t _m{ msb };
+        const std::uint8_t _l{ lsb };
 
-        return std::byte{ _msb << 4 } | std::byte{ _lsb };
-    }
+        const std::uint8_t _msb = ((_m & hex_alpha_bit) >> 6) * 9 + (msb & 0x0f);
+        const std::uint8_t _lsb = ((_l & hex_alpha_bit) >> 6) * 9 + (lsb & 0x0f);
+
+        return static_cast<std::byte>((_msb << 4) | _lsb);
+    };
 
     std::istream& operator>>(std::istream& is, uuid& u)
     {
-        return is.read(reinterpret_cast<char*>(&u), sizeof(uuid));
+        return is.read(reinterpret_cast<char*>(std::data(u)), sizeof(uuid));
     }
 
     std::ostream& operator<<(std::ostream& os, const uuid& u)
     {
-        return os.write(reinterpret_cast<const char*>(&u), sizeof(uuid));
+        return os.write(reinterpret_cast<const char*>(std::data(u)), sizeof(uuid));
     }
 
     std::string to_string(const uuid& u)
@@ -132,34 +101,29 @@ namespace drako
         // time-high-and-version "-"
         // clock-seq-and-reserved clock-seq-low "-"
         // node
-        std::string buffer(UUID_STRING_SIZE, '\0');
+        std::string s(UUID_STRING_SIZE, '\0');
 
         // time-low = 8 hex-digits ;
-        for (auto i = 0; i < 4; i += 2)
-            _to_hex_chars(u._bytes[i], &buffer[i]);
-        buffer[4] = UUID_STRING_SEPARATOR;
+        _to_hex_chars({ std::data(u), 4 }, { std::data(s), 8 });
+        s[UUID_HYPEN_1_OFFSET] = UUID_STRING_SEPARATOR;
 
         // time-mid = 4 hex-digits ;
-        _to_hex_chars(u._bytes[8], &buffer[5 /* bytes 5, 6 */]);
-        _to_hex_chars(u._bytes[9], &buffer[7 /* bytes 7, 8 */]);
-        buffer[9] = UUID_STRING_SEPARATOR;
+        _to_hex_chars({ std::data(u) + 4, 2 }, { std::data(s) + 8 + 1, 4 });
+        s[UUID_HYPEN_2_OFFSET] = UUID_STRING_SEPARATOR;
 
         // time-high-and-version = 4 hex-digits ;
-        _to_hex_chars(u._bytes[10], &buffer[10 /* bytes 10, 11 */]);
-        _to_hex_chars(u._bytes[11], &buffer[12 /* bytes 12, 13 */]);
-        buffer[14] = UUID_STRING_SEPARATOR;
+        _to_hex_chars({ std::data(u) + 6, 2 }, { std::data(s) + 12 + 2, 4 });
+        s[UUID_HYPEN_3_OFFSET] = UUID_STRING_SEPARATOR;
 
         // clock-seq-and-reserved = 2 hex-digits ;
-        _to_hex_chars(u._bytes[12], &buffer[15 /* bytes 15, 16 */]);
         // clock-seq-low = 2 hex-digits ;
-        _to_hex_chars(u._bytes[13], &buffer[17 /* bytes 17, 18 */]);
-        buffer[19] = UUID_STRING_SEPARATOR;
+        _to_hex_chars({ std::data(u) + 8, 2 }, { std::data(s) + 16 + 3, 4 });
+        s[UUID_HYPEN_3_OFFSET] = UUID_STRING_SEPARATOR;
 
         // node = 12 hex-digits ;
-        for (size_t i = 0; i < 12; i += 2)
-            _to_hex_chars(u._bytes[i], &buffer[20 + i]);
+        _to_hex_chars({ std::data(u) + 10, 6 }, { std::data(s) + 20 + 4, 12 });
 
-        return buffer;
+        return s;
     }
 
     [[nodiscard]] std::uint16_t _init_clock_sequence() noexcept
@@ -189,10 +153,10 @@ namespace drako
 
         std::array<std::byte, 16> bytes;
         if (std::size(s) != (32 + 4))
-            throw std::invalid_argument{ "Argument is not a UUID." };
+            throw std::invalid_argument{ "Not a valid UUID." };
         if ((s[UUID_HYPEN_1_OFFSET] != hypen) || (s[UUID_HYPEN_2_OFFSET] != hypen) ||
             (s[UUID_HYPEN_3_OFFSET] != hypen) || (s[UUID_HYPEN_4_OFFSET] != hypen))
-            throw std::invalid_argument{ "Argument is not a UUID." };
+            throw std::invalid_argument{ "Not a valid UUID." };
 
         for (size_t i = 0, j = 0; i < UUID_STRING_SIZE; i += 2, ++j)
         {
@@ -203,7 +167,7 @@ namespace drako
             const auto most_significant_bits = static_cast<unsigned char>(s[i]);
             const auto less_significant_bits = static_cast<unsigned char>(s[i + 1]);
             if (!std::isxdigit(most_significant_bits) || !std::isxdigit(less_significant_bits))
-                throw std::invalid_argument{ "Argument is not a UUID." };
+                throw std::invalid_argument{ "Not a valid UUID." };
             bytes[j] = _from_hex_chars(most_significant_bits, less_significant_bits);
         }
 

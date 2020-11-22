@@ -3,7 +3,7 @@
 #include <cassert>
 #include <vulkan/vulkan.hpp>
 
-namespace drako::gpx::vulkan
+namespace drako::vulkan
 {
     using _this = host_stack_allocator;
 
@@ -28,7 +28,7 @@ namespace drako::gpx::vulkan
     {
         assert(buffer != vk::Buffer{ nullptr });
         const auto specs = _device.getBufferMemoryRequirements(buffer);
-        
+
 
         _offset += specs.size;
         return _buffer + _offset;
@@ -39,4 +39,4 @@ namespace drako::gpx::vulkan
         assert(ptr);
         // TODO: deallocate
     }
-} // namespace drako::gpx::vulkan
+} // namespace drako::vulkan

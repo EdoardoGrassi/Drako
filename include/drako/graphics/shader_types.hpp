@@ -8,12 +8,11 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-#include <ios>
 #include <iostream>
 #include <string_view>
 #include <vector>
 
-namespace drako::gpx
+namespace drako
 {
     // Shader asset resource.
     class shader_source
@@ -102,6 +101,6 @@ namespace drako::gpx
             dst << static_cast<uint32_t>(bytes) << src.rdbuf();
         }
     }
-} // namespace drako::gpx
+} // namespace drako
 
 #endif // !DRAKO_SHADER_HPP

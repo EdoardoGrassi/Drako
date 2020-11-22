@@ -1,6 +1,8 @@
 #pragma once
-#ifndef DRAKO_INPUT_SYSTEM_TYPES_HPP_
-#define DRAKO_INPUT_SYSTEM_TYPES_HPP_
+#ifndef DRAKO_INPUT_SYSTEM_TYPES_HPP
+#define DRAKO_INPUT_SYSTEM_TYPES_HPP
+
+#include "drako/core/typed_handle.hpp"
 
 #include <array>
 #include <bitset>
@@ -10,8 +12,10 @@
 #include <tuple>
 #include <vector>
 
-namespace drako::engine::input
+namespace drako::input
 {
+    DRAKO_DEFINE_TYPED_ID(control_id, std::uint16_t);
+
     struct input_axis_info
     {
         std::string name;
@@ -48,41 +52,13 @@ namespace drako::engine::input
         std::string name;
     };
 
-    // Describes the capabilities of an input device.
+    /*// Describes the capabilities of an input device.
     struct input_device_layout
     {
         std::vector<input_axis_info>   input_axis;
         std::vector<input_button_info> input_buttons;
-    };
+    };*/
 
+} // namespace drako::input
 
-    // Describes the current state of an input device.
-    struct input_device_state
-    {
-        std::bitset<64>       buttons;
-        std::array<float, 10> axes;
-    };
-
-
-    // Describes an event occured on an input device.
-    struct input_device_event
-    {
-    };
-
-
-    class input_device_interface
-    {
-    public:
-        //[[nodiscard]] virtual std::vector<float> axis_states() noexcept = 0;
-
-        //[[nodiscard]] virtual std::vector<bool> button_states() noexcept = 0;
-
-        //[[nodiscard]] virtual std::vector<_native_input_event> poll_events() noexcept = 0;
-
-        [[nodiscard]] virtual std::tuple<std::error_code, input_device_state>
-        poll_state() noexcept = 0;
-    };
-
-} // namespace drako::engine::input
-
-#endif // !DRAKO_INPUT_SYSTEM_TYPES_HPP_
+#endif // !DRAKO_INPUT_SYSTEM_TYPES_HPP

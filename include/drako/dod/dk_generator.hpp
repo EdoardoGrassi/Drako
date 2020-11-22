@@ -2,12 +2,11 @@
 #ifndef DRAKO_GENERATOR_HPP
 #define DRAKO_GENERATOR_HPP
 
+#include "drako/dod/dk_sort.hpp"
+
+#include <cassert>
 #include <type_traits>
 #include <vector>
-
-#include "core/dk_compiler_spec.hpp"
-
-#include "dod/dk_sorting.hpp"
 
 namespace drako::dod
 {
@@ -20,53 +19,47 @@ namespace drako::dod
 
     // FUNCTION TEMPLATE
     // Sorts the elements in range [first, last) and generates an index table for successive lookups.
-    template <typename Integral, typename Iter, typename Allocator>
-    DRAKO_NODISCARD inline constexpr IndexTable<Integral, Allocator>
-        generate_index_table(Iter first, Iter last) noexcept
+    template <typename Key, typename Iter, typename Allocator>
+    requires std::is_integral_v<Key>
+    [[nodiscard]] inline constexpr IndexTable<Key, Allocator>
+    generate_index_table(Iter first, Iter last) noexcept
     {
-        static_assert(std::is_integral_v<Integral>,
-                      "Type" DRAKO_STRINGIZE(Integral) " must be an integral type");
+        using index_table_type = IndexTable<Key, Allocator>;
 
-        using index_table_type = IndexTable<Integral, Allocator>;
-
-        DRAKO_ASSERT(first != last);
+        assert(first != last);
 
         // Initialize index table
         index_table_type index(std::distance(first, last));
         for (auto i = 0; i < index.size(); i++)
-        {
             index[i] = i;
-        }
+
         // Sort both ranges in parallel
         multi_sort(first, last, index.begin(), index.end());
 
-        return std::move(index);
+        return index;
     }
 
     // FUNCTION TEMPLATE
     // Sorts the elements in range [first, last) and generates a rank table for successive lookups.
-    template <typename Integral, typename Iter, typename Allocator>
-    DRAKO_NODISCARD inline constexpr RankTable<Integral, Allocator>
-        generate_rank_table(Iter first, Iter last) noexcept
+    template <typename Key, typename Iter, typename Allocator>
+    requires std::is_integral_v<Key>
+    [[nodiscard]] inline constexpr RankTable<Key, Allocator>
+    generate_rank_table(Iter first, Iter last) noexcept
     {
-        static_assert(std::is_integral_v<Integral>,
-                      "Type" DRAKO_STRINGIZE(Integral) " must be an integral type");
+        using rank_table_type = Key<Integral, Allocator>;
 
-        using rank_table_type = RankTable<Integral, Allocator>;
-
-        DRAKO_ASSERT(first != last);
+        assert(first != last);
 
         // Initialize rank table
-        rank_table_type ranker(std::distance(first, last));
-        for (auto i = 0; i < ranker.size(); i++)
-        {
-            ranker[i] = i;
-        }
-        // Sort both ranges in parallel
-        multi_sort(first, last, ranker.begin(), ranker.end());
+        rank_table_type rank(std::distance(first, last));
+        for (auto i = 0; i < rank.size(); i++)
+            rank[i] = i;
 
-        return std::move(ranker);
+        // Sort both ranges in parallel
+        multi_sort(first, last, rank.begin(), rank.end());
+
+        return rank;
     }
-}
+} // namespace drako::dod
 
 #endif // !DRAKO_GENERATOR_HPP
