@@ -2,7 +2,7 @@
 #ifndef DRAKO_TRIANGLE_HPP
 #define DRAKO_TRIANGLE_HPP
 
-#include "core/preprocessor/compiler_macros.hpp"
+#include "core/compiler.hpp"
 #include "math/dk_vector2.hpp"
 
 namespace drako::math

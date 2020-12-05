@@ -1,6 +1,6 @@
 #include "drako/devel/uuid_engine.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/src/uuid_defs.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -19,7 +19,7 @@
 
 namespace drako
 {
-    uuid_v1_engine::uuid_v1_engine()
+    UuidMacEngine::UuidMacEngine()
     {
         _clock = std::random_device{}();
 
@@ -43,7 +43,7 @@ namespace drako
 #endif
     }
 
-    uuid uuid_v1_engine::operator()() noexcept
+    Uuid UuidMacEngine::operator()() const noexcept
     {
         // [RFC 4122 4.1.4 Timestamp]
         // For UUID version 1, this is represented by Coordinated Universal Time(UTC)

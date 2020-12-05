@@ -5,6 +5,7 @@
 #include "drako/core/drako_api_defs.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/devel/uuid.hpp"
+#include "drako/devel/uuid_engine.hpp"
 #include "drako/file_formats/dson.hpp"
 
 #include <filesystem>
@@ -36,7 +37,7 @@ namespace drako::editor
 
     struct project_info
     {
-        api_version version = current_api_version();
+        Version     version = current_api_version();
         std::string name;
         std::string author;
         //_fs::file_time_type last_project_scan;
@@ -49,16 +50,16 @@ namespace drako::editor
     dson::object& operator<<(dson::object&, const project_info&);
 
 
-    class project
+    class Project
     {
     public:
-        explicit project(const std::filesystem::path& file);
+        explicit Project(const std::filesystem::path& file);
 
-        project(const project&) = delete;
-        project& operator=(const project&) = delete;
+        Project(const Project&) = delete;
+        Project& operator=(const Project&) = delete;
 
-        project(project&&) = delete;
-        project& operator=(project&&) = delete;
+        Project(Project&&) = delete;
+        Project& operator=(Project&&) = delete;
 
         [[nodiscard]] std::filesystem::path asset_directory() const;
 
@@ -66,7 +67,7 @@ namespace drako::editor
 
         [[nodiscard]] std::filesystem::path meta_directory() const;
 
-        [[nodiscard]] uuid create_asset();
+        [[nodiscard]] Uuid generate_asset_uuid() const noexcept;
 
         void package_assets_as_single_bundle(const std::filesystem::path& where);
 
@@ -75,7 +76,7 @@ namespace drako::editor
         struct asset_table_t
         {
             /// @brief Assets uuids.
-            std::vector<uuid> guids;
+            std::vector<Uuid> ids;
 
             /// @brief Assets names.
             std::vector<std::string> names;
@@ -94,6 +95,8 @@ namespace drako::editor
         std::filesystem::path _tree_root;
 
         _project_config _config;
+
+        UuidMacEngine _generator;
     };
 
 
@@ -104,7 +107,7 @@ namespace drako::editor
     struct internal_asset_info
     {
         /// @brief Globally unique identifier of the asset.
-        uuid uuid = {};
+        Uuid id;
 
         /// @brief Type of content.
         asset_type type;
@@ -113,7 +116,7 @@ namespace drako::editor
         std::string name;
 
         /// @brief Version of the editor used for the serialization.
-        api_version version = current_api_version();
+        Version version = current_api_version();
     };
 
     //std::istream& load(std::istream&, internal_asset_info&);
@@ -129,9 +132,9 @@ namespace drako::editor
     ///
     struct external_asset_info
     {
-        uuid                  uuid = {};
+        Uuid                  uuid = {};
         std::filesystem::path path;
-        api_version           version = current_api_version();
+        Version               version = current_api_version();
     };
 
     std::istream& load(std::istream&, external_asset_info&);
@@ -141,12 +144,13 @@ namespace drako::editor
     dson::object& operator<<(dson::object&, const external_asset_info&);
 
 
-    struct asset_import_context
+    struct AssetImportContext
     {
         std::unordered_map<std::string, std::string> properties;
+        std::vector<std::string>                     flags;
     };
 
-    using asset_import_function = void (*)(const project_info&, const std::filesystem::path&, const asset_import_context&);
+    using AssetImportFunction = void (*)(const project_info&, const std::filesystem::path&, const AssetImportContext&);
 } // namespace drako::editor
 
 #endif // !DRAKO_PROJECT_TYPES_HPP

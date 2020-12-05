@@ -1,6 +1,6 @@
 #include "drako/io/vio_file_handle.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #if defined(_drako_platform_Win32)
 #include <Windows.h>

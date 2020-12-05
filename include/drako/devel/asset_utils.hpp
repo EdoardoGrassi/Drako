@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_ASSET_UTILS_HPP_
-#define DRAKO_ASSET_UTILS_HPP_
+#ifndef DRAKO_ASSET_UTILS_HPP
+#define DRAKO_ASSET_UTILS_HPP
 
 #include "drako/devel/asset_types.hpp"
 #include "drako/io/input_file_handle.hpp"
@@ -27,6 +27,8 @@ namespace drako
         ofs.write(reinterpret_cast<const char*>(bundles.data()), std::size(bundles) * sizeof(_bundle));
     }
     */
+
+    
 
     void write_bundle_metadata(const std::filesystem::path& dst);
 
@@ -80,4 +82,4 @@ namespace drako
 
 } // namespace drako
 
-#endif // !DRAKO_ASSET_UTILS_HPP_
+#endif // !DRAKO_ASSET_UTILS_HPP

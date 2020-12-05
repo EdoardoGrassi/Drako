@@ -2,8 +2,8 @@
 #ifndef DRAKO_BUILTINS_INTRINSICS_HPP
 #define DRAKO_BUILTINS_INTRINSICS_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 
 #if defined(_drako_compiler_msvc)
 #include <stdlib.h> // byte swapping intrinsics

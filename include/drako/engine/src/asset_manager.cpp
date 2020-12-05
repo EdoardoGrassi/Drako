@@ -5,19 +5,18 @@
 
 #include <cassert>
 #include <filesystem>
-#include <fstream>
 #include <vector>
 
 namespace drako::engine
 {
-    using _this = asset_manager;
+    using _this = AssetManager;
 
     [[nodiscard]] _this::_find_result _this::_available_bundle_index(const _bid id) noexcept
     {
         const auto& t = _available_bundles;
         if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), id);
             it != std::cend(t.ids))
-            return { true, std::distance(std::cbegin(t.ids), it) };
+            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
         else
             return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
     }
@@ -27,38 +26,40 @@ namespace drako::engine
         const auto& t = _loaded_assets;
         if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), id);
             it != std::cend(t.ids))
-            return { true, std::distance(std::cbegin(t.ids), it) };
+            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
         else
             return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
     }
 
-    [[nodiscard]] _this::_find_result _this::_loaded_bundle_index(const asset_bundle_id b) noexcept
+    [[nodiscard]] _this::_find_result _this::_loaded_bundle_index(const _bid b) noexcept
     {
         const auto& t = _loaded_bundles;
         if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), b);
             it != std::cend(t.ids))
-            return { true, std::distance(std::cbegin(t.ids), it) };
+            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
         else
             return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
     }
 
-    void _this::_load_bundle_metadata(const _bid id, const size_t index)
-    {
-        auto&      fs   = _available_bundles.sources[index];
-        const auto size = _available_bundles.sizes[index];
-
-        auto memory = std::make_unique<std::byte[]>(size);
-        fs.read(reinterpret_cast<char*>(memory.get()), size);
-
-        _loaded_bundles.ids.push_back(id);
-        _loaded_bundles.refcount.push_back(1);
-        _loaded_bundles.bundles.push_back();
-    }
-
     //[[nodiscard]] std::vector<std::byte> _this::_load_raw_asset() noexcept;
 
-    void _this::_dispatch_bundle_requests() noexcept
+    void _this::_handle_bundle_requests() noexcept
     {
+        /*
+        // gather completed loads
+        std::vector<_request_id> completed;
+        for (auto i = 0; i < std::size(_io_outputs); ++i)
+            while (const auto id = _io_outputs[i].pop())
+                completed.push_back(id.value());
+
+        std::vector<std::span<std::byte>> payloads;
+        for (auto request : completed)
+        {
+            // TODO: separte bundles and assets
+        }
+
+
+        // increase reference count of already loaded bundles
         std::vector<_bid> not_loaded;
         for (const auto& id : _bundle_load_list)
         {
@@ -67,36 +68,53 @@ namespace drako::engine
             else
                 not_loaded.push_back(id);
         }
+        _bundle_load_list.clear();
 
-        std::vector<_bid> not_in_flight;
-
+        // increase reference count of already pending bundles
         std::sort(std::begin(not_loaded), std::end(not_loaded));
         std::sort(std::begin(_load_in_flight), std::end(_load_in_flight));
+
+        std::vector<_bid> not_in_flight;
         std::set_difference(std::begin(not_loaded), std::end(not_loaded),
             std::begin(_load_in_flight), std::end(_load_in_flight), std::begin(not_in_flight));
 
-        for (auto b : not_in_flight) // TODO: for the ones in flight, increment refcount
-            void();
+        for (auto bundle : not_in_flight) // TODO: for the ones in flight, increment refcount
+        {
+            if (const auto [found, i] = _available_bundle_index(bundle); found)
+            {
+                auto&      file   = _available_bundles.sources[i];
+                const auto size   = _available_bundles.sizes[i];
+                auto       buffer = std::make_unique<std::byte[]>(size);
 
+                //assert(_ioservice.submit(file, std::span{ buffer.get(), size }, {}));
+            }
+        }
 
-
-        for (const auto& id : _bundle_dump_list)
+        for (auto id : _bundle_dump_list)
         {
             if (const auto [found, i] = _loaded_bundle_index(id); found)
             {
                 if (const auto refc = --_loaded_bundles.refcount[i]; refc == 0)
-                    _unload_bundle_metadata();
+                { // unload bundle
+                    _loaded_bundles.ids[i] = _bid{ 0 };
+                    // _loaded_bundles.bundles[i]
+
+                    // TODO: end impl
+                }
             }
         }
-
-        for (const auto b : _bundle_load_complete)
-        {
-            manifest_view m{};
-        }
+        _bundle_dump_list.clear();
+        */
     }
 
-    _this::asset_manager(const bundle_manifest_soa& bundles, const config& config)
+    void _this::_handle_asset_requests() noexcept
+    {
+    }
+
+    _this::AssetManager(const bundle_manifest_soa& bundles, const Config& config)
         : _config{ config }
+        , _io_service{ { .workers = 4, .submit_queue_size = 100, .output_queue_size = 100 } }
+        , _requests{ 100 }
     {
         namespace _fs = std::filesystem;
 
@@ -115,11 +133,7 @@ namespace drako::engine
 
         _available_bundles.sources.reserve(std::size(bundles.paths));
         for (const auto& p : bundles.paths)
-        {
-            std::ifstream f{ p, std::ios::binary };
-            f.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-            _available_bundles.sources.push_back(f);
-        }
+            _available_bundles.sources.emplace_back(p);
         _available_bundles.sources.shrink_to_fit();
 
         _available_bundles.sizes.reserve(std::size(bundles.paths));
@@ -131,36 +145,13 @@ namespace drako::engine
         _available_bundles.sizes.shrink_to_fit();
     }
 
-    void _this::load_bundle_async(const asset_bundle_id id) noexcept
-    {
-        assert(id);
-        _bundle_load_list.push_back(id);
-    }
-
-    void _this::unload_bundle(const asset_bundle_id id)
-    {
-        assert(id);
-        _bundle_dump_list.push_back(id);
-    }
-
-    void _this::load_asset(const uuid& a) noexcept
-    {
-        assert(a.has_value());
-        _asset_load_list.push_back(a);
-    }
-
-    void _this::unload_asset(const uuid& a) noexcept
-    {
-        assert(a.has_value());
-        _asset_dump_list.push_back(a);
-    }
-
     void _this::update() noexcept
     {
-        _dispatch_bundle_requests();
+        _handle_bundle_requests();
+        _handle_asset_requests();
     }
 
-    void _this::debug_print_loaded_bundles()
+    void _this::debug_print_registered_bundles()
     {
         std::cout << "[available_bundles]\n[id]\t\t[name]\t\t[size(bytes)]\n";
         const auto& t = _available_bundles;

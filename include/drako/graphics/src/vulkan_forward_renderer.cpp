@@ -1,9 +1,9 @@
 #include "drako/graphics/vulkan_forward_renderer.hpp"
 
 #include "drako/devel/logging.hpp"
-#include "drako/graphics/vulkan_gpu_shader.hpp"
 #include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/graphics/vulkan_queue.hpp"
+#include "drako/graphics/vulkan_shader_types.hpp"
 #include "drako/math/mat4x4.hpp"
 #include "drako/math/vector3.hpp"
 

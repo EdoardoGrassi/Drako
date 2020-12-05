@@ -2,7 +2,7 @@
 #ifndef DRAKO_DEVICE_SYSTEM_HPP
 #define DRAKO_DEVICE_SYSTEM_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/logging.hpp"
 #include "drako/input/device_system_types.hpp"
 

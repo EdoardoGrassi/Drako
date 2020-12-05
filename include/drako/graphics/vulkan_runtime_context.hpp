@@ -2,7 +2,7 @@
 #ifndef DRAKO_VULKAN_RUNTIME_CONTEXT_HPP
 #define DRAKO_VULKAN_RUNTIME_CONTEXT_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/graphics/vulkan_queue.hpp"
 #include "drako/system/desktop_window.hpp"
 
@@ -17,7 +17,7 @@
 
 namespace drako::vulkan
 {
-    VKAPI_ATTR VkBool32 VKAPI_CALL _debug_message_callback(
+    inline VKAPI_ATTR VkBool32 VKAPI_CALL _debug_message_callback(
         VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT             messageType,
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -28,7 +28,7 @@ namespace drako::vulkan
     }
 
 
-    [[nodiscard]] vk::UniqueInstance make_instance()
+    [[nodiscard]] inline vk::UniqueInstance make_instance()
     {
         DRAKO_LOG_INFO("[Vulkan] Instance creation started...");
 
@@ -91,7 +91,7 @@ namespace drako::vulkan
     }
 
 
-    [[nodiscard]] vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w)
+    [[nodiscard]] inline vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w)
     {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
         const vk::Win32SurfaceCreateInfoKHR surface_create_info{
@@ -134,7 +134,7 @@ namespace drako::vulkan
 
 
 
-    [[nodiscard]] vk::UniqueSwapchainKHR
+    [[nodiscard]] inline vk::UniqueSwapchainKHR
     make_swapchain(vk::PhysicalDevice p, vk::Device l, vk::SurfaceKHR s) noexcept
     {
         // query and select the presentation surface configuration
@@ -196,7 +196,7 @@ namespace drako::vulkan
     /// @brief Context of a Vulkan application.
     struct context
     {
-        explicit context(const sys::desktop_window& w) noexcept;
+        explicit context(sys::desktop_window&& w) noexcept;
 
         context(const context&) = delete;
         context& operator=(const context&) = delete;
@@ -210,10 +210,11 @@ namespace drako::vulkan
         vk::UniqueSurfaceKHR             surface;
         vk::DispatchLoaderDynamic        dld;
         vk::UniqueDebugUtilsMessengerEXT debug;
+        sys::desktop_window              window;
     };
 
-    context::context(const sys::desktop_window& w) noexcept
-        : instance(make_instance())
+    context::context(sys::desktop_window&& w) noexcept
+        : instance{ make_instance() }, window{ std::move(w) }
     {
         physical_device = make_physical_device(instance.get());
         surface         = make_surface(instance.get(), w);
@@ -236,7 +237,7 @@ namespace drako::vulkan
         debug = instance.get().createDebugUtilsMessengerEXTUnique(debug_messenger_info);
     }
 
-    void debug_print_all_queue_families(const context& ctx)
+    inline void debug_print_queue_families(const context& ctx)
     {
         const auto properties = ctx.physical_device.getQueueFamilyProperties();
         std::cout << "[Vulkan] Available queue families:\n";

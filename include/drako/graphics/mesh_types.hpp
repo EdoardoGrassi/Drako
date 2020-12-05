@@ -96,8 +96,8 @@ namespace drako
             std::span<const std::byte>   index) noexcept
             : _meta{ meta }, _verts{ verts }, _index{ index } {}
 
-        mesh(const mesh&) = delete;
-        mesh& operator=(const mesh&) = delete;
+        mesh(const mesh&) noexcept = default;
+        mesh& operator=(const mesh&) noexcept = default;
 
         /*
         [[nodiscard]] explicit operator mesh_view() const noexcept

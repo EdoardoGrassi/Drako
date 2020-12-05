@@ -16,17 +16,19 @@
 
 namespace drako
 {
-    DRAKO_DEFINE_TYPED_ID(asset_id, std::uint32_t);
-    DRAKO_DEFINE_TYPED_ID(asset_bundle_id, std::uint32_t);
+    //DRAKO_DEFINE_TYPED_ID(AssetID, std::uint32_t);
+    //DRAKO_DEFINE_TYPED_ID(AssetBundleID, std::uint32_t);
+    using AssetID       = Uuid; // allows direct usage with the editor assets
+    using AssetBundleID = Uuid; // allows direct usage with the editor bundles
 
 
     /// @brief Single item of an asset manifest.
     struct asset_manifest_entry
     {
-        asset_id        asset_guid;
-        uint32_t        packed_size_bytes;
-        uint32_t        unpacked_size_bytes;
-        asset_bundle_id bundle_guid;
+        AssetID       asset_guid;
+        uint32_t      packed_size_bytes;
+        uint32_t      unpacked_size_bytes;
+        AssetBundleID bundle_guid;
     };
 
 
@@ -81,16 +83,16 @@ namespace drako
             , _format_flags{ f } {}
 
         // Identifier of the package.
-        [[nodiscard]] size_t package_guid() const noexcept;
+        [[nodiscard]] std::size_t package_guid() const noexcept;
 
         // Byte offset inside the package.
-        [[nodiscard]] size_t package_offset_bytes() const noexcept;
+        [[nodiscard]] std::size_t package_offset_bytes() const noexcept;
 
         // Byte size of the uncompressed asset.
-        [[nodiscard]] size_t unpacked_size_bytes() const noexcept;
+        [[nodiscard]] std::size_t unpacked_size_bytes() const noexcept;
 
         // Byte size of the compressed asset.
-        [[nodiscard]] size_t packed_size_bytes() const noexcept;
+        [[nodiscard]] std::size_t packed_size_bytes() const noexcept;
 
         // Storage settings.
         [[nodiscard]] asset_storage_flags storage_flags() const noexcept;
@@ -140,15 +142,15 @@ namespace drako
 
 
     /// @brief Manifest file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path manifest_filename(asset_bundle_id bundle)
+    [[nodiscard]] inline std::filesystem::path manifest_filename(AssetBundleID b)
     {
-        return "bundle_" + std::to_string(bundle) + ".manifest.drako";
+        return "bundle_" + std::to_string(b) + ".manifest.drako";
     }
 
     /// @brief Storage file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path storage_filename(asset_bundle_id bundle)
+    [[nodiscard]] inline std::filesystem::path storage_filename(AssetBundleID b)
     {
-        return "bundle_" + std::to_string(bundle) + ".storage.drako";
+        return "bundle_" + std::to_string(b) + ".storage.drako";
     }
 
 } // namespace drako

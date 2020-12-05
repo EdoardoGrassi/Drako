@@ -10,7 +10,7 @@
 
 namespace drako
 {
-    using _this = render_system;
+    using _this = RenderSystem;
 
     const std::size_t DEVICE_ONLY_MEMORY_BYTES  = 10'000;
     const std::size_t HOST_VISIBLE_MEMORY_BYTES = 10'000;
@@ -32,12 +32,8 @@ namespace drako
 
     void _this::_create_gpu_mesh(mesh_id id, const mesh& asset)
     {
+        /*
         vulkan::mesh m{ _device, asset };
-
-        const auto _host_v_buffer = _host_side_allocator.allocate(m.vertex_buffer_handle());
-        const auto _host_i_buffer = _host_side_allocator.allocate(m.index_buffer_handle());
-        std::memcpy(_host_v_buffer, asset.vertex_buffer().data(), asset.vertex_buffer().size_bytes());
-        std::memcpy(_host_i_buffer, asset.index_buffer().data(), asset.index_buffer().size_bytes());
 
         const auto _device_v_buffer = _device_side_allocator.allocate(m.vertex_buffer_handle());
         const auto _device_i_buffer = _device_side_allocator.allocate(m.index_buffer_handle());
@@ -45,18 +41,17 @@ namespace drako
         const vulkan::memory_transfer info{};
 
         const auto callback = [this, id]() { _transferred_meshes.push_back(id); };
-        _staging.submit_for_transfer(info, callback);
+        _staging.submit(info, callback);
+        */
+        // TODO: impl
     }
 
     void _this::_destroy_gpu_mesh(mesh_id id)
     {
     }
 
-    _this::render_system(const vulkan::context& ctx) noexcept
-        : _device(ctx.logical_device.get())
-        , _device_ubo_allocator(ctx, DEVICE_ONLY_MEMORY_BYTES)
-        , _host_ubo_allocator(ctx, HOST_VISIBLE_MEMORY_BYTES)
-        , _renderer(ctx, 1000, 1000)
+    _this::RenderSystem(const vulkan::context& ctx) noexcept
+        : _renderer(ctx)
     {
     }
 

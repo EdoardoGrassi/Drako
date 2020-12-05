@@ -5,8 +5,8 @@
 #include <new>
 #include <type_traits>
 
-#include "core/memory/memory_core.hpp"
-#include "core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/memory/memory_core.hpp"
 
 namespace drako
 {
@@ -16,7 +16,6 @@ namespace drako
     class unsync_memory_pool
     {
     public:
-
         explicit constexpr unsync_memory_pool(size_t capacity) noexcept
         {
             _pool = static_cast<pool_node*>(_aligned_malloc(sizeof(pool_node) * capacity, Align));
@@ -51,10 +50,11 @@ namespace drako
         // Complexity: O(1)
         //
         DRAKO_NODISCARD DRAKO_ALLOCATOR
-            aligned_ptr<Align> allocate(size_t bytes) noexcept
+            aligned_ptr<Align>
+            allocate(size_t bytes) noexcept
         {
             const auto old_head = _head;
-            _head = (_head != nullptr) _head->next : nullptr;
+            _head               = (_head != nullptr) _head->next : nullptr;
             return old_head;
         }
 
@@ -64,14 +64,12 @@ namespace drako
         //
         void deallocate(aligned_ptr<Align> DRAKO_HPP_RESTRICT ptr) noexcept
         {
-
         }
 
     private:
-
         union pool_node
         {
-            pool_node* next;
+            pool_node*                          next;
             std::aligned_storage_t<Size, Align> value;
         };
         static_assert(sizeof(pool_node) == Size, "Pool block violates interface requirements");

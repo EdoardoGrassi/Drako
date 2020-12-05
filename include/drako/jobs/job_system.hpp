@@ -7,59 +7,71 @@
 // @author  Grassi Edoardo
 //
 
-#include "drako/core/lockfree_pool_allocator.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-
+#include "drako/concurrency/lockfree_dequeue.hpp"
+#include "drako/concurrency/lockfree_pool_allocator.hpp"
+#include "drako/concurrency/lockfree_ringbuffer.hpp"
 #include "drako/jobs/job_api.hpp"
-#include "drako/jobs/worker.hpp"
-#include "drako/jobs/dependency_manager.hpp"
 
-#define HW_THREAD_COUNT 8
+#include <atomic>
+#include <cassert>
+#include <thread>
 
-namespace drako
+namespace drako::jobs
 {
-    // Distributes jobs between a pool of workers.
-    //
-    class job_scheduler final
-    {
-        template <typename T>
-        using pool = drako::lockfree::object_pool<T>;
+    using WorkerHandle = std::uint32_t;
 
+
+    /// @brief Executes units of work from a service queue.
+    class Worker
+    {
     public:
+        explicit Worker(std::size_t stack_size, std::size_t heap_size) noexcept;
+        ~Worker() noexcept;
+
+        Worker(Worker const&) = delete;
+        Worker& operator=(Worker const&) = delete;
+
+        // Removes a job_unit from the local work queue.
+        bool steal() noexcept;
+
+
+    private:
+        //local_queue          _work_queue;
+        //local_allocator_type _local_heap;
+        std::atomic_flag _done;
+
+        void execute() noexcept;
+    };
+
+    /// @brief Distributes jobs between a pool of workers.
+    class Scheduler
+    {
+    public:
+        explicit Scheduler()
+            : _waiters{}, _events{}
+        {
+            for (auto i = 0; i < std::size(_workers); ++i)
+                _workers[i] = std::thread{ _run, std::ref(_queues[i]), std::ref(_done) };
+        }
+
+        Scheduler(const Scheduler&) = delete;
+        Scheduler& operator=(const Scheduler&) = delete;
 
         // @brief   Schedules a job_unit.
         //
-        void kick(const job_unit job_unit) noexcept
+        void kick(const Job& j) noexcept
         {
-            job_state_desc jd = _allocator.construct();
-
-            // TODO: equally distribute workload on all workers
-            schedule(job_unit);
+            schedule(j);
         }
 
         // @brief   Schedules a job_unit.
         //
         // Schedules a standalone job_unit, if possible on the hinted worker.
         //
-        void kick(job_unit const job_unit, WorkerHandle const hint) noexcept
-        {
-            JobLauncher new_job(job_unit);
-            // First try on hinted thread
-            if (this->_workers[10].enqueue(new_job))
-            {
-                return;
-            }
-            schedule(job_unit);
-        }
+        void kick(const Job& j, WorkerHandle hint) noexcept;
 
         // Schedules a group of standalone jobs.
-        void kick_parallel(job_unit const* jobs, size_t const count) noexcept
-        {
-            for (auto i = 0; i < count; i++)
-            {
-                _workers[0].enqueue(JobLauncher(jobs[i]));
-            }
-        }
+        void kick_parallel(const Job jobs[], std::size_t count) noexcept;
 
         void kick_sequential() noexcept;
 
@@ -67,45 +79,120 @@ namespace drako
         //
         // Suspends executing job_unit until another job_unit completes.
         //
-        void wait_for(job_state_desc* context, const job_handle handle) noexcept
-        {
-            if (context->wait_counter.load(std::memory_order_seq_cst) == 0)
-            {
-                return;
-            }
-            else
-            {
-                // Context switch
-            }
-        }
+        void wait_for(JobState* context, const JobHandle h) noexcept;
 
         // @brief   Waits for a job_unit to terminate.
         //
         // Suspends the executing until one of the specified jobs completes.
         //
-        void wait_for_any(const job_handle context, const job_handle jobs[], const size_t count) noexcept
-        {
-
-        }
+        void wait_for_any(const JobHandle ctx, const JobHandle jobs[], std::size_t count) noexcept;
 
         // @brief   Waits for a group of job_unit to terminate.
         //
         // Suspends the executing job_unit until all the specified jobs completes.
         //
-        void wait_for_all(const job_handle context, const job_handle jobs[], const size_t count) noexcept
-        {
-            // if all the jobs finished return, otherwise move current job_unit to wait list
-        }
+        void wait_for_all(const JobHandle ctx, const JobHandle jobs[], std::size_t count) noexcept;
+
+
+
+        void submit(const Job& j) noexcept;
+        void submit(const Job& j, Event& signal) noexcept;
+        void submit(Event& wait, const Job& j) noexcept;
+        void submit(Event& wait, const Job& j, Event& signal) noexcept;
+
+
+        void create_event(std::int32_t init) noexcept;
+        void destroy_event() noexcept;
 
     private:
+        struct alignas(std::hardware_destructive_interference_size) _work
+        {
+            Job    job;
+            Event* signal = nullptr;
+        };
+        //static_assert(sizeof(_work) <= std::hardware_constructive_interference_size,
+        //    "Bad class layout: can't fit inside a single cache page.");
+        static_assert(sizeof(_work) >= std::hardware_constructive_interference_size,
+            "Bad class layout: wasted space inside cache page.");
+        static_assert(alignof(_work) >= std::hardware_destructive_interference_size,
+            "Bad class layout: cache page alignment not mantained.");
 
-        details::Worker         _workers[HW_THREAD_COUNT];
-        pool<job_state_desc>    _allocator;
+        struct _waiter
+        {
+            Job                 job;
+            std::atomic_int32_t count;
+        };
+        using _queue = lockfree::SRSWQueue<_work>;
 
-        void schedule(const job_unit job_unit) noexcept;
+        struct _event
+        {
+            std::atomic_int32_t counter;
+        };
 
-        void create_dependencies(const job_unit job_unit) noexcept;
+        lockfree::StaticPool<_waiter, 100> _waiters;
+        lockfree::StaticPool<Event, 100>   _events;
+        std::thread                        _workers[4];
+        lockfree::SRSWQueue<_work>         _queues[4];
+        std::atomic_flag                   _done;
+
+        void schedule(const Job& j) noexcept;
+
+        _waiter* _make_waiter(const Job& j, std::int32_t counter) noexcept
+        {
+            using _alty = std::allocator_traits<decltype(_waiters)>;
+            auto p      = _alty::allocate(_waiters, 1);
+            _alty::construct(_waiters, p, j, counter);
+            return p;
+        }
+
+        void decrement(_waiter* w) noexcept
+        {
+            assert(w);
+            if (const auto prev = w->count.fetch_sub(1); prev == 1)
+            {
+                schedule(w->job);
+                std::allocator_traits<decltype(_waiters)>::destroy(_waiters, w);
+            }
+        }
+
+        //void decrement()
+
+        static void _run(_queue& q, std::atomic_flag& done) noexcept
+        {
+            while (!done.test(std::memory_order::acquire))
+            {
+                while (const auto item = q.pop())
+                {
+                    const auto& work = item.value();
+                    std::invoke(work.job);
+
+                    if (work.signal)
+                    {
+                        // TODO: send signal to waiters
+                    }
+                }
+            }
+        }
     };
-}
+
+
+    inline void Scheduler::submit(const Job& j) noexcept
+    {
+        const _work w{ .job = j };
+        const auto  worker = 0;
+        assert(_queues[worker].push(w));
+    }
+
+    inline void Scheduler::submit(const Job& j, Event& signal) noexcept
+    {
+        const _work w{ .job = j, .signal = std::addressof(signal) };
+        const auto  worker = 0;
+        assert(_queues[worker].push(w));
+    }
+
+    //inline void Scheduler::submit(Event& wait, const Job& j) noexcept
+
+
+} // namespace drako::jobs
 
 #endif // !DRAKO_JOB_SYSTEM_HPP

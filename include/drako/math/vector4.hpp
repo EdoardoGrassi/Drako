@@ -1,151 +1,142 @@
+#pragma once
+#ifndef DRAKO_VECTOR4_HPP
+#define DRAKO_VECTOR4_HPP
+
 /// @file
 ///
 /// @brief   Vector class with four single-precision components.
 /// @details Vector class that leverages support from available SIMD extensions.
 /// @author  Grassi Edoardo.
 /// @date    Last update: 03-09-2019
-///
-/// Compilation flags:
-/// DRAKO_API_SIMD    Enables hand-written SIMD implementation.
-
-#pragma once
-#ifndef DRAKO_VECTOR4_HPP
-#define DRAKO_VECTOR4_HPP
 
 #include <array>
 #include <cmath>
-
-#if defined(DRAKO_API_SIMD)
-#include <intrin.h>
-#endif
-
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include <type_traits>
 
 namespace drako
 {
     /// @brief Packed vector with four single-precision scalar components.
-    class alignas(sizeof(float) * 4) vec4
+    union alignas(sizeof(float) * 4) Vec4
     {
-    public:
-        constexpr explicit vec4() noexcept;
-        constexpr explicit vec4(float) noexcept;
-        constexpr explicit vec4(float, float, float, float) noexcept;
-        constexpr explicit vec4(const std::array<float, 4>&) noexcept;
+        constexpr explicit Vec4() noexcept
+            : x{ 0.f }, y{ 0.f }, z{ 0.f }, w{ 0.f } {}
 
-        DRAKO_FORCE_INLINE constexpr vec4(const vec4&) noexcept = default;
-        DRAKO_FORCE_INLINE constexpr vec4& operator=(const vec4&) noexcept = default;
+        constexpr explicit Vec4(float f) noexcept
+            : x{ f }, y{ f }, z{ f }, w{ f } {}
 
-        DRAKO_NODISCARD constexpr vec4& operator+=(float) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator+=(const vec4&) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator-=(float) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator-=(const vec4&) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator*=(float) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator*=(const vec4&) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator/=(float) noexcept;
-        DRAKO_NODISCARD constexpr vec4& operator/=(const vec4&) noexcept;
+        constexpr explicit Vec4(float x, float y, float z, float w) noexcept
+            : x{ x }, y{ y }, z{ z }, w{ w } {}
 
-        constexpr friend vec4 operator+(const vec4&, float) noexcept;
-        constexpr friend vec4 operator+(float, const vec4&) noexcept;
-        constexpr friend vec4 operator+(const vec4&, const vec4&) noexcept;
+        constexpr explicit Vec4(const float xyzw[4]) noexcept
+            : x{ xyzw[0] }, y{ xyzw[1] }, z{ xyzw[2] }, w{ xyzw[3] } {}
 
-        constexpr friend vec4 operator-(const vec4&, float) noexcept;
-        constexpr friend vec4 operator-(float, const vec4&) noexcept;
-        constexpr friend vec4 operator-(const vec4&, const vec4&) noexcept;
+        constexpr explicit Vec4(const std::array<float, 4>& xyzw) noexcept
+            : x{ xyzw[0] }, y{ xyzw[1] }, z{ xyzw[2] }, w{ xyzw[3] } {}
 
-        constexpr friend vec4 operator*(const vec4&, float)noexcept;
-        constexpr friend vec4 operator*(float, const vec4&)noexcept;
-        constexpr friend vec4 operator*(const vec4&, const vec4&)noexcept;
+        constexpr Vec4(const Vec4&) noexcept = default;
+        constexpr Vec4& operator=(const Vec4&) noexcept = default;
 
-        constexpr friend vec4 operator/(const vec4&, float) noexcept;
-        constexpr friend vec4 operator/(float, const vec4&) noexcept;
-        constexpr friend vec4 operator/(const vec4&, const vec4&) noexcept;
-
-        DRAKO_NODISCARD constexpr float& operator[](size_t) noexcept;
-        DRAKO_NODISCARD constexpr float  operator[](size_t) const noexcept;
-
-        constexpr friend bool operator==(const vec4&, const vec4&) noexcept;
-        constexpr friend bool operator!=(const vec4&, const vec4&) noexcept;
-
-        friend float norm(const vec4&) noexcept;
-
-        constexpr friend vec4 abs(const vec4&) noexcept;
-
-        constexpr friend float dot(const vec4&, const vec4&) noexcept;
-
-        constexpr friend vec4 max(const vec4&, const vec4&) noexcept;
-
-        constexpr friend vec4 min(const vec4&, const vec4&) noexcept;
-
-    private:
-#if !defined(DRAKO_API_SIMD)
-        float _xyzw[4];
-#else
-
-        __m128 _xyzw;
-
-        DRAKO_FORCE_INLINE constexpr vec4(__m128 data) noexcept
-            : _xyzw(data)
+        constexpr Vec4& operator+=(const Vec4& other) noexcept
         {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+            w += other.w;
+            return *this;
         }
 
-        DRAKO_FORCE_INLINE constexpr operator __m128() const noexcept { return _xyzw; }
+        constexpr Vec4& operator-=(const Vec4& other) noexcept
+        {
+            x -= other.x;
+            y -= other.y;
+            z -= other.z;
+            w -= other.w;
+            return *this;
+        }
 
-#endif
+        constexpr Vec4& operator*=(const Vec4& other) noexcept
+        {
+            x *= other.x;
+            y *= other.y;
+            z *= other.z;
+            w *= other.w;
+            return *this;
+        }
+
+        constexpr Vec4& operator/=(const Vec4& other) noexcept
+        {
+            x /= other.x;
+            y /= other.y;
+            z /= other.z;
+            w /= other.w;
+            return *this;
+        }
+
+        [[nodiscard]] friend constexpr bool operator==(Vec4, Vec4) noexcept = default;
+        [[nodiscard]] friend constexpr bool operator!=(Vec4, Vec4) noexcept = default;
+
+        [[nodiscard]] constexpr float& operator[](std::size_t pos) noexcept { return xyzw[pos]; }
+        [[nodiscard]] constexpr float  operator[](std::size_t pos) const noexcept { return xyzw[pos]; }
+
+        struct
+        {
+            float x, y, z, w;
+        };
+        float xyzw[4];
     };
-    static_assert(std::is_standard_layout_v<vec4>);
-    static_assert(std::is_trivially_copyable_v<vec4>);
-    static_assert(std::is_nothrow_swappable_v<vec4>);
-    static_assert(std::is_nothrow_destructible_v<vec4>);
+    static_assert(std::is_standard_layout_v<Vec4>);
+    static_assert(std::is_trivially_copyable_v<Vec4>);
+    static_assert(std::is_nothrow_swappable_v<Vec4>);
+    static_assert(std::is_nothrow_destructible_v<Vec4>);
 
-    // Component-wise multiplication by a scalar.
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4
-    operator*(const vec4& v, float f) noexcept
+
+    [[nodiscard]] inline constexpr Vec4 operator+(Vec4 lhs, Vec4 rhs) noexcept
     {
-        return v * vec4(f);
+        return Vec4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
     }
 
-    // Component-wise multiplication by a scalar.
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4
-    operator*(float f, const vec4& v) noexcept
+    [[nodiscard]] inline constexpr Vec4 operator-(Vec4 lhs, Vec4 rhs) noexcept
     {
-        return vec4(f) * v;
+        return Vec4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
     }
 
-    // Component-wise division by a scalar.
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4
-    operator/(const vec4& v, float f) noexcept
+    [[nodiscard]] inline constexpr Vec4 operator*(Vec4 lhs, Vec4 rhs) noexcept
     {
-        return v / vec4(f);
+        return Vec4(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w);
     }
 
-    // Component-wise division by a scalar.
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4
-    operator/(float f, const vec4& v) noexcept
+    [[nodiscard]] inline constexpr Vec4 operator/(Vec4 lhs, Vec4 rhs) noexcept
     {
-        return vec4(f) / v;
+        return Vec4(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w);
     }
 
-    inline std::istream& operator>>(std::istream& is, vec4& obj)
+    // Computes the dot product.
+    [[nodiscard]] inline constexpr float dot(Vec4 lhs, Vec4 rhs) noexcept
     {
-        return is >> obj[0] >> obj[1] >> obj[2] >> obj[3];
+        return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const vec4& obj)
+    // Computes the lenght of the vector.
+    [[nodiscard]] inline float norm(Vec4 v) noexcept
     {
-        return os << obj[0] << ' ' << obj[1] << ' ' << obj[2] << ' ' << obj[3];
+        return std::sqrt(dot(v, v));
+    }
+
+    // Computes the squared lenght of the vector.
+    [[nodiscard]] inline constexpr float sqrd_norm(Vec4 v) noexcept
+    {
+        return dot(v, v);
     }
 
     // Linear interpolation between vectors
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4 lerp(const vec4& v1, const vec4& v2, float t) noexcept
+    [[nodiscard]] inline constexpr Vec4 lerp(Vec4 v1, Vec4 v2, float t) noexcept
     {
-        return (v2 - v1) * t + v1;
+        return (v2 - v1) * Vec4{ t } + v1;
     }
 
     // Spherical interpolation between vectors
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr vec4 slerp(const vec4& v1, const vec4& v2, float t) noexcept;
+    [[nodiscard]] inline constexpr Vec4 slerp(Vec4 v1, Vec4 v2, float t) noexcept;
 
 } // namespace drako
-
-#include "drako/math/inl/vector4.inl"
 
 #endif // !DRAKO_VECTOR4_HPP

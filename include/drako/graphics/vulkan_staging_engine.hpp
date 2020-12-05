@@ -127,8 +127,17 @@ namespace drako::vulkan
 
         ~staging_engine() noexcept;
 
-        void submit_for_transfer(const memory_transfer&) noexcept;
-        void submit_for_transfer(const memory_transfer&, transfer_completed_callback) noexcept;
+        /// @brief Submit a memory transfer operation.
+        void submit(const memory_transfer& op) noexcept;
+
+        /// @brief Submit a memory transfer operation.
+        /// @param[in] op Details of the operation.
+        /// @param[in] c Callback invoked on operation completition.
+        ///
+        /// @remark Both source and destination buffer must remain valid
+        ///     for the duration of the operation.
+        ///
+        void submit(const memory_transfer& op, transfer_completed_callback c) noexcept;
 
         void update() noexcept;
 
@@ -231,18 +240,16 @@ namespace drako::vulkan
         _ldevice.unmapMemory(_device_memory.get());
     }
 
-    void staging_engine::submit_for_transfer(
-        const memory_transfer& info) noexcept
+    void staging_engine::submit(const memory_transfer& op) noexcept
     {
-        _wait_for_submit_transfers.push_back(info);
+        _wait_for_submit_transfers.push_back(op);
     }
 
-    void staging_engine::submit_for_transfer(
-        const memory_transfer& info, transfer_completed_callback cb) noexcept
+    void staging_engine::submit(const memory_transfer& op, transfer_completed_callback cb) noexcept
     {
         assert(cb != nullptr);
 
-        _wait_for_submit_transfers.push_back(info);
+        _wait_for_submit_transfers.push_back(op);
         _wait_for_submit_callbacks.push_back(cb);
     }
 
@@ -270,8 +277,8 @@ namespace drako::vulkan
         _allocator.reset();
         for (auto i = 0; i < std::size(_wait_for_submit_transfers); ++i)
         {
-            const auto t       = _wait_for_submit_transfers[i];
-            const auto staging = _allocator.allocate(t.source.size_bytes());
+            const auto& t       = _wait_for_submit_transfers[i];
+            const auto  staging = _allocator.allocate(t.source.size_bytes());
             if (staging == nullptr)
                 break;
 

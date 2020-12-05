@@ -1,8 +1,8 @@
 #include "drako/system/desktop_window.hpp"
 
-#include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
+#include <cassert>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -53,7 +53,7 @@ namespace drako::sys
     desktop_window::desktop_window(std::wstring_view title)
         : _instance(::GetModuleHandleW(nullptr))
     {
-        DRAKO_ASSERT(!std::empty(title));
+        assert(!std::empty(title));
 
         const std::wstring_view CLASS_NAME = L"Drako Window Class";
 
@@ -88,17 +88,17 @@ namespace drako::sys
     {
         if (_window != NULL)
             if (!::DestroyWindow(_window))
-                std::exit(EXIT_FAILURE);
+                [[unlikely]] std::terminate();
     }
 
-    constexpr desktop_window::desktop_window(desktop_window&& other) noexcept
+    desktop_window::desktop_window(desktop_window&& other) noexcept
         : _instance(other._instance)
         , _window(other._window)
     {
         other._window = NULL;
     }
 
-    constexpr desktop_window& desktop_window::operator=(desktop_window&& other) noexcept
+    desktop_window& desktop_window::operator=(desktop_window&& other) noexcept
     {
         if (this != std::addressof(other))
         {

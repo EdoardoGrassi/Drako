@@ -2,7 +2,7 @@
 #ifndef DRAKO_SYSTEM_TIMERS_WIN32_HPP_
 #define DRAKO_SYSTEM_TIMERS_WIN32_HPP_
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #include <chrono>
 #include <exception>

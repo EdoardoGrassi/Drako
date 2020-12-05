@@ -7,8 +7,7 @@
 //  \author     Grassi Edoardo
 //
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/math/utility.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/devel/assertion.hpp"
 
 namespace drako
@@ -25,35 +24,30 @@ namespace drako
 
     // Pointer to raw memory aligned to a multiple of byte.
     //
-    template <size_t Align>//, typename std::enable_if_t<is_valid_alignment(Align), int> = 0>
+    template <size_t Align> //, typename std::enable_if_t<is_valid_alignment(Align), int> = 0>
     class aligned_ptr
     {
     public:
-
         explicit constexpr aligned_ptr() noexcept = default;
 
         constexpr aligned_ptr(const aligned_ptr&) noexcept = default;
         constexpr aligned_ptr& operator=(const aligned_ptr&) noexcept = default;
 
-        DRAKO_FORCE_INLINE constexpr operator void* () noexcept { return _ptr; }
+        constexpr operator void*() noexcept { return _p; }
 
-        DRAKO_FORCE_INLINE explicit constexpr aligned_ptr(void* ptr) noexcept
-            : _ptr(ptr)
+        explicit constexpr aligned_ptr(void* p) noexcept
+            : _p(p)
         {
         }
 
-        friend aligned_ptr make_aligned(void* ptr);
-
     private:
-
-        std::aligned_storage<1, Align>* _ptr;
+        std::aligned_storage<1, Align>* _p;
     };
 
-    template <size_t Align>
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr
-        aligned_ptr<Align> make_aligned(void* ptr) noexcept
+    template <std::size_t Align>
+    [[nodiscard]] inline constexpr aligned_ptr<Align> align_cast(void* p) noexcept
     {
-        return aligned_ptr<Align>(ptr);
+        return aligned_ptr<Align>(p);
     }
 
 
@@ -64,12 +58,12 @@ namespace drako
     // \param[in]   ptr     Pointer to the first byte of memory block.
     // \param[in]   size    Byte size of memory block.
     //
-    DRAKO_FORCE_INLINE void fill_garbage_memory(void* _ptr, const size_t _size) noexcept
+    inline void fill_garbage_memory(void* p, std::size_t size) noexcept
     {
-        DRAKO_PRECON(_ptr != nullptr);
-        DRAKO_PRECON(_size > 0);
+        DRAKO_PRECON(p != nullptr);
+        DRAKO_PRECON(size > 0);
 
-        std::memset(_ptr, DRKAPI_GARBAGE_MEMORY, _size);
+        std::memset(p, DRKAPI_GARBAGE_MEMORY, size);
     }
 
     // FUNCTION
@@ -79,7 +73,7 @@ namespace drako
     // \param[in]   begin   Pointer to the first byte of memory block.
     // \param[in]   end     Pointer to the last byte of memory block.
     //
-    DRAKO_FORCE_INLINE void fill_garbage_memory(void* _begin, void* _end) noexcept
+    inline void fill_garbage_memory(void* _begin, void* _end) noexcept
     {
         DRAKO_PRECON(_begin != nullptr);
         DRAKO_PRECON(_end != nullptr);
@@ -95,12 +89,12 @@ namespace drako
     // \param[in]   ptr     Pointer to the first byte of memory block.
     // \param[in]   size    Byte size of memory block.
     //
-    DRAKO_FORCE_INLINE void fill_guard_buffer(void* _ptr, const size_t _size) noexcept
+    inline void fill_guard_buffer(void* p, std::size_t size) noexcept
     {
-        DRAKO_PRECON(_ptr != nullptr);
-        DRAKO_PRECON(_size > 0);
+        DRAKO_PRECON(p != nullptr);
+        DRAKO_PRECON(size > 0);
 
-        std::memset(_ptr, DRKAPI_OVERFLOW_MEMORY, _size);
+        std::memset(p, DRKAPI_OVERFLOW_MEMORY, size);
     }
 
     // FUNCTION
@@ -110,7 +104,7 @@ namespace drako
     // \param[in]   begin   Pointer to the first byte of memory block.
     // \param[in]   end     Pointer to the last byte of memory block.
     //
-    DRAKO_FORCE_INLINE void fill_guard_buffer(void* _begin, void* _end) noexcept
+    inline void fill_guard_buffer(void* _begin, void* _end) noexcept
     {
         DRAKO_ASSERT(_begin != nullptr);
         DRAKO_ASSERT(_end != nullptr);
@@ -120,17 +114,13 @@ namespace drako
     }
 
 
-        // \brief       Checks if an alignment request is valid.
+    // \brief       Checks if an alignment request is valid.
     //
     // \param[in]   alignment   Requested alignment.
     //
     // \returns     True if the alignment is supported, false otherwise.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr
-        bool is_valid_alignment(size_t align) noexcept
-    {
-        return is_pow2(align);
-    }
+    [[nodiscard]] inline constexpr bool is_valid_alignment(std::size_t align) noexcept;
 
 
     // \brief       Checks if a pointer is aligned correctly.
@@ -140,23 +130,21 @@ namespace drako
     //
     // \returns     Returns true if the pointer is aligned correctly, false otherwise.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        bool is_aligned(void* const ptr, size_t align) noexcept
+    [[nodiscard]] inline bool is_aligned(void* p, std::size_t align) noexcept
     {
-        DRAKO_ASSERT(ptr != nullptr, "Pointer can't be null");
+        DRAKO_ASSERT(p != nullptr, "Pointer can't be null");
         DRAKO_ASSERT(is_valid_alignment(align), "Alignment must be a power of 2");
 
-        return (reinterpret_cast<uintptr_t>(ptr) & (align - 1)) == 0;
+        return (reinterpret_cast<uintptr_t>(p) & (align - 1)) == 0;
     }
 
 
     // FUNCTION
     // Offsets a pointer by a specific amount
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr
-        void* offset_pointer(void* const ptr, intptr_t offset) noexcept
+    [[nodiscard]] inline constexpr void* offset_pointer(void* p, std::intptr_t offset) noexcept
     {
         // DRAKO_ASSERT(_ptr != nullptr);
-        return static_cast<std::byte*>(ptr) + offset;
+        return static_cast<std::byte*>(p) + offset;
     }
 
 
@@ -172,17 +160,8 @@ namespace drako
     // \returns     Offset to the next correctly aligned pointer.
     // \retval      0       Pointer is already aligned.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        ptrdiff_t align_up_offset(void* const ptr, size_t alignment) noexcept
-    {
-        // DRAKO_ASSERT(ptr != nullptr);
-        // DRAKO_ASSERT(is_valid_alignment(alignment));
-
-        // TODO: implementation
-        auto raw_ptr = static_cast<std::byte*>(ptr);
-
-        return 0;
-    }
+    [[nodiscard]] inline ptrdiff_t
+    align_up_offset(void* p, std::size_t alignment) noexcept;
 
     // FUNCTION
     //
@@ -196,32 +175,26 @@ namespace drako
     // \returns     Offset to the next correctly aligned pointer.
     // \retval      0       Pointer is already aligned.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        ptrdiff_t align_down_offset(void* const ptr, size_t align) noexcept
-    {
-        // TODO: implement
-        return 0;
-    }
+    [[nodiscard]] inline ptrdiff_t
+    align_down_offset(void* p, std::size_t align) noexcept;
 
 
-    template<size_t Align>
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE constexpr
-        aligned_ptr<Align> align_down_ptr(void* const ptr_) noexcept
+    template <std::size_t Align>
+    [[nodiscard]] inline constexpr aligned_ptr<Align> align_down(void* p) noexcept
     {
-        auto raw_ptr = reinterpret_cast<uintptr_t>(ptr_);
-        const auto mask = Align - 1;
+        auto       raw_ptr = reinterpret_cast<uintptr_t>(p);
+        const auto mask    = Align - 1;
 
         return raw_ptr & mask;
     }
 
 
-    template<size_t Align>
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        aligned_ptr<Align> align_up_ptr(void* const ptr) noexcept
+    template <std::size_t Align>
+    [[nodiscard]] inline aligned_ptr<Align> align_up(void* p) noexcept
     {
-        const auto raw_ptr = reinterpret_cast<uintptr_t>(ptr);
-        const auto mask = Align - 1;
-        const auto offset = Align - (raw_ptr & mask);
+        const auto raw_ptr = reinterpret_cast<uintptr_t>(p);
+        const auto mask    = Align - 1;
+        const auto offset  = Align - (raw_ptr & mask);
 
         return raw_ptr + offset;
     }
@@ -229,17 +202,16 @@ namespace drako
 
     // Rounds down a pointer so its aligned with the specified alignment.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        void* align_down_pointer(void* const ptr, size_t align) noexcept
+    [[nodiscard]] inline void* align_down(void* p, std::size_t align) noexcept
     {
-        DRAKO_ASSERT(ptr != nullptr, "Pointer can't be null");
+        DRAKO_ASSERT(p != nullptr, "Pointer can't be null");
         DRAKO_ASSERT(is_valid_alignment(align), "Alignment must be a power of 2");
 
-        const auto raw_ptr = reinterpret_cast<uintptr_t>(ptr);
-        const auto mask = align - 1;
+        const auto raw_ptr = reinterpret_cast<uintptr_t>(p);
+        const auto mask    = align - 1;
         const auto aligned = reinterpret_cast<void*>(raw_ptr & mask);
 
-        DRAKO_ASSERT(std::less_equal<void*>()(aligned, ptr));
+        DRAKO_ASSERT(std::less_equal<void*>()(aligned, p));
         DRAKO_ASSERT(is_aligned(aligned, align));
         return aligned;
     }
@@ -252,18 +224,17 @@ namespace drako
     //
     // \returns     Pointer with the required memory alignment.
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        void* align_up_pointer(void* const ptr, size_t align) noexcept
+    [[nodiscard]] inline void* align_up(void* p, std::size_t align) noexcept
     {
-        DRAKO_ASSERT(ptr != nullptr, "Pointer can't be null");
+        DRAKO_ASSERT(p != nullptr, "Pointer can't be null");
         DRAKO_ASSERT(is_valid_alignment(align), "Alignment must be a power of 2");
 
-        const auto raw_ptr = reinterpret_cast<uintptr_t>(ptr);
-        const auto mask = align - 1;
-        const auto offset = align - (raw_ptr & mask);
+        const auto raw_ptr = reinterpret_cast<uintptr_t>(p);
+        const auto mask    = align - 1;
+        const auto offset  = align - (raw_ptr & mask);
         const auto aligned = reinterpret_cast<void*>(raw_ptr + offset);
 
-        DRAKO_ASSERT(std::greater_equal<void*>()(aligned, ptr));
+        DRAKO_ASSERT(std::greater_equal<void*>()(aligned, p));
         DRAKO_ASSERT(is_aligned(aligned, align));
         return aligned;
     }
@@ -271,11 +242,10 @@ namespace drako
 
     // FUNCTION
     //
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE
-        void* align_to_l1_cache(void* const ptr) noexcept
+    [[nodiscard]] inline void* align_to_l1_cache(void* p) noexcept
     {
-        return align_up_pointer(ptr, DRKAPI_L1_CACHE_SIZE);
+        return align_up(p, DRKAPI_L1_CACHE_SIZE);
     }
-}
+} // namespace drako
 
 #endif // !DRAKO_MEMORY_UTILITY_HPP

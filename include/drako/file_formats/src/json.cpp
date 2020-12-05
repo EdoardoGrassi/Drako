@@ -1,4 +1,3 @@
-#pragma once
 #include "drako/file_formats/json.hpp"
 
 #include "drako/devel/logging.hpp"
@@ -89,14 +88,14 @@ namespace drako::file_formats::json
         }
     };
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE bool _is_json_whitespace(const char ch) noexcept
+    [[nodiscard]] bool _is_json_whitespace(const char ch) noexcept
     {
         return std::find(std::cbegin(JSON_WHITESPACE_SET),
                    std::cend(JSON_WHITESPACE_SET),
                    ch) != std::cend(JSON_WHITESPACE_SET);
     }
 
-    DRAKO_NODISCARD DRAKO_FORCE_INLINE bool _is_json_escaped(const char ch) noexcept
+    [[nodiscard]] bool _is_json_escaped(const char ch) noexcept
     {
         return std::find(std::cbegin(JSON_ESCAPED_SET),
                    std::cend(JSON_ESCAPED_SET),
@@ -110,10 +109,10 @@ namespace drako::file_formats::json
         return v.substr(tk_beg, tk_end - tk_beg);
     }
 
+    /*
 
     // Parses a json encoded string converting escaped and surrogate characters.
-    DRAKO_NODISCARD
-    std::tuple<bool, std::string> _json_to_utf8(std::string_view json)
+    [[nodiscard]] std::tuple<bool, std::string> _json_to_utf8(std::string_view json)
     {
         std::string result;
 
@@ -143,57 +142,53 @@ namespace drako::file_formats::json
         return { true, result };
     }
 
-    DRAKO_NODISCARD
-    std::string _ascii_to_json(std::string_view ascii)
+    [[nodiscard]] std::string _ascii_to_json(std::string_view ascii)
     {
         std::string result;
         for (auto ch = std::cbegin(ascii); ch != std::cend(ascii); std::advance(ch, 1))
         {
             if (_is_json_escaped(*ch))
-            {
                 result += REVERSE_SOLIDUS;
-            }
             result += *ch;
         }
         return result;
     }
 
 
-    DRAKO_NODISCARD
-    std::tuple<std::vector<_token>, parser_error>
+    [[nodiscard]] std::tuple<std::vector<_token>, parser_error>
     _tokenize_dom(std::u16string_view json, const parser_config& config) noexcept
     {
-        using _jtk    = _token;
-        using _jtk_ty = _token_type;
+        using tk = _token;
+        using tt = _token_type;
 
-        std::vector<_jtk> tokens(std::size(json) / 4); // rough guess of the number of tokens
+        std::vector<tk> tokens(std::size(json) / 4); // rough guess of the number of tokens
 
         for (const auto ch = &json[0]; ch != &json[std::size(json)]; std::advance(ch, 1))
         {
             switch (*ch)
             {
                 case JSON_VALUE_SEP:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::value_separator });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::value_separator });
                     break;
 
                 case JSON_NAME_SEP:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::name_separator });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::name_separator });
                     break;
 
                 case JSON_BEGIN_ARRAY:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::begin_array });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::begin_array });
                     break;
 
                 case JSON_END_ARRAY:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::end_array });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::end_array });
                     break;
 
                 case JSON_BEGIN_OBJECT:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::begin_object });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::begin_object });
                     break;
 
                 case JSON_END_OBJECT:
-                    tokens.emplace_back(_jtk{ ch, ch + 1, _jtk_ty::end_object });
+                    tokens.emplace_back(tk{ ch, ch + 1, tt::end_object });
                     break;
 
                 case JSON_FALSE[0]:
@@ -201,7 +196,7 @@ namespace drako::file_formats::json
                     if (std::distance(ch, &json[std::size(json)]) > std::size(JSON_FALSE) &&
                         std::u16string_view{ ch, std::size(JSON_FALSE) } == JSON_FALSE)
                     { // token matches keyword lenght and characters
-                        tokens.emplace_back(_jtk{ ch, ch + std::size(JSON_FALSE), _jtk_ty::false_value });
+                        tokens.emplace_back(tk{ ch, ch + std::size(JSON_FALSE), tt::false_value });
                     }
                     else
                     { // lexer error
@@ -215,7 +210,7 @@ namespace drako::file_formats::json
                     if (std::distance(ch, &json[std::size(json)]) > std::size(JSON_TRUE) &&
                         std::u16string_view{ ch, std::size(JSON_TRUE) } == JSON_TRUE)
                     { // token matches keyword lenght and characters
-                        tokens.emplace_back(_jtk{ ch, ch + std::size(JSON_TRUE), _jtk_ty::false_value });
+                        tokens.emplace_back(tk{ ch, ch + std::size(JSON_TRUE), tt::false_value });
                     }
                     else
                     { // lexer error
@@ -229,7 +224,7 @@ namespace drako::file_formats::json
                     if (std::distance(ch, &json[std::size(json)]) > std::size(JSON_NULL) &&
                         std::u16string_view{ ch, std::size(JSON_NULL) } == JSON_NULL)
                     { // token matches keyword lenght and characters
-                        tokens.emplace_back(_jtk{ ch, ch + std::size(JSON_NULL), _jtk_ty::false_value });
+                        tokens.emplace_back(tk{ ch, ch + std::size(JSON_NULL), tt::false_value });
                     }
                     else
                     { // lexer error
@@ -241,8 +236,7 @@ namespace drako::file_formats::json
         }
     }
 
-    DRAKO_NODISCARD
-    std::tuple<dom_tree, parser_error>
+    [[nodiscard]] std::tuple<dom_tree, parser_error>
     _parse_dom(const std::vector<_token>& tokens) noexcept
     {
         enum class _parser_context
@@ -340,8 +334,7 @@ namespace drako::file_formats::json
         }
     }
 
-    DRAKO_NODISCARD
-    std::tuple<dom_tree, parser_error>
+    [[nodiscard]] std::tuple<dom_tree, parser_error>
     parse_dom(std::u16string_view json, const parser_config& config) noexcept;
 
 
@@ -363,13 +356,12 @@ namespace drako::file_formats::json
             {
             }
         }
+        // TODO: end impl
+        return os;
     }
 
-    std::ostream& operator<<(std::ostream& os, const dom_tree& dom)
-    {
-        while (true)
-        {
-        }
-    }
+    std::ostream& operator<<(std::ostream& os, const dom_tree& dom);
+
+    */
 
 } // namespace drako::file_formats::json

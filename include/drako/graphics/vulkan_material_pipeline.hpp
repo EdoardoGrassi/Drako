@@ -183,14 +183,14 @@ namespace drako::vulkan
                 static_cast<vk::SpecializationInfo*>(nullptr) }
         };
 
-        const uint32_t SHADER_BINDING_NUMBER = 0;
-        const uint32_t BUFFER_BINDING_NUMBER = 0;
+        const std::uint32_t SHADER_BINDING_NUMBER = 0;
+        const std::uint32_t BUFFER_BINDING_NUMBER = 0;
 
         const vk::VertexInputBindingDescription vertex_bindings[] = {
             // vertex position [x,y,z]
             {
                 BUFFER_BINDING_NUMBER,       // binding
-                sizeof(::drako::vec3),       // stride
+                sizeof(drako::Vec3),       // stride
                 vk::VertexInputRate::eVertex // AoSformat
             }
         };
@@ -201,14 +201,14 @@ namespace drako::vulkan
                 SHADER_BINDING_NUMBER, // shader binding location number
                 BUFFER_BINDING_NUMBER, // buffer binding location number
                 vk::Format::eR32G32B32Sfloat,
-                sizeof(::drako::vec3) // stride
+                sizeof(drako::Vec3) // stride
             }
         };
 
         const vk::PipelineVertexInputStateCreateInfo vertex_input_state{
             vk::PipelineVertexInputStateCreateFlags{},
-            static_cast<uint32_t>(std::size(vertex_bindings)), vertex_bindings,
-            static_cast<uint32_t>(std::size(vertex_attributes)), vertex_attributes
+            static_cast<std::uint32_t>(std::size(vertex_bindings)), vertex_bindings,
+            static_cast<std::uint32_t>(std::size(vertex_attributes)), vertex_attributes
         };
 
         const vk::PipelineInputAssemblyStateCreateInfo input_assembly_state{

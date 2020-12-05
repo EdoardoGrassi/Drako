@@ -1,6 +1,6 @@
 #include "drako/io/core.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #if !defined(DRAKO_PLT_WIN32)
 #error This source file shouldn't be included.

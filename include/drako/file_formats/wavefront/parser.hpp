@@ -5,6 +5,7 @@
 #include "drako/file_formats/wavefront/object.hpp"
 
 #include <memory>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -37,13 +38,13 @@ namespace drako::file_formats::obj
             case _pec::duplicate_object_name: return "Multiple object names.";
             case _pec::invalid_arg_count: return "Invalid arguments count.";
             case _pec::invalid_arg_format: return "Invalid argument format.";
-            case _pec::index_out_of_range: return "Index out of valid range";
+            case _pec::index_out_of_range: return "Index out of valid range.";
             case _pec::tag_o_invalid_args_count: return "Tag 'o' requires one argument.";
             case _pec::tag_v_invalid_args_count: return "Tag 'v' requires 3 or 4 arguments.";
             case _pec::tag_vn_invalid_args_count: return "Tag 'vn' requires 3 arguments.";
             case _pec::tag_vt_invalid_args_count: return "Tag 'vt' requires 2 or 3 arguments.";
-            case _pec::tag_f_invalid_args_count: return "";
-            case _pec::tag_f_invalid_args_format: return "";
+            case _pec::tag_f_invalid_args_count: return "Tag 'f' requires 3 arguments.";
+            case _pec::tag_f_invalid_args_format: return "Invalid triplet format.";
             case _pec::unknown_tag: return "Unknown tag.";
             default: return "Unknown error code.";
         }
@@ -54,10 +55,10 @@ namespace drako::file_formats::obj
     {
     public:
         explicit parser_error(parser_error_code ec)
-            : std::runtime_error{ to_string(ec) }, _ec{ ec } {}
+            : std::runtime_error{ to_string(ec) } {}
 
-    private:
-        parser_error_code _ec;
+        explicit parser_error(const char* msg)
+            : std::runtime_error{ msg } {}
     };
 
     class parser_token_error : public parser_error
@@ -84,15 +85,15 @@ namespace drako::file_formats::obj
 
         /// @brief Expected number of objects.
         ///
-        size_t expected_object_count = 1;
+        std::size_t expected_object_count = 1;
 
         /// @brief Expected number of vertices.
         ///
-        size_t expected_vertex_count = 10'000;
+        std::size_t expected_vertex_count = 10'000;
 
         /// @brief Expected number of triangle.
         ///
-        size_t expected_triangle_count = 10'000;
+        std::size_t expected_triangle_count = 10'000;
 
         extension flags = extension::standard;
     };
@@ -140,8 +141,8 @@ namespace drako::file_formats::obj
     {
     public:
         explicit constexpr parser_error_report(
-            size_t row, size_t column, size_t offset, parser_error_code ec) noexcept
-            : _char_index{ offset }, _row{ row }, _col{ column }, _ec{ ec } {}
+            size_t row, size_t col, size_t offset, parser_error_code ec) noexcept
+            : _char_index{ offset }, _row{ row }, _col{ col }, _ec{ ec } {}
 
         /// @brief Index of the character in the buffer.
         ///
@@ -169,9 +170,9 @@ namespace drako::file_formats::obj
         message() const noexcept { return to_string(_ec); }
 
     private:
-        size_t            _char_index; // [ 0, size(source) )  , zero-based
-        size_t            _row;        // [ 1, #rows ]         , one-based
-        size_t            _col;        // [ 1, size(col) ]     , one-based
+        std::size_t       _char_index; // [ 0, size(source) )  , zero-based
+        std::size_t       _row;        // [ 1, #rows ]         , one-based
+        std::size_t       _col;        // [ 1, size(col) ]     , one-based
         parser_error_code _ec;
     };
 
@@ -194,7 +195,7 @@ namespace drako::file_formats::obj
 
 #if !defined(_drako_disable_exceptions) /*vvv implementation with exceptions vvv*/
 
-    [[nodiscard]] parser_result parse(const std::string_view source, const parser_config& config);
+    [[nodiscard]] parser_result parse(std::span<char> source, const parser_config& config);
 
 #else /*^^^ implementation with exceptions ^^^/vvv implementation with error codes vvv*/
 

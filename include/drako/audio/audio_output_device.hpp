@@ -3,8 +3,8 @@
 #define DRAKO_AUDIO_OUTPUT_DEVICE_HPP
 
 #include "drako/audio/native_audio_api.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 
 #include <memory>
 #include <system_error>

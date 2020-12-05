@@ -20,12 +20,12 @@ int main()
     std::copy(original.cbegin(), original.cend(), result.begin());
 
     {
-        drako::io::output_file_handle ofs{ fullpath };
+        drako::io::UniqueOutputFile ofs{ fullpath };
         ofs.write(original.data(), original.size());
     }
 
     {
-        drako::io::input_file_handle ifs{ fullpath };
+        drako::io::UniqueInputFile ifs{ fullpath };
         ifs.read(result.data(), result.size());
     }
 

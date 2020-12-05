@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 
 namespace drako
 {
@@ -24,17 +24,15 @@ namespace drako
 
     DRAKO_FORCE_INLINE void debug_assert(bool condition)
     {
-        if (DRAKO_LIKELY(condition)) {}
-        else
-            _raise_debug_break();
+        if (!condition)
+            [[unlikely]] _raise_debug_break();
     }
 
     DRAKO_FORCE_INLINE void debug_assert(bool condition, const char* error_message_ptr)
     {
-        if (DRAKO_LIKELY(condition)) {}
-        else
+        if (!condition)
         {
-            std::cerr << error_message_ptr << std::endl;
+            [[unlikely]] std::cerr << error_message_ptr << std::endl;
             _raise_debug_break();
         }
     }

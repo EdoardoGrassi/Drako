@@ -19,10 +19,10 @@ int main()
         if (const auto [ec, info] = device.query_device_info(); ec)
         {
             std::cout << "Vendor ID:     " << info.vendor_id() << '\n'
-                      << "Product ID:    " << info.product_id() << '\n'
-                      << "Manufacturer:  " << info.manufacturer_string().data() << '\n'
-                      << "Product:       " << info.product_string().data() << '\n'
-                      << "Serial number: " << info.serial_number_string().data() << '\n';
+                      << "Product ID:    " << info.product_id() << '\n';
+                      //<< "Manufacturer:  " << info.manufacturer_string(). << '\n'
+                      //<< "Product:       " << info.product_string() << '\n'
+                      //<< "Serial number: " << info.serial_number_string() << '\n';
         }
         else
         {

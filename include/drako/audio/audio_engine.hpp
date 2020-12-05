@@ -3,7 +3,7 @@
 #define DRAKO_AUDIO_ENGINE_HPP
 
 #include "drako/audio/audio_types.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/core/typed_handle.hpp"
 
 #if defined(DRAKO_PLT_WIN32)

@@ -26,10 +26,10 @@ namespace drako
     };
 
     // lenght of a UUID in byte array form
-    const size_t UUID_BYTE_SIZE = sizeof(uuid);
+    const size_t UUID_BYTE_SIZE = sizeof(Uuid);
 
     // lenght of a UUID in ASCII string form
-    const size_t UUID_STRING_SIZE = sizeof(uuid) * 2 + sizeof('-') * 4;
+    const size_t UUID_STRING_SIZE = sizeof(Uuid) * 2 + sizeof('-') * 4;
 
     const size_t UUID_HYPEN_1_OFFSET = 8;
     const size_t UUID_HYPEN_2_OFFSET = 8 + 1 + 4;
@@ -46,13 +46,13 @@ namespace drako
     const size_t UUID_NODE_FIELD_OFFSET = UUID_TIME_FIELD_SIZE + UUID_CLOCK_FIELD_SIZE;
 
     // build an UUID from the different parts.
-    [[nodiscard]] inline uuid _assemble(
+    [[nodiscard]] inline Uuid _assemble(
         _version v, uint64_t timestamp, uint16_t clock, std::array<std::byte, 6> node) noexcept
     {
         const auto version_mask = static_cast<std::byte>(v);
         const auto variant_mask = static_cast<std::byte>(_variant::rfc4122);
 
-        std::array<std::byte, sizeof(uuid)> bytes;
+        std::array<std::byte, sizeof(Uuid)> bytes{};
         // time_low
         bytes[0] = static_cast<std::byte>((timestamp >> 3 * 8) & 0xff);
         bytes[1] = static_cast<std::byte>((timestamp >> 2 * 8) & 0xff);
@@ -74,7 +74,7 @@ namespace drako
         for (size_t i = 0; i < std::size(node); ++i)
             bytes[10 + i] = node[i];
 
-        return uuid{ bytes };
+        return Uuid{ bytes };
     }
 
 } // namespace drako

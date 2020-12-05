@@ -1,10 +1,13 @@
 #include "drako/system/keyboard_device.hpp"
 
+#include "drako/core/platform.hpp"
+
+#include <Windows.h>
+// vvv/^^^ preserve inclusion order
+#include <WinUser.h>
+
 #include <chrono>
 #include <vector>
-
-#include <minwindef.h>
-#include <WinUser.h>
 
 #if !defined(DRAKO_PLT_WIN32)
 #error This source file should be included only on Windows builds
@@ -12,37 +15,40 @@
 
 namespace drako::sys
 {
-    keyboard_scan_code map(keyboard_virt_code virt_code) noexcept
+    ScanCode map(const VirtCode vc) noexcept
     {
-        auto scan_code = ::MapVirtualKeyW(static_cast<UINT>(virt_code), MAPVK_VK_TO_VSC);
-        return (scan_code != 0) ? static_cast<keyboard_scan_code>(scan_code)
-                                : keyboard_scan_code::undefined;
+        // returns zero if there is no translation available
+        const auto sc = ::MapVirtualKeyW(static_cast<UINT>(vc), MAPVK_VK_TO_VSC_EX);
+        return (sc != 0) ? static_cast<ScanCode>(sc) : ScanCode::undefined;
     }
 
-    keyboard_virt_code map(keyboard_scan_code scan_code) noexcept
+    VirtCode map(const ScanCode sc) noexcept
     {
-        auto virt_code = ::MapVirtualKeyW(static_cast<UINT>(scan_code), MAPVK_VSC_TO_VK_EX);
-        return (virt_code != 0) ? static_cast<keyboard_virt_code>(virt_code)
-                                : keyboard_virt_code::undefined;
+        // returns zero if there is no translation available
+        const auto vc = ::MapVirtualKeyW(static_cast<UINT>(sc), MAPVK_VSC_TO_VK_EX);
+        return (vc != 0) ? static_cast<VirtCode>(vc) : VirtCode::undefined;
     }
 
-    // TODO: end impl
-    std::vector<keyboard_event> keyboard_device::poll_events() noexcept
+    std::vector<Keyboard::Event> Keyboard::poll_events() noexcept
     {
-        std::vector<keyboard_event> events;
+        std::vector<Event> events;
 
         for (MSG msg; ::PeekMessageW(&msg, NULL,
                  WM_KEYFIRST, WM_KEYLAST, PM_REMOVE | PM_QS_INPUT);) // deque keyboard related messages
         {
-            const std::chrono::milliseconds timestamp{ msg.time };
-
+            Event e{};
+            e.timestamp = std::chrono::milliseconds{ msg.time };
+            e.virt_code = static_cast<VirtCode>(msg.wParam);
             switch (msg.message)
             {
                 case WM_KEYDOWN:
-                case WM_KEYUP:
                 case WM_SYSKEYDOWN:
+                    e.action = Event::Action::key_press;
+                    break;
 
+                case WM_KEYUP:
                 case WM_SYSKEYUP:
+                    e.action = Event::Action::key_release;
                     break;
 
                 default:
@@ -50,7 +56,7 @@ namespace drako::sys
                     continue;
             }
             ::TranslateMessage(&msg);
-            events.emplace_back();
+            events.emplace_back(e);
         }
         return events;
     }

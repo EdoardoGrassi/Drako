@@ -10,3 +10,6 @@ target_link_libraries(drako-obj-viewer PRIVATE drako::obj drako::io)
 set_target_properties(drako-obj-viewer
     PROPERTIES RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone")
 # install(TARGETS drako-obj-viewer DESTINATION "")
+
+add_executable(drako-obj-test-1 "test/obj_test_1.cpp")
+target_link_libraries(drako-obj-test-1 PRIVATE drako::obj)

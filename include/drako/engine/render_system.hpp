@@ -5,13 +5,10 @@
 #include "drako/core/typed_handle.hpp"
 #include "drako/graphics/material_types.hpp"
 #include "drako/graphics/mesh_types.hpp"
-#include "drako/graphics/vulkan_forward_renderer.hpp"
-#include "drako/graphics/vulkan_memory_allocator.hpp"
-#include "drako/graphics/vulkan_mesh_types.hpp"
+#include "drako/graphics/texture_types.hpp"
+#include "drako/graphics/vulkan_render_engine.hpp"
 #include "drako/graphics/vulkan_runtime_context.hpp"
-#include "drako/graphics/vulkan_staging_engine.hpp"
-#include "drako/graphics/vulkan_texture_types.hpp"
-#include "drako/graphics/vulkan_wireframe_pipeline.hpp"
+#include "drako/math/mat4x4.hpp"
 
 #include <vector>
 
@@ -27,8 +24,7 @@ namespace drako
 
     struct mesh_create_info
     {
-        mesh_id id;
-        mesh    data;
+        mesh data;
     };
 
     struct shader_create_info
@@ -44,14 +40,8 @@ namespace drako
 
 
 
-    class render_system
+    class RenderSystem
     {
-        using _pipeline = vulkan::graphics_pipeline;
-        using _mesh     = vulkan::mesh;
-        using _texture  = vulkan::texture_view;
-        using _mtl_data = vulkan::material_instance;
-        using _shader   = vulkan::shader;
-
     public:
         // contains data for the rendering of a single frame
         struct frame_render_soa
@@ -60,11 +50,11 @@ namespace drako
             std::vector<mat4x4>    mvps;
         };
 
-        explicit render_system(const vulkan::context& ctx) noexcept;
+        explicit RenderSystem(const vulkan::context& ctx) noexcept;
 
         //void create(pipeline_id, const vulkan::graphics_pipeline&) noexcept;
         void create(mesh_id, const mesh_create_info&) noexcept;
-        void create(texture_id, const texture_view&) noexcept;
+        //void create(texture_id, const texture_view&) noexcept;
         void create(material_id, const material_template&) noexcept;
         void create(shader_id, const shader_create_info&) noexcept;
         void create(render_id, const renderable_create_info&) noexcept;
@@ -75,36 +65,26 @@ namespace drako
         void update(const frame_render_soa&) noexcept;
 
     private:
-        template <typename THandle, typename TInfo>
+        template <typename TID, typename TInfo>
         struct _basic_cmd
         {
-            TInfo   info;
-            THandle id;
+            TInfo info;
+            TID   id;
 
-            explicit _basic_cmd(THandle _handle, const TInfo& _info) noexcept
-                : info{ _info }, handle{ _handle } {}
+            explicit _basic_cmd(TID _id, const TInfo& _info) noexcept
+                : info{ _info }, id{ _id } {}
         };
 
         using _mesh_create_cmd       = _basic_cmd<mesh_id, mesh_create_info>;
         using _shader_create_cmd     = _basic_cmd<shader_id, shader_create_info>;
         using _renderable_create_cmd = _basic_cmd<render_id, renderable_create_info>;
 
-
-        const vk::Device               _device;
-        vulkan::device_local_allocator _device_side_allocator;
-        vulkan::global_allocator       _host_side_allocator;
-        vulkan::staging_engine         _staging;
-
-        vulkan::fixed_device_ubo _vertex_buffer;
-        vulkan::fixed_device_ubo _index_buffer;
-        vulkan::fixed_host_ubo   _transforms_buffer;
-
         /* currently available resources */
 
         struct _avail_mesh_soa
         {
-            std::vector<handle<mesh>> id;
-            std::vector<vulkan::mesh> meshes;
+            std::vector<mesh_id> id;
+            std::vector<mesh>    meshes;
         } meshes;
 
         /* resources scheduled for construction */
@@ -125,14 +105,14 @@ namespace drako
 
         struct _renderable_table
         {
-            std::vector<render_id>         ids;
-            std::vector<mesh_id>           meshes;
-            std::vector<handle<_mtl_data>> materials;
-            std::vector<handle<_pipeline>> pipelines;
+            std::vector<render_id>   ids;
+            std::vector<mesh_id>     meshes;
+            std::vector<material_id> materials;
+            std::vector<pipeline_id> pipelines;
         };
         _renderable_table _entities;
 
-        vulkan::forward_renderer _renderer;
+        vulkan::RenderEngine _renderer;
 
         void _update_meshes() noexcept;
 

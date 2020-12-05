@@ -1,4 +1,4 @@
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/file_formats/wavefront/parser.hpp"
 #include "drako/io/input_file_handle.hpp"
 
@@ -58,12 +58,12 @@ int main(const int argc, const char* argv[])
         try
         {
             const std::filesystem::path  path{ argv[i] };
-            drako::io::input_file_handle src{ path };
+            drako::io::UniqueInputFile src{ path };
 
             const auto file_size = static_cast<size_t>(std::filesystem::file_size(path));
 
             auto buffer = std::make_unique<char[]>(file_size);
-            drako::io::read_from_bytes(buffer.get(), file_size, src);
+            src.read(reinterpret_cast<std::byte*>(buffer.get()), file_size);
 
             std::cout << "Parsing " << path << " ...\n";
             const auto result = parse({ buffer.get(), file_size }, config);

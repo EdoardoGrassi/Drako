@@ -10,7 +10,7 @@
 #include <atomic>
 #include <optional>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/concurrency/lockfree_pool_allocator.hpp"
 
 namespace drako::concurrency::lockfree

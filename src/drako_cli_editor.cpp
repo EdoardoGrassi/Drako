@@ -1,4 +1,4 @@
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/devel/build_utils.hpp"
 #include "drako/devel/mesh_importers.hpp"
 #include "drako/devel/project_utils.hpp"
@@ -91,14 +91,14 @@ void cli_open_project(const std::filesystem::path& dir)
 {
     using namespace drako::editor;
 
-    project proj{ dir };
+    Project proj{ dir };
     try
     {
         const auto proj_info = load_project_info(dir);
         std::cout << "Name: " << proj_info.name << '\n';
 
         load_project(proj);
-        std::cout << "Located assets count: " << std::size(proj.assets.guids) << '\n';
+        std::cout << "Located assets count: " << std::size(proj.assets.ids) << '\n';
     }
     catch (const std::exception& e)
     {
@@ -134,9 +134,11 @@ int main(const int argc, const char* argv[])
 {
     using _cmd_fun = std::function<void(_cmd_params)>;
 
+    /*
     const std::unordered_map<std::string_view, drako::editor::asset_import_function> importers{
-        { ".obj", drako::editor::import_obj_asset }
+        { ".obj", drako::editor::import_obj_file }
     };
+    */
 
     const std::unordered_map<std::string_view, _cmd_fun> commands = {
         { "create", cli_create_project }

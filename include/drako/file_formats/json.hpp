@@ -1,10 +1,8 @@
 #pragma once
-#ifndef DRAKO_FILE_FORMATS_JSON_HPP_
-#define DRAKO_FILE_FORMATS_JSON_HPP_
+#ifndef DRAKO_JSON_HPP
+#define DRAKO_JSON_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
-
+#include <cassert>
 #include <string_view>
 #include <tuple>
 
@@ -22,6 +20,8 @@ namespace drako::file_formats::json
         string,
         number
     };
+
+    class dom_tree_node;
 
     struct value_array
     {
@@ -62,42 +62,34 @@ namespace drako::file_formats::json
         {
         }
 
-        DRAKO_NODISCARD
-        dom_tree_node operator[](size_t index) const noexcept
+        [[nodiscard]] dom_tree_node operator[](size_t index) const noexcept
         {
-            DRAKO_ASSERT(_payload_type == value_type::array,
-                "This isn't a JSON array");
+            assert(_payload_type == value_type::array); // "This is not a JSON array");
             return _payload_array.values[index];
         }
 
-        DRAKO_NODISCARD
-        dom_tree_node operator[](std::string_view name) const noexcept
+        [[nodiscard]] dom_tree_node operator[](std::string_view name) const noexcept
         {
-            DRAKO_ASSERT(_payload_type == value_type::object,
-                "This isn't a JSON object");
+            assert(_payload_type == value_type::object); // "This is not a JSON object");
+            //return _payload_object;
         }
 
-        DRAKO_NODISCARD
-        bool is_array() const noexcept
+        [[nodiscard]] bool is_array() const noexcept
         {
             return _payload_type == value_type::array;
         }
 
-        DRAKO_NODISCARD
-        bool is_object() const noexcept
+        [[nodiscard]] bool is_object() const noexcept
         {
             return _payload_type == value_type::object;
         }
 
 
-        DRAKO_NODISCARD
-        int to_int() noexcept;
+        [[nodiscard]] int to_int() noexcept;
 
-        DRAKO_NODISCARD
-        float to_float() noexcept;
+        [[nodiscard]] float to_float() noexcept;
 
-        DRAKO_NODISCARD
-        std::tuple<bool, double> to_double() noexcept
+        [[nodiscard]] std::tuple<bool, double> to_double() noexcept
         {
             if (_payload_type == value_type::invalid)
                 return { false, 0 };
@@ -105,7 +97,7 @@ namespace drako::file_formats::json
             if (_payload_type != value_type::number)
                 return { false, 0 };
 
-            return { true, static_cast<double>(_payload_number.value) };
+            return { true, static_cast<double>(_payload_number.value_floating) };
         }
 
         friend std::ostream& operator<<(std::ostream&, const dom_tree_node&);
@@ -142,15 +134,13 @@ namespace drako::file_formats::json
     {
     };
 
-    DRAKO_NODISCARD
-    std::tuple<dom_tree, parser_error>
+    [[nodiscard]] std::tuple<dom_tree, parser_error>
     parse_dom(std::string_view json, const parser_config& config) noexcept;
 
-    DRAKO_NODISCARD
-    std::tuple<dom_tree, parser_error>
+    [[nodiscard]] std::tuple<dom_tree, parser_error>
     parse_dom(std::u16string_view json, const parser_config& config) noexcept;
 
 
 } // namespace drako::file_formats::json
 
-#endif // !DRAKO_FILE_FORMATS_JSON_HPP_
+#endif // !DRAKO_JSON_HPP

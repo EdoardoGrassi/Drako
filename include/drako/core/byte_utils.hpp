@@ -17,7 +17,7 @@ namespace drako
     [[nodiscard]] inline constexpr Int from_le_bytes(
         const std::array<std::byte, sizeof(Int)>& bytes) noexcept /* clang-format on */
     {
-        static_assert(alignof(Int) == alignof(decltype(bytes)));
+        //static_assert(alignof(Int) == alignof(decltype(bytes)));
         return std::bit_cast<Int>(bytes);
     }
 
@@ -39,7 +39,7 @@ namespace drako
     [[nodiscard]] inline constexpr Int from_be_bytes(
         const std::array<std::byte, sizeof(Int)>& bytes) noexcept /* clang-format on */
     {
-        static_assert(alignof(Int) == alignof(decltype(bytes)));
+        //static_assert(alignof(Int) == alignof(decltype(bytes)));
         return byte_swap(std::bit_cast<Int>(bytes));
     }
 

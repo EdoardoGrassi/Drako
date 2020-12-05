@@ -2,7 +2,7 @@
 #ifndef DRAKO_INPUT_FILE_HANDLE_HPP
 #define DRAKO_INPUT_FILE_HANDLE_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/io/core.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -17,37 +17,37 @@
 namespace drako::io
 {
     /// @brief Smart handle that manages an input file.
-    class input_file_handle
+    class UniqueInputFile
     {
     public:
         using path_type = std::filesystem::path;
 
-        explicit constexpr input_file_handle() noexcept;
+        explicit constexpr UniqueInputFile() noexcept;
 
-        explicit constexpr input_file_handle(native_handle_type handle) noexcept
+        explicit constexpr UniqueInputFile(native_handle_type handle) noexcept
             : _handle{ handle } {}
 
-        explicit input_file_handle(const path_type& filename)
+        explicit UniqueInputFile(const path_type& filename)
             : _handle{ io::open(filename, mode::read, creation::open_existing) } {}
 
 
-        input_file_handle(const input_file_handle&) = delete;
-        input_file_handle& operator=(const input_file_handle&) = delete;
+        UniqueInputFile(const UniqueInputFile&) = delete;
+        UniqueInputFile& operator=(const UniqueInputFile&) = delete;
 
 
-        input_file_handle(input_file_handle&& other) noexcept
+        UniqueInputFile(UniqueInputFile&& other) noexcept
         {
             using std::swap;
             swap(_handle, other._handle);
         }
-        input_file_handle& operator=(input_file_handle&& other) noexcept
+        UniqueInputFile& operator=(UniqueInputFile&& other) noexcept
         {
             using std::swap;
             swap(_handle, other._handle);
             return *this;
         }
 
-        ~input_file_handle() noexcept
+        ~UniqueInputFile()
         {
             if (_handle != INVALID_HANDLE_VALUE)
                 io::close(_handle);
@@ -88,17 +88,14 @@ namespace drako::io
         native_handle_type _handle = INVALID_HANDLE_VALUE;
     };
 
-    using InputFileHandle = input_file_handle;
-
-
     inline void read(
-        input_file_handle input, std::span<std::byte> buffer)
+        UniqueInputFile input, std::span<std::byte> buffer)
     {
         input.read(std::data(buffer), std::size(buffer));
     }
 
     inline void read(
-        input_file_handle input, std::span<std::byte> buffer, std::error_code& ec) noexcept
+        UniqueInputFile input, std::span<std::byte> buffer, std::error_code& ec) noexcept
     {
         input.read(std::data(buffer), std::size(buffer), ec);
     }
@@ -111,8 +108,7 @@ namespace drako::io
     /// @param storage Memory destination.
     template <typename T> /* clang-format off */
     requires std::is_trivially_copyable_v<T>
-    inline void read_from_bytes(
-        input_file_handle& input, T& storage) /* clang-format on */
+    inline void read_from_bytes(UniqueInputFile& input, T& storage) /* clang-format on */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");
@@ -125,8 +121,7 @@ namespace drako::io
 
     template <typename T, size_t Size> /* clang-format off */
     requires std::is_trivially_copyable_v<T> && std::is_bounded_array_v<T>
-    inline void read_from_bytes(
-        input_file_handle& input, T (&storage)[Size]) /* clang-format off */
+    inline void read_from_bytes(UniqueInputFile& input, T (&storage)[Size]) /* clang-format off */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");
@@ -138,8 +133,7 @@ namespace drako::io
 
     template <typename T> /* clang-format off */
     requires std::is_trivially_copyable_v<T> //&& std::is_unbounded_array_v<T>
-    inline void read_from_bytes(
-        input_file_handle& input, T storage[], std::size_t size) /* clang-format off */
+    inline void read_from_bytes(UniqueInputFile& input, T storage[], std::size_t size) /* clang-format off */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");

@@ -5,8 +5,8 @@
 #include <cstdlib>
 
 #include "drako/concurrency/thread_context.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/system/system_info.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -19,8 +19,8 @@ namespace drako::sys
     class native_thread final
     {
     public:
-        using id_type       = size_t;
-        using priority_type = size_t;
+        using id_type       = std::size_t;
+        using priority_type = std::size_t;
         using routine_type  = unsigned long(DRAKO_API_STDCALL)(void* args);
 
 
@@ -85,13 +85,13 @@ namespace drako::sys
 
         void run(const thread_context&) noexcept;
 
-        DRAKO_NODISCARD priority_type get_priority() const noexcept;
+        [[nodiscard]] priority_type priority() const noexcept;
 
         void set_priority(const priority_type p) noexcept;
 
-        DRAKO_NODISCARD native_cpu_core get_core_affinity() noexcept;
+        [[nodiscard]] native_cpu_core core_affinity() noexcept;
 
-        bool set_core_affinity(native_cpu_core core) noexcept
+        [[nodiscard]] bool core_affinity(native_cpu_core core) noexcept
         {
 #if defined(DRAKO_PLT_WIN32)
 

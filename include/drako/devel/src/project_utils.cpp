@@ -16,9 +16,13 @@ namespace _fs = std::filesystem;
 namespace drako::editor
 {
 
-    fs::path _external_asset_to_metafile(const _fs::path& source);
+    [[nodiscard]] fs::path _external_asset_to_metafile(const _fs::path& source);
 
-    fs::path _guid_to_metafile(const uuid& guid) noexcept;
+    // currently is just the uuid in string form with ".dkmeta" as extension
+    [[nodiscard]] fs::path _guid_to_metafile(const Uuid& guid) noexcept
+    {
+        return to_string(guid) + ".dkmeta";
+    }
 
     void _create_project_info_file(const fs::path& where)
     {
@@ -70,7 +74,7 @@ namespace drako::editor
     }
 
     /*
-    void load_asset_index_cache(const project& p)
+    void load_asset_index_cache(const Project& p)
     {
         std::ifstream f{ p.cache_directory() / "asset_index" };
         f.exceptions(std::ios_base::failbit | std::ios_base::badbit);
@@ -83,32 +87,32 @@ namespace drako::editor
     }
     */
 
-    void make_project_tree(const fs::path& root)
+    void make_project_tree(std::string_view name, const fs::path& root)
     {
+        assert(!std::empty(name));
         assert(fs::is_directory(root));
 
-        if (fs::exists(root))
-            throw std::runtime_error{ "Directory already exists." };
-
+        const auto dir = root / name;
         try
         {
-            fs::create_directories(root);
-            fs::create_directory(root / project_asset_dir);
-            fs::create_directory(root / project_cache_dir);
-            fs::create_directory(root / project_meta_dir);
+            fs::create_directory(dir);
+            fs::create_directory(dir / project_asset_dir);
+            fs::create_directory(dir / project_cache_dir);
+            fs::create_directory(dir / project_meta_dir);
 
             project_info  info{};
-            std::ofstream ofs{ root / project_config_file };
+            std::ofstream ofs{ dir / project_config_file };
         }
         catch (const fs::filesystem_error&)
         {
-            fs::remove_all(root);
+            fs::remove_all(dir);
             throw;
         }
     }
 
     void import_external_asset(const project_info& p, const fs::path& src)
     {
+        /*
         if (!fs::exists(src) || !fs::is_regular_file(src))
             throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
 
@@ -124,10 +128,11 @@ namespace drako::editor
         }
         catch (...)
         {
-        }
+        }*/
+        throw std::runtime_error{ "Not implemented." };
     }
 
-    void create_imported_asset(const project& p,
+    void create_imported_asset(const Project& p,
         const std::vector<fs::path>&          inputs,
         const std::vector<fs::path>&          outputs)
     {
@@ -135,16 +140,16 @@ namespace drako::editor
         assert(!std::empty(outputs));
 
 
-        const auto guid = uuid_v1_engine{}();
+        const auto guid = p.generate_asset_uuid();
 
         // TODO: end impl
     }
 
 
-    void create_asset(const project& p, const fs::path& asset)
+    void create_asset(const Project& p, const fs::path& asset)
     {
         assert(fs::is_regular_file(asset));
-        const auto guid           = uuid_v1_engine{}();
+        const auto guid           = p.generate_asset_uuid();
         const auto meta_file_path = p.meta_directory() / to_string(guid);
 
         try
@@ -165,15 +170,15 @@ namespace drako::editor
     }
 
 
-    [[nodiscard]] project create_project_tree(const fs::path& where)
+    [[nodiscard]] Project create_project_tree(const fs::path& where)
     {
         if (!fs::is_directory(where))
             throw std::invalid_argument{ DRAKO_STRINGIZE(where) };
 
-        return project{ where };
+        return Project{ where };
     }
 
-    void load_project(project& p)
+    void load_project(Project& p)
     {
         // scan the whole meta folder for metafiles
         for (const auto& f : _fs::directory_iterator{ p.meta_directory() })
@@ -188,7 +193,7 @@ namespace drako::editor
                     asset_file.replace_extension(); // remove .dkmeta
                     const auto size = static_cast<std::size_t>(_fs::file_size(asset_file));
 
-                    p.assets.guids.push_back(info.uuid);
+                    p.assets.ids.push_back(info.id);
                     p.assets.names.push_back(info.name);
                     p.assets.sizes.push_back(size);
                     p.assets.paths.push_back(asset_file);
@@ -205,12 +210,12 @@ namespace drako::editor
         std::cout << "Project loaded!\n";
     }
 
-    void save_project(const project& p)
+    void save_project(const Project& p)
     {
         throw std::runtime_error{ "Not implemented yet!" };
     }
 
-    [[nodiscard]] fs::path guid_to_path(const project& p, const uuid& asset)
+    [[nodiscard]] fs::path guid_to_path(const Project& p, const Uuid& asset)
     {
         return p.cache_directory() / to_string(asset);
     }

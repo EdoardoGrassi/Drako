@@ -2,7 +2,7 @@
 #ifndef DRAKO_AIO_FILE_HANDLE_HPP
 #define DRAKO_AIO_FILE_HANDLE_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Windows.h>

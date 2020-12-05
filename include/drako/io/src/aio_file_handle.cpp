@@ -1,7 +1,7 @@
 #pragma once
 #include "drako/io/aio_file_handle.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/io/aio_api_defs.hpp"
 

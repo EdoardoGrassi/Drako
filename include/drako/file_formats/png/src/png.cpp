@@ -61,9 +61,14 @@ namespace drako::formats::png
 
         std::vector<rgb> palette;
         palette.reserve(begin.length);
-        for (auto i = 0; i < begin.length; i += 3)
+        for (std::size_t i = 0; i < begin.length; i += 3)
         {
-            palette.emplace_back(data[i], data[i + 1], data[i + 2]);
+            rgb rgb{
+                .r = std::to_integer<std::uint8_t>(data[i]),
+                .g = std::to_integer<std::uint8_t>(data[i + 1]),
+                .b = std::to_integer<std::uint8_t>(data[i + 2])
+            };
+            palette.emplace_back(rgb);
         }
     }
 

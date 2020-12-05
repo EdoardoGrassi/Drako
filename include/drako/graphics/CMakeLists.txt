@@ -36,7 +36,7 @@ if(NOT Vulkan_FOUND)
 endif()
 
 
-add_library(vulkan-forward-renderer STATIC "src/vulkan_forward_renderer.cpp" "src/vulkan_memory_allocator.cpp")
+add_library(vulkan-forward-renderer STATIC "src/vulkan_forward_renderer.cpp" "src/vulkan_memory_allocator.cpp" "vulkan_render_engine.hpp")
 add_library(drako::vulkan-forward-renderer ALIAS vulkan-forward-renderer)
 
 # set_property(TARGET vulkan_forward_renderer PROPERTY CXX_STANDARD 17)

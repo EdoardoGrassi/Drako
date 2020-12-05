@@ -4,20 +4,22 @@
 /// @author Edoardo Grassi
 
 #pragma once
-#ifndef DRAKO_LOCKFREE_RINGBUFFER
-#define DRAKO_LOCKFREE_RINGBUFFER
+#ifndef DRAKO_LOCKFREE_RINGBUFFER_HPP
+#define DRAKO_LOCKFREE_RINGBUFFER_HPP
 
 #include <atomic>
 #include <cassert>
 #include <iterator>
 #include <memory> // std::allocator_traits
 #include <new>
+#include <optional>
 
 namespace drako::lockfree
 {
-    template <typename T, typename Al = std::allocator<T>> // clang-format off
-    requires std::atomic<std::size_t>::is_always_lock_free
-    class ringbuffer final // clang-format on
+    /// @brief Single producer, single consumer thread-safe FIFO container.
+    ///
+    template <typename T, typename Al = std::allocator<T>>
+    requires std::atomic<std::size_t>::is_always_lock_free class SRSWQueue
     {
         static_assert(std::atomic<std::size_t>::is_always_lock_free,
             "Required for lock-free property");
@@ -25,11 +27,15 @@ namespace drako::lockfree
         using _al_traits = std::allocator_traits<Al>;
 
     public:
+        using value_type     = T;
         using size_type      = std::size_t;
         using allocator_type = Al;
 
+        constexpr SRSWQueue() noexcept(noexcept(Al()))
+            : _alloc(), _size{ 0 }, _data{ nullptr }, _reader{ 0 }, _writer{ 0 } {}
+
         /// @brief Constructs a queue with specified capacity.
-        explicit ringbuffer(size_type size, const Al& alloc = Al())
+        explicit SRSWQueue(size_type size, const Al& alloc = Al())
             : _alloc{ alloc }
             , _size{ size }
             , _data{ _al_traits::allocate(_alloc, _size) }
@@ -44,7 +50,7 @@ namespace drako::lockfree
 
         /*
         template <input_iterator Iter> // clang-format off
-        explicit ringbuffer(Iter first, Iter last, const Al& alloc = Al()) // clang-format on
+        explicit SRSWQueue(Iter first, Iter last, const Al& alloc = Al()) // clang-format on
             : _alloc{ alloc }
             , _size{ std::distance(first, last) }
             , _data{ _al_traits::allocate(_alloc, _size) }
@@ -62,7 +68,7 @@ namespace drako::lockfree
         }
         */
 
-        ~ringbuffer() noexcept
+        ~SRSWQueue() noexcept
         {
             assert(_data != nullptr);
             for (auto i = _reader.load(); i != _writer.load(); i = _next_index(i))
@@ -70,11 +76,11 @@ namespace drako::lockfree
             _al_traits::deallocate(_alloc, _data, _size);
         }
 
-        ringbuffer(const ringbuffer&) = delete;
-        ringbuffer& operator=(const ringbuffer&) = delete;
+        SRSWQueue(const SRSWQueue&) = delete;
+        SRSWQueue& operator=(const SRSWQueue&) = delete;
 
-        ringbuffer(ringbuffer&&) = delete;
-        ringbuffer& operator=(ringbuffer&&) = delete;
+        SRSWQueue(SRSWQueue&&) = delete;
+        SRSWQueue& operator=(SRSWQueue&&) = delete;
 
 
         /// @brief Inserts an element in the queue.
@@ -115,8 +121,9 @@ namespace drako::lockfree
             return false;
         }
 
-        template <typename... Args>
-        bool emplace(Args&&... args) noexcept requires std::is_constructible_v<T, Args...>
+        template <typename... Args> // clang-format off
+        requires std::is_constructible_v<T, Args...>
+        bool emplace(Args&&... args) noexcept // clang-format on
         {
             const auto writer = _writer.load();
             const auto reader = _reader.load();
@@ -131,22 +138,24 @@ namespace drako::lockfree
 
         /// @brief Removes an element from the queue.
         ///
-        /// @param[out] value Destination of the removed element.
+        /// @return Value from the queue, or nothing.
         ///
         /// @note Thread-safe and wait-free.
         ///
-        [[nodiscard]] bool pop(T& value) noexcept requires std::is_move_assignable_v<T>
+        [[nodiscard]] std::optional<T> pop() noexcept
+            requires std::is_move_assignable_v<T> ||
+            std::is_copy_assignable_v<T>
         {
             const auto writer = _writer.load();
             const auto reader = _reader.load();
             if (reader != writer)
             {
-                value = std::move(_data[reader]);
+                const auto value = std::make_optional(std::move(_data[reader]));
                 _al_traits::destroy(_alloc, _data + reader);
                 _reader.store(_next_index(reader));
-                return true;
+                return value;
             }
-            return false;
+            return {};
         }
 
         /// @brief Checks whether the queue is empty.
@@ -179,11 +188,15 @@ namespace drako::lockfree
         }
 
     private:
-        Al                     _alloc;
-        const size_type        _size;
-        T*                     _data;
-        std::atomic<size_type> _reader; // index of the most recently read item
-        std::atomic<size_type> _writer; // index of the most recently written item
+        Al              _alloc;
+        const size_type _size;
+        T*              _data;
+
+        alignas(std::hardware_destructive_interference_size)
+            std::atomic<size_type> _reader; // index of the most recently read item
+
+        alignas(std::hardware_destructive_interference_size)
+            std::atomic<size_type> _writer; // index of the most recently written item
 
         [[nodiscard]] constexpr size_type _next_index(size_type idx) noexcept
         {
@@ -191,10 +204,9 @@ namespace drako::lockfree
         }
     };
 
-
     template <typename T, typename Al = std::allocator<T>>
-    using RingBuffer = ringbuffer<T, Al>;
+    using RingBuffer = SRSWQueue<T, Al>;
 
 } // namespace drako::lockfree
 
-#endif // !DRAKO_LOCKFREE_RINGBUFFER
+#endif // !DRAKO_LOCKFREE_RINGBUFFER_HPP

@@ -2,71 +2,63 @@
 #ifndef DRAKO_JOBS_API_HPP
 #define DRAKO_JOBS_API_HPP
 
-#include <any>
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <thread>
 
-#define DRAKO_JOB [[drako::job_declaration]]
-
-namespace drako
+namespace drako::jobs
 {
-    // CONSTANT
-    // Byte size of a L1 cache page.
-    static constexpr const auto L1_PAGE_SIZE = std::hardware_constructive_interference_size;
-
-    struct job_args final
+    struct JobArgs final
     {
         void* packed_args;
     };
 
     // Signature of a function that can be schedule for execution in the job_unit system.
-    using job_routine   = void(*)(const job_args);
-    using job_priority  = uint32_t;
-    using job_handle    = uintptr_t;
+    using JobRoutine  = void (*)(const JobArgs);
+    using JobPriority = uint32_t;
+    using JobHandle   = uintptr_t;
 
 
-    // STRUCTURE
-    // Standalone unit of work that can be scheduled for execution.
-    class alignas(L1_PAGE_SIZE) job_unit final
+    /// @brief Standalone unit of work that can be scheduled.
+    using Job = std::function<void()>;
+
+    /*
+    class alignas(std::hardware_destructive_interference_size) Job
     {
     public:
-
-        template <typename ...Args, void(JobFunction)(Args...)>
-        explicit constexpr job_unit(Args... args) noexcept
+        template <typename... Args, void(JobFunction)(Args...)>
+        explicit constexpr Job(Args... args) noexcept
         {
-            static_assert(sizeof(Args...) <= sizeof(_args), "Not enough space to embed arguments");
+            static_assert(sizeof(Args...) <= sizeof(_args) "Not enough space to embed arguments locally.");
 
             _args = std::make_tuple(args);
-            _call = &job_call_wrapper<Args..., JobFunction>;
-        }
-
-        constexpr bool is_runnable() const noexcept
-        {
-            return true;
+            _call = &_wrap<Args..., JobFunction>;
         }
 
     private:
+        std::byte  _args[std::hardware_constructive_interference_size - (sizeof(JobRoutine) + sizeof(JobChain*))];
+        JobChain*  _dependencies;
+        JobRoutine _call;
 
-        uint8_t         _args[L1_PAGE_SIZE - (sizeof(job_routine) + sizeof(job_chain_desc*))];
-        job_chain_desc* _dependencies;
-        job_routine     _call;
-
-        // Unified wrapper for scheduled job_unit function.
-        //
-        template <typename ...Args, void(JobFunction)(Args...)>
-        static void job_call_wrapper(const job_args args) noexcept
+        // unified wrapper for scheduled job_unit function.
+        template <typename... Args, void(JobFunction)(Args...)>
+        static void _wrap(const JobArgs args) noexcept
         {
             auto unpacked_args = static_cast<std::tuple<Args...>>(args.packed_args);
             std::apply(JobFunction, unpacked_args);
         }
     };
-    static_assert(sizeof(job_unit) == L1_PAGE_SIZE, "Cache alignment not mantained");
+    static_assert(sizeof(Job) == std::hardware_constructive_interference_size,
+        "Bad class layout: cache page size not mantained.");
+    static_assert(alignof(Job) >= std::hardware_destructive_interference_size,
+        "Bad class layout: cache page alignment not mantained.");
+        */
 
 
     // Runtime state of a job_unit instance.
     //
-    struct job_state_desc final
+    struct JobState
     {
         std::atomic<uint32_t> wait_counter;
     };
@@ -74,43 +66,45 @@ namespace drako
 
     // Runtime scheduler dependencies of a job_unit instance.
     //
-    class job_chain_desc final
+    class JobChain
     {
-        explicit constexpr job_chain_desc(uint32_t counter) noexcept
+        explicit constexpr JobChain(uint32_t counter) noexcept
             : _counter(counter), _dependencies()
         {
         }
 
-        constexpr job_chain_desc(const job_chain_desc&) noexcept;
-        constexpr job_chain_desc& operator=(const job_chain_desc&) noexcept;
+        constexpr JobChain(const JobChain&) noexcept;
+        constexpr JobChain& operator=(const JobChain&) noexcept;
 
-        void set_dependency(const job_handle h) noexcept;
+        void set_dependency(const JobHandle h) noexcept;
 
     private:
-
-        std::atomic<uint32_t>   _counter = 0;
-        job_handle              _dependencies[8];
+        std::atomic<uint32_t> _counter = 0;
+        JobHandle             _dependencies[8];
     };
 
 
-    // Group of jobs that shares dependencies.
-    //
-    struct job_batch final
+    /// @brief Group of jobs that shares dependencies.
+    struct Batch
     {
-
     };
 
+    struct Waiter
+    {
+    };
 
     // Synchronizes the execution of different jobs.
     //
-    struct job_scheduler_fence final
+    class Event
     {
-        std::atomic<int32_t>    counter;
-        JobWaiter* waiters[];
+        explicit constexpr Event(std::int32_t count) noexcept;
 
-        explicit constexpr job_scheduler_fence() noexcept;
+        void signal() noexcept;
+
+    private:
+        std::atomic<std::int32_t> _counter;
+        Waiter                    _waiters[10];
     };
-}
+} // namespace drako::jobs
 
 #endif // !DRAKO_JOBS_API_HPP
-

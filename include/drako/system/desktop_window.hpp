@@ -2,7 +2,7 @@
 #ifndef DRAKO_DESKTOP_WINDOW_HPP
 #define DRAKO_DESKTOP_WINDOW_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/assertion.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
@@ -29,8 +29,8 @@ namespace drako::sys
         desktop_window(const desktop_window&) = delete;
         desktop_window& operator=(const desktop_window&) = delete;
 
-        constexpr desktop_window(desktop_window&&) noexcept;
-        constexpr desktop_window& operator=(desktop_window&&) noexcept;
+        desktop_window(desktop_window&&) noexcept;
+        desktop_window& operator=(desktop_window&&) noexcept;
 
         // Hides the window.
         void hide() noexcept;

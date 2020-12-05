@@ -1,6 +1,6 @@
 #include "drako/input/device_system.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/logging.hpp"
 #include "drako/input/input_system_utils.hpp"
 

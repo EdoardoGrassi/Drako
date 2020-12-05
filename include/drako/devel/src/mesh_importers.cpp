@@ -2,18 +2,24 @@
 
 #include "drako/file_formats/dson.hpp" // NOTE: for the time being we use Drakoson format
 #include "drako/file_formats/wavefront/object.hpp"
+#include "drako/file_formats/wavefront/parser.hpp"
 
 #include <filesystem>
 #include <fstream>
 
 namespace drako::editor
 {
-    void import_obj_asset(const project_info& p, const std::filesystem::path& src, const asset_import_context& ctx)
+    void import_obj_file(
+        const std::filesystem::path& src,
+        const std::filesystem::path& dst,
+        const properties& p, const flags& f)
     {
+        namespace _fs  = std::filesystem;
         namespace _obj = drako::file_formats::obj;
 
-        /*
-        if (!_fs::exists(src) || !_fs::is_regular_file(src))
+        if (!_fs::is_regular_file(src))
+            throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
+        if (!_fs::is_directory(dst))
             throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
 
         std::ifstream ifs{ src };
@@ -32,38 +38,22 @@ namespace drako::editor
 
         const auto src_bytes = _fs::file_size(src);
         const auto data      = std::make_unique<char[]>(src_bytes);
-
         ifs.read(data.get(), src_bytes);
 
         // const _obj::parser_config config{};
-        const auto result = _obj::parse(std::string_view{ data.get(), src_bytes }, {});
-        if (const auto report = std::get_if<_obj::parser_result_report>(&result); report)
+        const auto result = _obj::parse({ data.get(), src_bytes }, {});
+        for (const auto& object : result.objects)
         {
-            for (const auto& object : report->objects)
+            std::clog << "Processing object " << object.name << '\n';
+            if (!std::empty(object.faces))
             {
-                const vertex_attribute_descriptor verts_layout[]{
-                    // vertex position
-                    { meta::format::float_32, vertex_attribute::position, 3 },
-                    // vertex normal
-                    { meta::format::float_32, vertex_attribute::normal, 3 }
-                };
-                const vertex_attribute_descriptor index_layout{
-                    meta::format::u_int_16,
-                    vertex_attribute::index,
-                    1
-                };
-                const auto mesh = from_obj_source(verts_layout, index_layout, object);
-                ofs << mesh;
+                // worst case scenario: each data point is never reused
+                const auto size   = sizeof(float) * 3 * std::size(object.faces);
+                auto       buffer = std::make_unique<std::byte[]>(size);
             }
         }
-        else if (const auto error = std::get_if<_obj::parser_error_report>(&result); error)
-        {
-            const auto e = *error;
-            std::clog << "[DRAKO] File " << src << " at line " << e.line() << ":\n"
-                      << "[DRAKO] \terror " << e.value() << ": " << e.message() << '\n';
-            return;
-        }
-        */
+
+
         throw std::runtime_error{ "Not implemented." };
     }
 

@@ -7,190 +7,128 @@
 #ifndef DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
 #define DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
 
+#include "drako/core/compiler.hpp"
 #include "drako/core/memory/memory_core.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/math/utility.hpp"
 
 #include <atomic>
 #include <bit>
 #include <cassert>
+#include <new>     // std::bad_alloc
+#include <numeric> // std::iota
 #include <type_traits>
 
-
-namespace drako
+namespace drako::lockfree
 {
     /// @brief Thread-safe lock-free pool allocator.
     ///
     /// @tparam Size        Byte size of a single memory block.
     /// @tparam Align       Minimum address alignment guaranteed by each memory block.
     ///
-    template <size_t Size, size_t Align>
-    //requires std::has_single_bit(Align)
-    class lockfree_pool_allocator final
+    template <typename T, std::size_t Size> // clang-format off
+    requires std::atomic<std::uint32_t>::is_always_lock_free && (Size > 0)
+    class StaticPool // clang-format on
     {
-        static_assert(Size > 0, "Block size must be greater than zero.");
-        static_assert(is_valid_alignment(Align), "Block alignment must be a power of 2.");
-        static_assert(Align <= Size, "Block alignment can't be greater than block size.");
-
-        using _block = std::aligned_storage<Size, Align>;
-
     public:
-        explicit lockfree_pool_allocator(const std::size_t capacity);
-        ~lockfree_pool_allocator() noexcept = default;
+        // types declarations for std::allocator_traits
+        using value_type = T;
 
-        lockfree_pool_allocator(const lockfree_pool_allocator&) = delete;
-        lockfree_pool_allocator& operator=(const lockfree_pool_allocator&) = delete;
+        explicit StaticPool() noexcept
+            : _head{ 0 }
+        {
+            std::iota(std::begin(_list), std::end(_list), 1);
+            std::end(_list)[-1] = empty_pool_value;
+        }
 
-        lockfree_pool_allocator(lockfree_pool_allocator&&) = delete;
-        lockfree_pool_allocator& operator=(lockfree_pool_allocator&&) = delete;
+        StaticPool(const StaticPool&) = delete;
+        StaticPool& operator=(const StaticPool&) = delete;
 
-        [[nodiscard]] DRAKO_ALLOCATOR void* allocate(size_t bytes) noexcept;
-        [[nodiscard]] DRAKO_ALLOCATOR void* allocate(size_t bytes, size_t align) noexcept;
+        StaticPool(StaticPool&&) = delete;
+        StaticPool& operator=(StaticPool&&) = delete;
 
-        void deallocate(void* DRAKO_HPP_RESTRICT ptr) noexcept;
+        [[nodiscard]] DRAKO_ALLOCATOR T* DRAKO_RESTRICT allocate(std::size_t n)
+        {
+            assert(n == 1); // we can only allocate single objects
 
-        [[nodiscard]] std::size_t capacity() const noexcept;
+            for (auto head = _head.load();;)
+            {
+                const auto block = block_index(head);
+                if (block == empty_pool_value) // no free blocks left
+                    throw std::bad_alloc{};
 
-        [[nodiscard]] void* raw_memory_buffer() const noexcept { return _pool; }
+                const auto next_tag   = aba_tag(head) + 1;
+                const auto next_block = _list[head].load();
 
+                const auto new_head = compose_index_and_tag(next_block, next_tag);
+                if (_head.compare_exchange_strong(head, new_head))
+                    return reinterpret_cast<T*>(_pool + block);
+            }
+        }
 
-#if defined(DRAKO_API_DEBUG)
+        void deallocate(T* DRAKO_RESTRICT p, std::size_t n) noexcept
+        {
+            assert(n == 1); // we can only deallocate single objects
+            assert(p);
+            assert((p >= _pool) && p < (_pool + Size));
 
-        // \brief   Validates an allocated pointer. (debug only)
-        //
-        // Checks if a pointer could have been allocated from the allocator.
-        //
-        bool dbg_validate_ptr(void* ptr) const noexcept;
+            const auto block = static_cast<std::size_t>(std::distance(_pool, p));
+            for (auto head = _head.load();;)
+            { // try to push our block as the new head of the free list
+                _list[block] = head;
+                if (_head.compare_exchange_strong(head, block))
+                    return;
+                // else the new head value gets loaded by CAS instruction
+            }
+        }
 
-        // \brief   Validates the internal state of the allocator. (debug only)
-        //
-        // Checks the internal integrity of the allocator.
-        //
-        bool dbg_validate_allocator() const noexcept;
-
-#endif
+        [[nodiscard]] constexpr std::size_t capacity() const noexcept { return Size; }
 
     private:
-        struct pool_block final
-        {
-            pool_block* next;
-        };
+        using _block = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
-        static_assert(std::atomic<pool_block*>::is_always_lock_free,
+        static_assert(std::atomic<std::uint64_t>::is_always_lock_free,
             "Required to guarantee lock-free property.");
 
-        std::unique_ptr<_block[]> _pool; // preallocated buffer
-        std::atomic<pool_block*>  _head; // head of internal free list
+        static const auto empty_pool_value = std::numeric_limits<std::uint32_t>::max();
+
+        std::atomic<std::uint64_t> _head;       // head of free list of unallocated blocks
+        std::atomic<std::uint32_t> _list[Size]; // free list blocks
+        _block                     _pool[Size]; // memory blocks
+
+        [[nodiscard]] static std::uint32_t block_index(std::uint64_t head) noexcept
+        {
+            return static_cast<std::uint32_t>(head);
+        }
+
+        [[nodiscard]] static std::uint32_t aba_tag(std::uint64_t head) noexcept
+        {
+            return static_cast<std::uint32_t>(head >> 32);
+        }
+
+        [[nodiscard]] static std::uint64_t compose_index_and_tag(std::uint32_t index, std::uint32_t tag)
+        {
+            return static_cast<std::uint64_t>(index) & (static_cast<std::uint64_t>(tag) << 32);
+        }
 
 #if defined(DRKAPI_DEBUG)
-        size_t dbg_block_count;
+        std::atomic<std::size_t> debug_allocated_blocks_count;
 #endif
     };
 
-
-    /// @brief Thread safe object pool.
-    template <typename T>
-    using lockfree_object_pool = lockfree_pool_allocator<sizeof(T), alignof(T)>;
-
-
-#if defined(DRKAPI_DEBUG)
-    static constexpr const size_t dbg_overflow_guard_size  = DRKAPI_L1_CACHE_SIZE;
-    static constexpr const size_t dbg_underflow_guarg_size = DRKAPI_L1_CACHE_SIZE;
-#endif
-
-
-    template <size_t Size, size_t Align>
-    inline lockfree_pool_allocator<Size, Align>::lockfree_pool_allocator(size_t count)
+    template <typename T, typename Al = std::allocator<T>>
+    class Pool
     {
-        assert(count > 0);
+    public:
+        // type declarations for std::allocator_traits
+        using value_type = T;
 
-        _pool = std::make_unique<_block[]>(count);
+        explicit Pool(std::size_t capacity, Al al = Al());
 
-        // Initialize free list nodes
-        auto curr_block = _pool;
-        for (auto i = 0; i < (count - 1); ++i)
-        {
-            curr_block->next = curr_block + Size;
-            curr_block       = curr_block->next;
-        }
-        // Set last header as dummy block that always returns nullptr
-        curr_block->next = nullptr;
-    }
+        [[nodiscard]] constexpr std::size_t capacity() const noexcept;
 
-    template <size_t Size, size_t Align>
-    inline void* lockfree_pool_allocator<Size, Align>::allocate(size_t bytes) noexcept
-    {
-        assert(bytes > 0);
-        assert(bytes <= Size);
+    private:
+        std::unique_ptr<T> _pool;
+    };
 
-        for (;;)
-        {
-            auto curr_block = _head.load(std::memory_order_acquire);
-            if (curr_block == nullptr)
-                return nullptr;
-
-            auto next_block = curr_block->next;
-
-            if (_head.compare_exchange_weak(curr_block, next_block))
-            {
-#if defined(DRKAPI_DEBUG)
-                {
-                    fill_garbage_memory(curr_block, Size);
-                }
-#endif
-                return curr_block;
-            }
-        }
-    }
-
-    template <size_t Size, size_t Align>
-    inline void* lockfree_pool_allocator<Size, Align>::allocate(size_t bytes, size_t alignment) noexcept
-    {
-        assert(bytes > 0);
-        assert(bytes <= Size);
-        assert(std::has_single_bit(alignment));
-
-        for (;;)
-        {
-            auto curr      = _head.load();
-            auto temp_curr = curr->this_block;
-            auto temp_next = curr->next;
-            if (_head.compare_exchange_strong(curr, temp_next))
-            {
-#if defined(DRKAPI_DEBUG)
-                {
-                    fill_garbage_memory(temp_curr, Size);
-                }
-#endif
-                return temp_curr;
-            }
-        }
-    }
-
-    template <size_t Size, size_t Align>
-    inline void lockfree_pool_allocator<Size, Align>::deallocate(void* DRAKO_HPP_RESTRICT ptr) noexcept
-    {
-        assert(ptr != nullptr);
-        assert(ptr >= _pool);
-        assert(ptr <= (_pool + Size * dbg_block_count));
-        assert(is_aligned(ptr, Align));
-
-        auto new_head = static_cast<pool_block*>(ptr);
-#if defined(DRKAPI_DEBUG)
-        {
-            fill_garbage_memory(new_head, Size);
-        }
-#endif
-
-        for (;;)
-        {
-            new_head->next = _head.load();
-
-            if (_head.compare_exchange_strong(new_head->next, new_head))
-                return;
-        }
-    }
-
-} // namespace drako
+} // namespace drako::lockfree
 
 #endif // !DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP

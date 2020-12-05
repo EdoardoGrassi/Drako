@@ -10,8 +10,8 @@
 #include <iostream>
 #include <string_view>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 
 // TODO: remove header dependency or move implementation
 #if defined(DRAKO_PLT_WIN32)

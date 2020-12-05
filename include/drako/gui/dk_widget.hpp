@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 
 namespace drako
 {

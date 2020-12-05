@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <new>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 
 // Minimum payload size of a standalone block.
 // Partially allocated blocks won't be splitted if the resulting blocks are smaller than this limit.

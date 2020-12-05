@@ -2,67 +2,83 @@
 #ifndef DRAKO_OUTPUT_FILE_HANDLE_HPP
 #define DRAKO_OUTPUT_FILE_HANDLE_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/io/core.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Windows.h>
 #endif
 
+#include <cassert>
 #include <filesystem>
 #include <type_traits>
 
 namespace drako::io
 {
-    /// @brief Unformatted binary output on a file.
-    class output_file_handle final
+    /// @brief Smart handle that manages an output file.
+    class UniqueOutputFile
     {
     public:
         using path_type = std::filesystem::path;
 
-        explicit constexpr output_file_handle() noexcept = default;
+        explicit constexpr UniqueOutputFile() noexcept = default;
 
-        explicit constexpr output_file_handle(native_handle_type handle) noexcept
+        explicit constexpr UniqueOutputFile(native_handle_type handle) noexcept
             : _handle{ handle } {}
 
-        explicit output_file_handle(const path_type& filename, creation c = creation::if_needed)
+        explicit UniqueOutputFile(const path_type& filename, creation c = creation::if_needed)
             : _handle{ io::open(filename, mode::write, c) } {}
 
-        ~output_file_handle() noexcept;
+        ~UniqueOutputFile() noexcept
+        {
+            if (_handle != INVALID_HANDLE_VALUE)
+                io::close(_handle);
+        }
 
 
-        output_file_handle(const output_file_handle&) = delete;
-        output_file_handle& operator=(const output_file_handle&) = delete;
+        UniqueOutputFile(const UniqueOutputFile&) = delete;
+        UniqueOutputFile& operator=(const UniqueOutputFile&) = delete;
 
 
-        output_file_handle(output_file_handle&& other) noexcept
+        UniqueOutputFile(UniqueOutputFile&& other) noexcept
             : _handle{ INVALID_HANDLE_VALUE }
         {
             using std::swap;
             swap(_handle, other._handle);
         }
-        output_file_handle& operator=(output_file_handle&& other) noexcept
+        UniqueOutputFile& operator=(UniqueOutputFile&& other) noexcept
         {
             using std::swap;
             swap(_handle, other._handle);
             return *this;
         }
 
-        void write(const std::byte* src, std::size_t bytes);
+        void write(const std::byte* src, std::size_t bytes)
+        {
+            io::write(src, _handle, bytes);
+        }
 
-        void write(const std::byte* src, std::size_t bytes, std::error_code& ec) noexcept;
+        void write(const std::byte* src, std::size_t bytes, std::error_code& ec) noexcept
+        {
+            io::write(src, _handle, bytes, ec);
+        }
 
-        void close();
+        void close()
+        {
+            assert(_handle != INVALID_HANDLE_VALUE);
+            io::close(_handle);
+        }
 
-        void flush();
+        void flush()
+        {
+            io::flush(_handle);
+        }
 
         [[nodiscard]] native_handle_type native_handle() noexcept { return _handle; }
 
     private:
         native_handle_type _handle = INVALID_HANDLE_VALUE;
     };
-
-    using OutputFileHandle = output_file_handle;
 
 
     /// @brief Write the value representation of an object.
@@ -71,7 +87,7 @@ namespace drako::io
     /// @param ofs
     template <typename T> /* clang-format off */
     requires std::is_trivially_copyable_v<T>
-    void write_to_bytes(output_file_handle& output, const T& object) /* clang-format on */
+    void write_to_bytes(UniqueOutputFile& output, const T& object) /* clang-format on */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");
@@ -84,7 +100,7 @@ namespace drako::io
 
     template <typename T, size_t Size> /* clang-format off */
     requires std::is_trivially_copyable_v<T> && std::is_bounded_array_v<T>
-    void write_to_bytes(output_file_handle& output, const T (&objects)[Size] ) /* clang-format on */
+    void write_to_bytes(UniqueOutputFile& output, const T (&objects)[Size] ) /* clang-format on */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");
@@ -96,7 +112,7 @@ namespace drako::io
 
     template <typename T> /* clang-format off */
     requires std::is_trivially_copyable_v<T> //&& std::is_unbounded_array_v<T>
-    void write_to_bytes(output_file_handle& output, const T objects[], std::size_t size) /* clang-format on */
+    void write_to_bytes(UniqueOutputFile& output, const T objects[], std::size_t size) /* clang-format on */
     {
         static_assert(std::is_trivially_copyable_v<T>,
             "Required by C++ standard for well-defined type punning.");

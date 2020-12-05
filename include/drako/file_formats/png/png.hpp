@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_FORMATS_PNG_HPP
-#define DRAKO_FORMATS_PNG_HPP
+#ifndef DRAKO_PNG_HPP
+#define DRAKO_PNG_HPP
 
 #include <stdexcept>
 #include <vector>
@@ -18,9 +18,7 @@ namespace drako::formats::png
     {
     public:
         explicit parser_error(const char* msg)
-            : std::runtime_error(msg)
-        {
-        }
+            : std::runtime_error(msg) {}
     };
 
 
@@ -35,4 +33,4 @@ namespace drako::formats::png
     };
 } // namespace drako::formats::png
 
-#endif // !DRAKO_FORMATS_PNG_HPP
+#endif // !DRAKO_PNG_HPP

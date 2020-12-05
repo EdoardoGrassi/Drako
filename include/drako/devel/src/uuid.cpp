@@ -22,7 +22,7 @@ namespace drako
         std::uint16_t _clock;
         std::uint8_t  _node[6];
     };
-    static_assert(sizeof(_uuid_byte_layout) == sizeof(uuid),
+    static_assert(sizeof(_uuid_byte_layout) == sizeof(Uuid),
         "Size mismatch between reference layout and metadata format");
     static_assert(std::is_standard_layout_v<_uuid_byte_layout>,
         "Required for correct behaviour of offsetof() macro (standard C++17)");
@@ -82,17 +82,17 @@ namespace drako
         return static_cast<std::byte>((_msb << 4) | _lsb);
     };
 
-    std::istream& operator>>(std::istream& is, uuid& u)
+    std::istream& operator>>(std::istream& is, Uuid& u)
     {
-        return is.read(reinterpret_cast<char*>(std::data(u)), sizeof(uuid));
+        return is.read(reinterpret_cast<char*>(std::data(u)), sizeof(Uuid));
     }
 
-    std::ostream& operator<<(std::ostream& os, const uuid& u)
+    std::ostream& operator<<(std::ostream& os, const Uuid& u)
     {
-        return os.write(reinterpret_cast<const char*>(std::data(u)), sizeof(uuid));
+        return os.write(reinterpret_cast<const char*>(std::data(u)), sizeof(Uuid));
     }
 
-    std::string to_string(const uuid& u)
+    std::string to_string(const Uuid& u)
     { // uuid: {8 hex-digits} '-' {4 hex-digits} '-' {4 hex-digits} '-' {4 hex-digits} '-' {12 hex-digits}
         const char UUID_STRING_SEPARATOR = '-';
 
@@ -146,7 +146,7 @@ namespace drako
         return rng();
     }
 
-    [[nodiscard]] uuid uuid::parse(const std::string_view s)
+    void parse(const std::string_view s, Uuid& out)
     {
         // accepted canonical format: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
         const char hypen = '-';
@@ -171,10 +171,10 @@ namespace drako
             bytes[j] = _from_hex_chars(most_significant_bits, less_significant_bits);
         }
 
-        return uuid{ bytes };
+        out = Uuid{ bytes };
     }
 
-    std::variant<uuid, std::error_code> try_parse(const std::string_view s) noexcept
+    std::variant<Uuid, std::error_code> try_parse(const std::string_view s) noexcept
     {
         // accepted canonical format: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
 
@@ -200,7 +200,7 @@ namespace drako
 
             bytes[j] = _from_hex_chars(most_significant_bits, less_significant_bits);
         }
-        return uuid{ bytes };
+        return Uuid{ bytes };
     }
 
 } // namespace drako

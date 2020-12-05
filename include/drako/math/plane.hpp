@@ -2,7 +2,7 @@
 #ifndef DRAKO_PLANE_HPP
 #define DRAKO_PLANE_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/math/utility.hpp"
 #include "drako/math/vector3.hpp"
 

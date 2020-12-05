@@ -6,7 +6,7 @@
 #include <new>
 #include <vector>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/math/utility.hpp"
 
 #include "drako/devel/assertion.hpp"

@@ -2,43 +2,45 @@
 #ifndef DRAKO_ASSET_BUNDLE_MANIFEST_HPP
 #define DRAKO_ASSET_BUNDLE_MANIFEST_HPP
 
+#include "drako/core/byte_utils.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/io/input_file_handle.hpp"
 #include "drako/io/output_file_handle.hpp"
 
+#include <cassert>
 #include <memory>
 #include <span>
 
 namespace drako
 {
-    class asset_bundle_manifest
+    class AssetBundleManifest
     {
     public:
-        explicit asset_bundle_manifest(const std::span<std::byte> blob);
+        explicit AssetBundleManifest(const std::span<std::byte> blob);
 
-        asset_bundle_manifest(const asset_bundle_manifest&) = delete;
-        asset_bundle_manifest& operator=(const asset_bundle_manifest&) = delete;
+        //AssetBundleManifest(const AssetBundleManifest&) = delete;
+        //AssetBundleManifest& operator=(const AssetBundleManifest&) = delete;
 
-        void load_from_file(io::input_file_handle);
+        void load_from_file(io::UniqueInputFile);
 
-        void save_to_file(io::output_file_handle);
+        void save_to_file(io::UniqueOutputFile);
 
     private:
         /// @brief Header section of an asset manifest
-        struct _header_type
+        struct _header
         {
-            api_version   version = current_api_version();
+            Version       version = current_api_version();
             std::uint32_t crc;
             std::uint32_t items_count;
         };
 
-        _header_type                       _header;
-        std::unique_ptr<asset_id[]>        _ids;
+        _header                            _header;
+        std::unique_ptr<AssetID[]>         _ids;
         std::unique_ptr<asset_load_info[]> _infos;
     };
 
     /*
-    void asset_bundle_manifest::load_from_file(io::input_file_handle is)
+    void asset_bundle_manifest::load_from_file(io::UniqueInputFile is)
     {
         io::read_from_bytes(is, _header);
 
@@ -51,7 +53,7 @@ namespace drako
         io::read_from_bytes(is, _infos.get(), _header.items_count);
     }
 
-    void asset_bundle_manifest::save_to_file(io::output_file_handle os)
+    void asset_bundle_manifest::save_to_file(io::UniqueOutputFile os)
     {
         io::write_to_bytes(os, _header);
         io::write_to_bytes(os, _ids.get(), _header.items_count);
@@ -59,11 +61,12 @@ namespace drako
     }
     */
 
-    class manifest_view
+    class AssetBundleManifestView
     {
     public:
-        explicit manifest_view(std::span<const std::byte> bytes)
+        explicit AssetBundleManifestView(std::span<const std::byte> bytes)
         {
+            assert(std::size(bytes) > sizeof(_header));
             std::memcpy(&_size, std::data(bytes), sizeof(decltype(_size)));
             if (std::size(bytes) != (sizeof(_size) + 2 * _size))
                 throw std::runtime_error{ "Reported size doesn't match input buffer size." };
@@ -72,13 +75,27 @@ namespace drako
             _meta = std::data(bytes) + sizeof(_size) + _size;
         }
 
-        [[nodiscard]] std::span<const std::byte> ids() const noexcept;
-        [[nodiscard]] std::span<const std::byte> metadata() const noexcept;
+        [[nodiscard]] std::span<const std::byte> ids() const noexcept
+        {
+            return { _ids, _size };
+        }
+        [[nodiscard]] std::span<const std::byte> metadata() const noexcept
+        {
+            return { _meta, _size };
+        }
 
     private:
+        struct _header
+        {
+            std::uint32_t size;
+
+            _header(std::span<const std::byte> bytes)
+                : size{ from_le_bytes<decltype(size)>(std::data(bytes)) } {}
+        };
+
         const std::byte* _ids;
         const std::byte* _meta;
-        std::uint32_t    _size;
+        std::size_t      _size;
     };
 
 } // namespace drako

@@ -15,19 +15,19 @@ namespace fs = std::filesystem; // convenient alias
 namespace drako
 {
     /// @brief Cyclic redundancy check (version C32) of given byte sequence.
-    [[nodiscard]] std::uint32_t crc32c(const std::byte* data, size_t size) noexcept;
+    [[nodiscard]] std::uint32_t crc32c(const std::byte* data, std::size_t size) noexcept;
 
 
     /// @brief Cyclic redundancy check (version C32) of given byte sequence.
-    [[nodiscard]] std::uint32_t crc32c(const std::uint32_t* data, size_t size) noexcept;
+    [[nodiscard]] std::uint32_t crc32c(const std::uint32_t* data, std::size_t size) noexcept;
 
 
     /// @brief Cyclic redundancy check (version C32) of given byte sequence.
-    [[nodiscard]] std::uint32_t crc32c(const std::uint64_t* data, size_t size) noexcept;
+    [[nodiscard]] std::uint32_t crc32c(const std::uint64_t* data, std::size_t size) noexcept;
 
 
     [[nodiscard]] asset_manifest_entry
-    build_asset_descriptor(const uuid& id);
+    build_asset_descriptor(const Uuid& id);
 
 
     [[nodiscard]] std::variant<packaging_result, build_error>

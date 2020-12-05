@@ -10,7 +10,7 @@ int main()
 {
     drako::sys::desktop_window      main(L"Keyboard Test App");
     const std::chrono::milliseconds timeout{ 100 };
-    drako::sys::keyboard_device     keyboard{ main };
+    drako::sys::Keyboard     keyboard{ main };
 
     while (true)
     {

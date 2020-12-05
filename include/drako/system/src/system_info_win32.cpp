@@ -1,11 +1,11 @@
 #pragma once
 #include "drako/system/system_info.hpp"
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/assertion.hpp"
 
-#include <cstdint>
+#include <cstddef>
 
 // #include <WinBase.h>
 // #include <sysinfoapi.h>
@@ -17,16 +17,15 @@
 
 namespace drako::sys
 {
-    DRAKO_NODISCARD
-    native_cpu_core current_process_cpu() noexcept
+    [[nodiscard]] native_cpu_core current_process_cpu() noexcept
     {
         PROCESSOR_NUMBER proc_number = {};
         ::GetCurrentProcessorNumberEx(&proc_number);
         return native_cpu_core{ proc_number };
     }
 
-    DRAKO_NODISCARD
-    uint32_t cpu_logical_core_count() noexcept
+
+    [[nodiscard]] std::uint32_t cpu_logical_core_count() noexcept
     {
 #if defined(DRAKO_PLT_WIN32)
 
@@ -44,8 +43,7 @@ namespace drako::sys
 #endif
     }
 
-    DRAKO_NODISCARD
-    int64_t cpu_counter_value() noexcept
+    [[nodiscard]] std::int64_t cpu_counter_value() noexcept
     {
 #if defined(DRAKO_PLT_WIN32)
 
@@ -53,15 +51,14 @@ namespace drako::sys
         // doesn't produce errors on Windows XP or later
         ::QueryPerformanceCounter(&counter);
 
-        return static_cast<int64_t>(counter.QuadPart);
+        return static_cast<std::int64_t>(counter.QuadPart);
 
 #else
 #error Platform not supported
 #endif
     }
 
-    DRAKO_NODISCARD
-    int64_t cpu_counter_frequency() noexcept
+    [[nodiscard]] std::int64_t cpu_counter_frequency() noexcept
     {
 #if defined(DRAKO_PLT_WIN32)
 
@@ -74,8 +71,7 @@ namespace drako::sys
 #endif
     }
 
-    DRAKO_NODISCARD
-    native_numa_node cpu_numa_node(native_cpu_core core) noexcept
+    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core core) noexcept
     {
 #if defined(DRAKO_PLT_WIN32)
 

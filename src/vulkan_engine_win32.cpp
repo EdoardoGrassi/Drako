@@ -1,26 +1,15 @@
-#include <fstream>
-#include <ios>
-#include <iostream>
-
-#include <vulkan/vulkan.hpp>
-
 #include "drako/core/memory/unsync_linear_allocator.hpp"
-#include "drako/devel/logging.hpp"
-#include "drako/devel/uuid.hpp"
+#include "drako/devel/asset_bundle_manifest.hpp"
 #include "drako/engine/asset_manager.hpp"
 #include "drako/engine/render_system.hpp"
-#include "drako/graphics/material_types.hpp"
-#include "drako/graphics/mesh_types.hpp"
-#include "drako/graphics/shader_types.hpp"
 #include "drako/graphics/transform.hpp"
-#include "drako/graphics/vulkan_mesh_types.hpp"
 #include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/graphics/vulkan_wireframe_pipeline.hpp"
 #include "drako/system/desktop_window.hpp"
 
-#if !defined(_drako_platform_Win32)
-#error This source file should be included only on Windows builds
-#endif
+#include <vulkan/vulkan.hpp>
+
+#include <iostream>
 
 using namespace drako;
 namespace _fs = std::filesystem;
@@ -34,32 +23,34 @@ using _g_alloc = unsync_linear_allocator;
 _g_alloc g_allocator{ 1'000'000 };
 
 
-const std::vector<asset_bundle_id> bundles_guids = { asset_bundle_id{ 1 } };
-const std::vector<std::string>     bundles_names = { "main" };
-const std::vector<_fs::path>       bundles_paths = { "./bundles/main.dkbundle" };
-
-
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int main()
 {
-    engine::asset_manager am{ { bundles_guids, bundles_names, bundles_paths }, {} };
+    engine::AssetManager am{ {}, {} };
 
-    am.load_bundle_async(asset_bundle_id{ 1 });
+    const _fs::path path = "./bundles/main.dkbundle";
+    const auto      size = static_cast<std::size_t>(_fs::file_size(path));
+    auto            data = std::make_unique<std::byte[]>(size);
+
+    {
+        io::UniqueInputFile f{ path };
+        f.read(data.get(), size);
+    }
+
+    AssetBundleManifestView main{ { data.get(), size } };
+    // TODO: do things
 
     sys::desktop_window render_window(L"Drako Engine");
     render_window.show();
 
-    mat4x4 m = transform(vec3(1, 1, 1), uquat::identity(), vec3(1));
-    mat4x4 v = transform(vec3(0, 0, 0), uquat::identity(), vec3(1));
+    mat4x4 m = transform(Vec3(1, 1, 1), quat{}, Vec3(1));
+    mat4x4 v = transform(Vec3(0, 0, 0), quat{}, Vec3(1));
     mat4x4 p = ortographic(10, 10, 10, 10, 0, 1000);
 
-    //const auto vert_source = make_from_stream(std::ifstream(VERT_SOURCE, std::ios::binary));
-    //const auto frag_source = make_from_stream(std::ifstream(FRAG_SOURCE, std::ios::binary));
 
+    const vulkan::context context{ std::move(render_window) };
+    vulkan::debug_print_queue_families(context);
 
-    const vulkan::context context{ render_window };
-    vulkan::debug_print_all_queue_families(context);
-
-    render_system render_system{ context };
+    RenderSystem rs{ context };
 
     //const auto wireframe_pipeline = gpx::vulkan::make_wireframe_pipeline(context.logical_device.get(), vert, renderer.renderpass());
     //render_system.create(1, wireframe_pipeline);

@@ -91,16 +91,8 @@ namespace drako
 
 
     [[nodiscard]] std::error_code
-    compile_from_spirv(const std::filesystem::path& file, const std::filesystem::path& out) noexcept
-    {
-        std::error_code ec;
-        if (const auto bytes = std::filesystem::file_size(file, ec); ec)
-        {
-            std::ifstream src(file, std::ios::binary);
-            std::ofstream dst(out, std::ios::binary);
-            dst << static_cast<uint32_t>(bytes) << src.rdbuf();
-        }
-    }
+    compile_spirv_source(const std::filesystem::path& file, const std::filesystem::path& out) noexcept;
+
 } // namespace drako
 
 #endif // !DRAKO_SHADER_HPP

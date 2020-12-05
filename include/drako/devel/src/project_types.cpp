@@ -28,7 +28,7 @@ namespace drako::editor
         return os;
     }
 
-    project::project(const _fs::path& file)
+    Project::Project(const _fs::path& file)
         : _tree_root(file.root_directory())
     {
         // TODO: load settings configuration from project file
@@ -38,22 +38,27 @@ namespace drako::editor
         _fs::create_directories(meta_directory());
     }
 
-    [[nodiscard]] _fs::path project::asset_directory() const
+    [[nodiscard]] _fs::path Project::asset_directory() const
     {
         return _tree_root / "assets";
     }
 
-    [[nodiscard]] _fs::path project::cache_directory() const
+    [[nodiscard]] _fs::path Project::cache_directory() const
     {
         return _tree_root / "cache";
     }
 
-    [[nodiscard]] _fs::path project::meta_directory() const
+    [[nodiscard]] _fs::path Project::meta_directory() const
     {
         return _tree_root / "meta";
     }
 
-    void project::package_assets_as_single_bundle(const _fs::path& where)
+    [[nodiscard]] Uuid Project::generate_asset_uuid() const noexcept
+    {
+        return _generator();
+    }
+
+    void Project::package_assets_as_single_bundle(const _fs::path& where)
     {
         if (_fs::exists(where))
             throw std::invalid_argument{ "File already exists." };
@@ -64,7 +69,7 @@ namespace drako::editor
         const auto max_size       = std::max_element(assets.sizes.cbegin(), assets.sizes.cend());
         auto       staging_buffer = std::make_unique<char[]>(*max_size);
 
-        for (auto i = 0; i < std::size(assets.guids); ++i)
+        for (auto i = 0; i < std::size(assets.ids); ++i)
         {
             std::ifstream binary{ assets.paths[i], std::ios_base::binary };
             binary.exceptions(std::ios_base::failbit | std::ios_base::badbit);
@@ -79,7 +84,7 @@ namespace drako::editor
     {
         dson::object serialized{};
         is >> serialized;
-        inter.uuid = uuid::parse(serialized.get("uuid"));
+        parse(serialized.get("uuid"), inter.id);
         inter.name = serialized.get("name");
         from_string(serialized.get("version"), inter.version);
         return is;
@@ -88,7 +93,7 @@ namespace drako::editor
     std::ostream& save(std::ostream& os, const internal_asset_info& inter)
     {
         dson::object serialized{};
-        serialized.set("uuid", to_string(inter.uuid));
+        serialized.set("uuid", to_string(inter.id));
         serialized.set("name", inter.name);
         serialized.set("version", to_string(inter.version));
         os << serialized;
@@ -97,7 +102,7 @@ namespace drako::editor
 
     dson::object& operator>>(dson::object& is, internal_asset_info& inter)
     {
-        inter.uuid = uuid::parse(is.get("uuid"));
+        parse(is.get("uuid"), inter.id);
         inter.name = is.get("name");
         from_string(is.get("version"), inter.version);
         return is;
@@ -105,7 +110,7 @@ namespace drako::editor
 
     dson::object& operator<<(dson::object& os, const internal_asset_info& inter)
     {
-        os.set("uuid", to_string(inter.uuid));
+        os.set("uuid", to_string(inter.id));
         os.set("name", inter.name);
         os.set("version", to_string(inter.version));
         return os;
@@ -116,7 +121,7 @@ namespace drako::editor
     {
         dson::object serialized{};
         is >> serialized;
-        ext.uuid = uuid::parse(serialized.get("uuid"));
+        parse(serialized.get("uuid"), ext.uuid);
         ext.path = serialized.get("path");
         from_string(serialized.get("version"), ext.version);
         return is;
@@ -133,7 +138,7 @@ namespace drako::editor
 
     dson::object& operator>>(dson::object& is, external_asset_info& ext)
     {
-        ext.uuid = uuid::parse(is.get("uuid"));
+        parse(is.get("uuid"), ext.uuid);
         ext.path = is.get("path");
         from_string(is.get("version"), ext.version);
         return is;

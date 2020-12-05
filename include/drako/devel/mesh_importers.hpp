@@ -14,8 +14,7 @@ namespace drako::editor
 {
     struct mesh_import_info
     {
-    public:
-        uuid                  guid;
+        Uuid                  guid;
         std::string           name;
         std::filesystem::path path;
     };
@@ -30,7 +29,7 @@ namespace drako::editor
         }
 
         mesh_import_info info;
-        info.guid = uuid::parse(serialized.get("guid"));
+        parse(serialized.get("guid"), info.guid);
         info.name = serialized.get("name");
         info.path = serialized.get("path");
         return info;
@@ -47,9 +46,19 @@ namespace drako::editor
         ofs << serialized;
     }
 
+    using properties = std::vector<std::pair<std::string, std::string>>;
+    using flags      = std::vector<std::string>;
 
-    // import assets from .OBJ format files
-    void import_obj_asset(const project_info& p, const std::filesystem::path& src, const asset_import_context& ctx);
+    /// @brief Import assets from .obj file.
+    ///
+    /// Possible configuration settings:
+    ///     --discard-normals   remove normals data from output
+    ///     --discard-uvs       remove texture uvs data from output
+    ///
+    void import_obj_file(
+        const std::filesystem::path& src,
+        const std::filesystem::path& dst,
+        const properties& p, const flags& f);
 
 } // namespace drako::editor
 

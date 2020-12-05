@@ -2,7 +2,7 @@
 #ifndef DRAKO_SYSTEM_TIMER_HPP_
 #define DRAKO_SYSTEM_TIMER_HPP_
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include "drako/system/src/timers_win32.hpp"

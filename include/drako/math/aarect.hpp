@@ -2,7 +2,7 @@
 #ifndef DRAKO_AARECT_HPP
 #    define DRAKO_AARECT_HPP
 
-#    include "drako/core/preprocessor/compiler_macros.hpp"
+#    include "drako/core/compiler.hpp"
 #    include "drako/math/vector2.hpp"
 
 namespace drako

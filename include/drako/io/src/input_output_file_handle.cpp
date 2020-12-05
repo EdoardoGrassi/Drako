@@ -1,6 +1,6 @@
-#include "drako/io/input_output_file_handle.hpp"
+#include "drako/io/input_UniqueOutputFile.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
@@ -14,19 +14,19 @@
 
 namespace drako::io
 {
-    using _this = input_output_file_handle;
+    using _this = input_UniqueOutputFile;
 
-    constexpr _this::input_output_file_handle() noexcept
+    constexpr _this::input_UniqueOutputFile() noexcept
         : _handle{ INVALID_HANDLE_VALUE }
     {
     }
 
-    constexpr _this::input_output_file_handle(native_handle_type handle) noexcept
+    constexpr _this::input_UniqueOutputFile(native_handle_type handle) noexcept
         : _handle{ handle }
     {
     }
 
-    _this::input_output_file_handle(const path_type& file, creation c = creation::if_needed)
+    _this::input_UniqueOutputFile(const path_type& file, creation c = creation::if_needed)
     {
         DWORD open_mode = OPEN_ALWAYS;
         if (c == creation::open_existing)
@@ -40,7 +40,7 @@ namespace drako::io
             throw std::system_error(::GetLastError(), std::system_category());
     }
 
-    _this::input_output_file_handle(_this&& other) noexcept
+    _this::input_UniqueOutputFile(_this&& other) noexcept
         : _handle{ other._handle }
     {
         other._handle = INVALID_HANDLE_VALUE;
@@ -53,7 +53,7 @@ namespace drako::io
         return *this;
     }
 
-    _this::~input_output_file_handle() noexcept
+    _this::~input_UniqueOutputFile() noexcept
     {
         if (_handle != INVALID_HANDLE_VALUE)
             if (::CloseHandle(_handle) == 0)

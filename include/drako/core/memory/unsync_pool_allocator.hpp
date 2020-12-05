@@ -7,68 +7,123 @@
 /// @brief      Unsynchronized pool allocator.
 /// @author     Grassi Edoardo
 
-#include "drako/core/memory/unsync_memory_pool.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/devel/assertion.hpp"
+#include <cassert>
+#include <memory>
 
 namespace drako
 {
-    // CLASS TEMPLATE
-    // Unsynchronized allocator that recycles objects inside a preallocated pool.
-    template <typename T>
-    class unsync_pool_allocator : private unsync_memory_pool<sizeof(T), alignof(T)>
+    /// @brief Pool allocator with static backing memory.
+    template <typename T, std::size_t Size>
+    class StaticPool
     {
     public:
+        explicit StaticPool() noexcept;
 
-        // \brief       Constructor.
-        //
-        // \param[in]   count      Maximum capacity of the pool.
-        //
-        explicit unsync_pool_allocator(size_t capacity) noexcept
-            : unsync_memory_pool(capacity)
+        StaticPool(const StaticPool&) = delete;
+        StaticPool& operator=(const StaticPool&) = delete;
+
+        StaticPool(StaticPool&&) noexcept = delete;
+        StaticPool& operator=(StaticPool&&) noexcept = delete;
+
+    private:
+        union _block
         {
-        }
-        
-        unsync_pool_allocator(const unsync_pool_allocator&) = delete;
-        unsync_pool_allocator& operator=(const unsync_pool_allocator&) = delete;
+            std::aligned_storage_t<sizeof(T), alignof(T)> storage;
+            _block*                                       next;
+        };
 
-        unsync_pool_allocator(unsync_pool_allocator&&) noexcept = default;
-        unsync_pool_allocator& operator=(unsync_pool_allocator&&) noexcept = default;
+        _block* _free;
+        _block  _pool[Size];
+    };
 
-
-        // \brief   Allocates and constructs an object in the pool.
-        //
-        DRAKO_NODISCARD T* new_object() noexcept(std::is_nothrow_constructible_v<T>);
-
-
-        // \brief   Destroys and deallocates an object from the pool.
-        //
-        void delete_object(T* ptr) noexcept(std::is_nothrow_destructible_v<T>)
+    /// @brief Pool allocator with runtime allocated backing memory.
+    template <typename T>
+    class Pool
+    {
+    public:
+        /// @brief Constructs a pool with given capacity.
+        ///
+        /// @param[in] capacity Number of object that can be stored.
+        ///
+        explicit Pool(std::size_t capacity)
+            : _pool{ std::make_unique<_block[]>(capacity) }
         {
-            ptr->~();
-            deallocate(ptr);
-        }
+            assert(capacity > 0);
 
-
-        // \brief   Checks if the allocator is full.
-        //
-        DRAKO_NODISCARD constexpr bool full() const noexcept;
-
-
-        // \brief   Converts an object pointer to corresponding index inside the pool.
-        //
-        DRAKO_NODISCARD constexpr size_t ptr_to_index(T* ptr) const noexcept
-        {
-
+            // link blocks as a free list
+            _free = _pool.get();
+            for (auto i = 0; i < capacity - 1; ++i)
+                _pool[i].next = _pool.get() + i + 1;
+            _pool[capacity - 1].next = nullptr; // last block with no successor
         }
 
+        Pool(const Pool&) = delete;
+        Pool& operator=(const Pool&) = delete;
 
-        // \brief   Converts an object index to corresponding pointer inside the pool.
-        //
-        DRAKO_NODISCARD constexpr T* index_to_ptr(size_t idx) const noexcept
+        Pool(Pool&&) noexcept = delete;
+        Pool& operator=(Pool&&) noexcept = delete;
+
+
+        /// @brief Allocates memory.
+        ///
+        /// @param[in] n Must be 1. Provided for compatibility with std::allocator.
+        ///
+        [[nodiscard]] T* allocate(std::size_t n)
         {
+            assert(n == 1);
+            if (_free == nullptr)
+                [[unlikely]] throw std::bad_alloc{ "Out of pool memory." };
 
+            const auto p = _free;
+            _free        = _free->next;
+            return reinterpret_cast<T*>(std::addressof(p->storage));
         }
+
+        /// @brief Deallocates memory.
+
+        /// @param[in] p Previously allocated object.
+        /// @param[in] n Must be 1. Provided for compatibility with std::allocator.
+        ///
+        void deallocate(T* p, std::size_t n) noexcept
+        {
+            assert(p);
+            assert(n == 1);
+            auto block = reinterpret_cast<_block*>(p);
+            p->next    = _free;
+            _free      = p;
+        }
+
+
+        /// @brief Checks if the allocator is full.
+        [[nodiscard]] constexpr bool full() const noexcept
+        {
+            return _free == nullptr;
+        }
+
+
+        /// @brief Converts an object pointer to corresponding index inside the pool.
+        [[nodiscard]] constexpr std::size_t ptr_to_index(T* ptr) const noexcept
+        {
+            return static_cast<std::size_t>(std::distance(_pool.get(), reinterpret_cast<_block*>(ptr)));
+        }
+
+
+        /// @brief Converts an object index to corresponding pointer inside the pool.
+        [[nodiscard]] constexpr T* index_to_ptr(std::size_t idx) const noexcept
+        {
+            return reinterpret_cast<_block*>(std::addressof(_pool[idx].storage));
+        }
+
+    private:
+        union _block
+        {
+            std::aligned_storage_t<sizeof(T), alignof(T)> storage;
+            _block*                                       next;
+        };
+
+        _block*                   _free; // freelist of unallocated blocks
+        std::unique_ptr<_block[]> _pool; // backing buffer
+        //const std::size_t         _size; // number of preallocated blocks
     };
 
 } // namespace drako

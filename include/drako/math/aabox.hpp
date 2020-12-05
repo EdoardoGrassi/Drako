@@ -2,12 +2,11 @@
 #ifndef DRAKO_AABOX_HPP
 #define DRAKO_AABOX_HPP
 
-#include <algorithm>
-#include <limits>
-#include <tuple>
-
 #include "drako/math/line.hpp"
 #include "drako/math/vector3.hpp"
+
+#include <algorithm>
+#include <limits>
 
 namespace drako
 {
@@ -15,45 +14,45 @@ namespace drako
     // Axis-aligned box with min-max vertices representation.
     struct _aabox_mix_max
     {
-        vec3 min;
-        vec3 max;
+        Vec3 min;
+        Vec3 max;
 
         // Constructs a box with the given origin and size.
-        constexpr explicit _aabox_mix_max(vec3 center, vec3 extents) noexcept;
+        constexpr explicit _aabox_mix_max(Vec3 center, Vec3 extents) noexcept;
     };
 
-    using aabox = _aabox_mix_max;
+    using AABox = _aabox_mix_max;
 
     // Constructs a box from two vertexes.
-    [[nodiscard]] constexpr aabox
-    aabox_from_corners(vec3 min, vec3 max) noexcept;
+    [[nodiscard]] constexpr AABox
+    aabox_from_corners(Vec3 min, Vec3 max) noexcept;
 
     // Constructs a box from a vertex and box size.
-    [[nodiscard]] constexpr aabox
-    aabox_from_vertex(vec3 min, vec3 extents) noexcept;
+    [[nodiscard]] constexpr AABox
+    aabox_from_vertex(Vec3 min, Vec3 extents) noexcept;
 
 
     // Test if point P is contained in aab B volume.
-    [[nodiscard]] constexpr bool
-    overlap(const vec3& p, const aabox& b) noexcept
-    {
-    }
+    [[nodiscard]] constexpr bool overlap(const Vec3& p, const AABox& b) noexcept;
 
-    // Closest point contained in aabox B to point P.
-    [[nodiscard]] constexpr vec3
-    closest_point(const vec3& p, const aabox& b) noexcept
+    // Closest point contained in AABox B to point P.
+    [[nodiscard]] constexpr Vec3 closest_point(const Vec3& p, const AABox& b) noexcept
     {
         // clamp point coordinates to be inside B boundaries if P lies outside
         return max(min(p, b.max), b.min);
     }
 
-    // Squared distance between point P and aabox B.
-    [[nodiscard]] constexpr float
-    squared_distance(const vec3& p, const aabox& b) noexcept;
+    // Squared distance between point P and AABox B.
+    [[nodiscard]] constexpr float squared_distance(const Vec3& p, const AABox& b) noexcept;
 
 
-    [[nodiscard]] constexpr std::tuple<bool, float, vec3>
-    intersect(vec3 const p, vec3 const d, aabox const b) noexcept
+    struct IntersectResult
+    {
+        Vec3  where;
+        float distance;
+        bool  found;
+    };
+    [[nodiscard]] constexpr IntersectResult intersect(Vec3 const p, Vec3 const d, AABox const b) noexcept
     {
         float tmin = 0.0f;
         float tmax = std::numeric_limits<float>::max();
@@ -65,7 +64,7 @@ namespace drako
             {
                 // Ray is parallel to slab. No hit if origin is within slab
                 if (p[i] < b.min[i] || p[i] > b.max[i])
-                    return { false, std::numeric_limits<float>::infinity(), {} };
+                    return { Vec3{}, std::numeric_limits<float>::infinity(), false };
             }
             else
             {
@@ -83,9 +82,9 @@ namespace drako
                 tmax = std::fmaxf(tmax, t2);
             }
             // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
-            return { true, tmin, p + d * tmin };
+            return { p + d * tmin, tmin, true };
         }
-        return { false, std::numeric_limits<float>::infinity(), {} };
+        return { Vec3{}, std::numeric_limits<float>::infinity(), false };
     }
 
 } // namespace drako

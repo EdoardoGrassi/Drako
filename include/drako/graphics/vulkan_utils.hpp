@@ -2,7 +2,7 @@
 #ifndef DRAKO_VULKAN_UTILS_HPP
 #define DRAKO_VULKAN_UTILS_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/devel/logging.hpp"
 
 #include <vulkan/vulkan.hpp>

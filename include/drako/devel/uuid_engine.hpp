@@ -14,16 +14,16 @@ namespace drako
     /// Time-based version as specified in [RFC 4122].
     /// Requires access to the MAC address of the current machine.
     /// 
-    class uuid_v1_engine
+    class UuidMacEngine
     {
         // TODO: end impl
     public:
-        explicit uuid_v1_engine();
+        explicit UuidMacEngine();
 
-        uuid_v1_engine(const uuid_v1_engine&) = delete;
-        uuid_v1_engine& operator=(const uuid_v1_engine&) = delete;
+        //UuidMacEngine(const UuidMacEngine&) = delete;
+        //UuidMacEngine& operator=(const UuidMacEngine&) = delete;
 
-        [[nodiscard]] uuid operator()() noexcept;
+        [[nodiscard]] Uuid operator()() const noexcept;
 
     private:
         std::uint16_t            _clock;

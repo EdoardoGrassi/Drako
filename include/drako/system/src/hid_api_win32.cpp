@@ -1,6 +1,6 @@
 #include "drako/system/hid_types.hpp"
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/devel/assertion.hpp"
 #include "drako/devel/logging.hpp"
 
@@ -296,7 +296,7 @@ namespace drako::sys::hid
 
     //std::error_code hid_device::interrupt_pipe_write() noexcept;
 
-
+    /*
     result<input_report_info> device::input_report_info() noexcept
     {
         HIDP_CAPS capabilities;
@@ -315,5 +315,8 @@ namespace drako::sys::hid
             if (::HidP_GetValueCaps(HidP_Input, buffer.get(), &size, _preparsed) != HIDP_STATUS_SUCCESS)
                 return { std::error_code(::GetLastError(), std::system_category()), {} };
         }
+        // TODO: end impl
     }
+    */
+
 } // namespace drako::sys::hid

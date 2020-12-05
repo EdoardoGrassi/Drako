@@ -60,16 +60,16 @@ namespace drako::file_formats::obj
 
         [[nodiscard]] std::string_view view() const noexcept
         {
-            return { _first, static_cast<size_t>(std::distance(_first, _last)) };
+            return { _first, static_cast<std::size_t>(std::distance(_first, _last)) };
         }
-        //[[nodiscard]] size_t           file_line() const noexcept { return row; }
-        //[[nodiscard]] size_t           file_column() const noexcept { return col; }
+        //[[nodiscard]] std::size_t file_line() const noexcept { return row; }
+        //[[nodiscard]] std::size_t file_column() const noexcept { return col; }
     };
 
     struct _line // single file line info
     {
         const char* begin;
-        size_t      row;
+        std::size_t row;
     };
 
 
@@ -134,6 +134,13 @@ namespace drako::file_formats::obj
         };
     }
 
+    // ckeck if character is considered whitespace
+    // according to .obj format specs
+    [[nodiscard]] bool _is_whitespace(char c) noexcept
+    {
+        return c == ' ';
+    }
+
     // check if a keyword is ignored by current implementation
     [[nodiscard]] bool _is_ignored_keyword(const std::string_view keyword) noexcept
     {
@@ -147,7 +154,7 @@ namespace drako::file_formats::obj
     // parse an index integer according to specs
     [[nodiscard]] index _parse_index(const char* first, const char* last)
     {
-        index v;
+        index v{};
         if (const auto r = std::from_chars(first, last, v); r.ec != std::errc{})
             throw parser_error{ parser_error_code::invalid_arg_format };
         return v;
@@ -161,7 +168,7 @@ namespace drako::file_formats::obj
 
     [[nodiscard]] value _parse_value(const char* first, const char* last)
     {
-        value v;
+        value v{};
         if (const auto r = std::from_chars(first, last, v, std::chars_format::fixed);
             r.ec != std::errc{})
             throw parser_error{ parser_error_code::invalid_arg_format };
@@ -174,19 +181,22 @@ namespace drako::file_formats::obj
         return _parse_value(t.first(), t.last());
     }
 
-    [[nodiscard]] std::string_view _find_next_line(std::string_view data) noexcept
+    // starting from <first>, find the end of next line
+    // skipping comments ('#') and line continuation ('\')
+    [[nodiscard]] char* _next_line_end(char* first, char* last) noexcept
     {
-        for (auto begin = 0;; ++begin)
+        char* ch = first;
+        for (;; ++ch)
         {
-            const auto end = data.find_first_of('\n');
+            while (*ch != '\n')
+                ++ch;
 
-            if (data[begin] == '#') // line is a comment
+            if (*first == '#' && ch != last) // line is a comment
                 continue;
-            if (data[end - 1] == '\\') // line wraps into the next one
+            if (ch[-1] == '\\' && ch != last) // line wraps into the next one
                 continue;
-
-            return data.substr(begin, end);
         }
+        return ch;
     }
 
     [[nodiscard]] std::vector<_token> _tokenize_line(char* first, char* last)
@@ -227,8 +237,7 @@ namespace drako::file_formats::obj
         if (const auto s = std::size(args); s != 3 && s != 4)
             throw parser_error{ _pec::tag_v_invalid_args_count };
 
-        float v[4];
-        v[3] = default_vertex_weight;
+        value v[4] = { 0, 0, 0, default_vertex_weight };
         for (auto i = 0; i < std::size(args); ++i)
             v[i] = _parse_value(args[i]);
 
@@ -242,7 +251,7 @@ namespace drako::file_formats::obj
         if (std::size(args) != 3)
             throw parser_error{ parser_error_code::tag_vn_invalid_args_count };
 
-        value vn[3];
+        value vn[3] = { 0, 0, 0 };
         for (auto i = 0; i < 3; ++i)
             vn[i] = _parse_value(args[i]);
 
@@ -318,27 +327,33 @@ namespace drako::file_formats::obj
         auto& names = state.groups.names;
         for (const auto& name : args)
         {
-            const auto it = std::find(names.cbegin(), names.cend(), name.view());
-            if (it == names.cend())
+            const auto it = std::find(std::cbegin(names), std::cend(names), name.view());
+            if (it == std::cend(names))
             { // create a new group with provided name
                 names.emplace_back(name.view());
                 state.groups.data.emplace_back();
             }
-            const auto index = static_cast<std::size_t>(std::distance(names.cbegin(), it));
+            const auto index = static_cast<std::size_t>(std::distance(std::cbegin(names), it));
             state.active_groups_ids.emplace_back(index);
         }
     }
 
-    parser_result parse(const std::string_view source, const parser_config& config)
+    parser_result parse(std::span<char> s, const parser_config& config)
     {
+        // enforce newline as file ending character
+        std::cout << '>' << static_cast<uint8_t>(*std::prev(std::cend(s))) << "\n\n\n";
+        if (*std::prev(std::cend(s)) == '\n')
+            throw parser_error{ "Unexpected end of file reached. "
+                                "The ending newline character is missing." };
+
         _context state{};
 
-        for (auto head = 0; head < std::size(source);)
+        for (char* curr = std::data(s); curr != std::data(s) + std::size(s);)
         {
-            const auto line = _find_next_line(source.substr(head));
-            std::cout << line << '\n';
-            head += std::size(line);
+            const auto line = _next_line_end(curr, std::data(s) + std::size(s));
+            std::cout << line;
 
+            curr = line;
             /*
             const auto tokens = _tokenize_line(line);
 

@@ -20,14 +20,14 @@ namespace drako
         /* clang-format on */
     }
 
-    [[nodiscard]] inline constexpr mat4x4 translate(vec3 v) noexcept
+    [[nodiscard]] inline constexpr mat4x4 translate(Vec3 v) noexcept
     {
         return translate(v[0], v[1], v[2]);
     }
 
     // Creates a rotation transform matrix.
     [[nodiscard]] inline constexpr mat4x4 rotate(float x, float y, float z) noexcept;
-    [[nodiscard]] inline constexpr mat4x4 rotate(uquat rotation) noexcept;
+    [[nodiscard]] inline constexpr mat4x4 rotate(quat r) noexcept;
 
     [[nodiscard]] inline mat4x4 rotate_x(float radians) noexcept
     {
@@ -83,7 +83,7 @@ namespace drako
         return scale(s, s, s);
     }
 
-    [[nodiscard]] inline constexpr mat4x4 scale(const vec3& s) noexcept
+    [[nodiscard]] inline constexpr mat4x4 scale(const Vec3& s) noexcept
     {
         return scale(s[0], s[1], s[2]);
     }
@@ -119,8 +119,7 @@ namespace drako
     }
 
     // Creates a translation, rotation and scaling transform matrix.
-    [[nodiscard]] inline constexpr mat4x4
-    transform(vec3 p, uquat r, vec3 s) noexcept;
+    [[nodiscard]] inline constexpr mat4x4 transform(Vec3 p, quat r, Vec3 s) noexcept;
 
     // Creates an ortographic projection matrix.
     [[nodiscard]] inline constexpr mat4x4
@@ -173,11 +172,9 @@ namespace drako
     }
 
     // Rotates about axis passing through point in world space by angle degrees.
-    [[nodiscard]] constexpr mat4x4
-    rotate_around(vec3 point, vec3 axis, float angle) noexcept;
+    [[nodiscard]] constexpr mat4x4 rotate_around(Vec3 point, Vec3 axis, float angle) noexcept;
 
-    [[nodiscard]] constexpr mat4x4
-    look_at(vec3 camera, vec3 target, norm3 up) noexcept;
+    [[nodiscard]] constexpr mat4x4 look_at(Vec3 camera, Vec3 target, norm3 up) noexcept;
 
 } // namespace drako
 

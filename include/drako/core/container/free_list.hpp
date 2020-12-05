@@ -4,17 +4,14 @@
 
 #include <memory>
 
-#include "development/dk_assertion.hpp"
-
 namespace drako
 {
-    template <typename T>
-    class free_list
+    template <typename T, typename Al = std::allocator<T>>
+    class FreeList
     {
     public:
-
-        explicit free_list(const size_t size) noexcept
-            : _pool(static_cast<list_block*>(std::malloc(sizeof(list_block)* count)))
+        explicit FreeList(const std::size_t size) noexcept
+            : _pool(static_cast<list_block*>(std::malloc(sizeof(list_block) * count)))
             , _tail(_pool)
         {
             if (_pool == nullptr)
@@ -29,7 +26,7 @@ namespace drako
             _pool[count - 1].next_ptr = nullptr;
         }
 
-        ~free_list() noexcept
+        ~FreeList() noexcept
         {
             if (this->_pool != nullptr)
             {
@@ -37,71 +34,50 @@ namespace drako
             }
         }
 
-        free_list(const free_list&) = delete;
-        free_list& operator=(const free_list&) = delete;
+        FreeList(const FreeList&) = delete;
+        FreeList& operator=(const FreeList&) = delete;
 
-        constexpr free_list(free_list&& other) noexcept
+        constexpr FreeList(FreeList&& other) noexcept
             : _pool(other._pool), _tail(other._tail)
         {
             other._pool = nullptr;
         }
 
-        constexpr free_list& operator=(free_list&& other) noexcept
+        constexpr FreeList& operator=(FreeList&& other) noexcept
         {
-            _pool = other._pool;
-            _tail = other._tail;
+            _pool       = other._pool;
+            _tail       = other._tail;
             other._pool = nullptr;
         }
 
-        result_code push_back(T&& obj) noexcept
-        {
-            if (this->_tail == nullptr)
-            {
-                return result_code::error_out_of_memory;
-            }
-            auto old_block = this->_tail;
-            this->_tail = this->_tail->next_ptr;
-            old_block->data = T(obj);
+        bool push_back(T&& obj) noexcept;
 
-            return result_code::success;
-        }
-
-        result_code pop_back(T& out) noexcept
-        {
-            if (this->_tail == nullptr)
-            {
-                return result_code::failure;
-            }
-
-            return result_code::success;
-        }
+        bool pop_back(T& out) noexcept;
 
         void erase(T& obj) noexcept;
 
     private:
-
         union list_block
         {
             list_block* next_ptr;
-            T data;
+            T           data;
         };
 
+        Al          _al;
         list_block* _pool;
         list_block* _tail;
     };
 
 
     // CLASS TEMPLATE
-    // Free list with static memory allocation.
-    template <typename T>
-    class fixed_free_list
+    // Free list with bounded capacity.
+    template <typename T, typename Al = std::allocator<T>>
+    class FixedFreeList
     {
     public:
-
     private:
     };
 
 } // namespace drako
 
 #endif // !DRAKO_FREE_LIST_HPP
-

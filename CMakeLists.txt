@@ -16,7 +16,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
 
 if(MSVC)
+    # max warnings
     add_compile_options(/WX)
+
+    # enable c++ conforming behaviour for std::aligned_storage
+    add_compile_definitions(_ENABLE_EXTENDED_ALIGNED_STORAGE)
 else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
@@ -35,6 +39,7 @@ add_subdirectory("include/drako/engine")
 add_subdirectory("include/drako/file_formats")
 add_subdirectory("include/drako/input")
 add_subdirectory("include/drako/io")
+add_subdirectory("include/drako/jobs")
 add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
 add_subdirectory("include/drako/graphics")

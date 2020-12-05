@@ -1,6 +1,6 @@
 #include "drako/system/mouse_device.hpp"
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 // #include <WinUser.h>
 #include <Windows.h>
@@ -16,14 +16,14 @@
 
 namespace drako::sys
 {
-    void mouse_device::poll_state() noexcept
+    void MouseDevice::poll_state() noexcept
     {
     }
 
-    std::vector<mouse_event> mouse_device::poll_events() noexcept
+    std::vector<MouseEvent> MouseDevice::poll_events() noexcept
     {
         // TODO: add wheel events
-        std::vector<mouse_event> events;
+        std::vector<MouseEvent> events;
         // std::vector<mouse_wheel_event> wheel_events;
 
         for (MSG msg = {}; ::PeekMessageW(&msg, _context.handle_win32(),
@@ -35,38 +35,38 @@ namespace drako::sys
 
             const ivec2                     position(x, y);
             const std::chrono::milliseconds timestamp{ msg.time };
-            mouse_action                    action;
+            MouseAction                     action;
 
             switch (msg.message)
             {
                 case WM_LBUTTONDOWN:
-                    action = mouse_action::left_btn_press;
+                    action = MouseAction::left_btn_press;
                     break;
                 case WM_LBUTTONUP:
-                    action = mouse_action::left_btn_release;
+                    action = MouseAction::left_btn_release;
                     break;
                 case WM_LBUTTONDBLCLK:
-                    action = mouse_action::left_btn_double;
+                    action = MouseAction::left_btn_double;
                     break;
 
                 case WM_RBUTTONDOWN:
-                    action = mouse_action::right_btn_press;
+                    action = MouseAction::right_btn_press;
                     break;
                 case WM_RBUTTONUP:
-                    action = mouse_action::right_btn_release;
+                    action = MouseAction::right_btn_release;
                     break;
                 case WM_RBUTTONDBLCLK:
-                    action = mouse_action::right_btn_double;
+                    action = MouseAction::right_btn_double;
                     break;
 
                 case WM_MBUTTONDOWN:
-                    action = mouse_action::mid_btn_press;
+                    action = MouseAction::mid_btn_press;
                     break;
                 case WM_MBUTTONUP:
-                    action = mouse_action::mid_btn_release;
+                    action = MouseAction::mid_btn_release;
                     break;
                 case WM_MBUTTONDBLCLK:
-                    action = mouse_action::mid_btn_double;
+                    action = MouseAction::mid_btn_double;
                     break;
 
                     /*case WM_MOUSEWHEEL:

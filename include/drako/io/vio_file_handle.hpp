@@ -2,7 +2,7 @@
 #ifndef DRAKO_VIO_FILE_HANDLE_HPP
 #define DRAKO_VIO_FILE_HANDLE_HPP
 
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/platform.hpp"
 
 #if defined(_drako_platform_Win32)
 #include <Windows.h>

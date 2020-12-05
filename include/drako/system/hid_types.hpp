@@ -2,8 +2,8 @@
 #ifndef DRAKO_HID_TYPES_HPP_
 #define DRAKO_HID_TYPES_HPP_
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/system/hid_standard.hpp"
 
 #include <iostream>

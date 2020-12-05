@@ -9,8 +9,8 @@ int main()
 {
     using namespace drako;
     {
-        const uuid a{};
-        const uuid b{};
+        const Uuid a{};
+        const Uuid b{};
 
         assert(!a.has_value());
         assert(!b.has_value());
@@ -25,8 +25,9 @@ int main()
         assert(!(b > a));
     }
     {
-        const auto a = uuid::parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
-        const auto b = uuid::parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+        Uuid a, b;
+        parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8", a);
+        parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8", b);
 
         assert(a.has_value());
         assert(b.has_value());
@@ -35,9 +36,9 @@ int main()
         assert(!(a != b));
     }
     {
-        uuid_v1_engine gen{};
-        const uuid     a = gen();
-        const uuid     b = gen();
+        UuidMacEngine gen{};
+        const Uuid    a = gen();
+        const Uuid    b = gen();
 
         assert(a.has_value());
         assert(b.has_value());
@@ -51,10 +52,10 @@ int main()
     {
         const auto iters = 1000u;
 
-        std::vector<uuid> v;
+        std::vector<Uuid> v;
         v.reserve(iters);
 
-        uuid_v1_engine gen{};
+        UuidMacEngine gen{};
         for (auto i = 0; i < iters; ++i)
         {
             const auto u = gen();

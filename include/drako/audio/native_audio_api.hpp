@@ -2,8 +2,8 @@
 #ifndef DRAKO_NATIVE_AUDIO_API_HPP
 #define DRAKO_NATIVE_AUDIO_API_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/logging.hpp"
 
 #if defined(DRAKO_PLT_WIN32)

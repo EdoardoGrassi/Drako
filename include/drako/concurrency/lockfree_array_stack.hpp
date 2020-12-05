@@ -9,7 +9,7 @@
 
 #include <atomic>
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/concurrency/lockfree_pool_allocator.hpp"
 
 // TODO: end implementation

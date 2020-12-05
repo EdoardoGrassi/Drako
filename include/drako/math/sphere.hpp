@@ -2,7 +2,7 @@
 #ifndef DRAKO_SPHERE_HPP
 #define DRAKO_SPHERE_HPP
 
-#include "drako/core/preprocessor/compiler_macros.hpp"
+#include "drako/core/compiler.hpp"
 #include "drako/math/line.hpp"
 #include "drako/math/vector3.hpp"
 

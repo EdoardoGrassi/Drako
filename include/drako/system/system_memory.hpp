@@ -3,8 +3,8 @@
 #define DRAKO_SYSTEM_MEMORY_HPP
 
 #include "drako/core/memory/memory_core.hpp"
-#include "drako/core/preprocessor/compiler_macros.hpp"
-#include "drako/core/preprocessor/platform_macros.hpp"
+#include "drako/core/compiler.hpp"
+#include "drako/core/platform.hpp"
 #include "drako/devel/assertion.hpp"
 
 #if defined(DRAKO_PLT_WIN32)

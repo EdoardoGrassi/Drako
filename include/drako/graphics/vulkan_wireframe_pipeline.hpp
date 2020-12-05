@@ -72,7 +72,7 @@ namespace drako::vulkan
             // vertex position [x,y,z]
             {
                 BUFFER_BINDING_NUMBER,       // binding
-                sizeof(::drako::vec3),       // stride
+                sizeof(drako::Vec3),       // stride
                 vk::VertexInputRate::eVertex // AoSformat
             }
         };
@@ -82,7 +82,7 @@ namespace drako::vulkan
                 SHADER_BINDING_NUMBER, // shader binding location number
                 BUFFER_BINDING_NUMBER, // buffer binding location number
                 vk::Format::eR32G32B32Sfloat,
-                sizeof(::drako::vec3) // stride
+                sizeof(drako::Vec3) // stride
             }
         };
         const vk::PipelineVertexInputStateCreateInfo vertex_input_state{

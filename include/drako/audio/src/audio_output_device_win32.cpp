@@ -21,9 +21,9 @@ namespace drako::audio
         // TODO: change CLSCTX_ALL flag, some options aren't needed
         if (const auto hr = CoCreateInstance(__uuidof(MMDeviceEnumerator),
                 NULL, CLSCTX_ALL, IID_PPV_ARGS(&enumerator));
-            DRAKO_UNLIKELY(hr != S_OK))
+            hr != S_OK)
         {
-            return { std::error_code(hr, std::system_category()), _id{} };
+            [[unlikely]] return { _ec(hr, std::system_category()), _id{} };
         }
 
         // std::unique_ptr<IMMDevice, decltype(IMMDevice::Release)> device;

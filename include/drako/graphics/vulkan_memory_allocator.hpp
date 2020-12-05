@@ -14,17 +14,16 @@
 
 namespace drako::vulkan
 {
-    class global_allocator
+    class GlobalAllocator
     {
     public:
-        explicit global_allocator(const context& ctx);
+        explicit GlobalAllocator(const context& ctx);
 
-        global_allocator(const global_allocator&) = delete;
-        global_allocator& operator=(const global_allocator&) = delete;
+        GlobalAllocator(const GlobalAllocator&) = delete;
+        GlobalAllocator& operator=(const GlobalAllocator&) = delete;
 
-        global_allocator(global_allocator&&) = delete;
-        global_allocator& operator=(global_allocator&&) = delete;
-
+        GlobalAllocator(GlobalAllocator&&) = delete;
+        GlobalAllocator& operator=(GlobalAllocator&&) = delete;
 
         void bind_non_sparse(vk::Buffer desc);
 
@@ -39,7 +38,7 @@ namespace drako::vulkan
         std::array<vk::UniqueDeviceMemory, VK_MAX_MEMORY_TYPES> _mem_pools;
     };
 
-    global_allocator::global_allocator(const context& ctx)
+    GlobalAllocator::GlobalAllocator(const context& ctx)
         : _pdevice(ctx.physical_device), _ldevice(ctx.logical_device.get())
     {
         const auto properties = _pdevice.getMemoryProperties();
@@ -55,7 +54,7 @@ namespace drako::vulkan
         }
     }
 
-    void global_allocator::bind_non_sparse(vk::Buffer desc)
+    void GlobalAllocator::bind_non_sparse(vk::Buffer desc)
     {
         /*
         const auto buffer_mem_req = _ldevice.getBufferMemoryRequirements(desc);
@@ -74,96 +73,6 @@ namespace drako::vulkan
         }
         */
     }
-
-
-    // Allocator for buffers with frequent device (GPU) usage
-    class device_local_allocator
-    {
-    public:
-        explicit device_local_allocator(const context& ctx, size_t bytes, const std::span<uint32_t> queue_families);
-
-        device_local_allocator(const device_local_allocator&) = delete;
-        device_local_allocator& operator=(const device_local_allocator&) = delete;
-
-        device_local_allocator(device_local_allocator&&) = delete;
-        device_local_allocator operator=(device_local_allocator&&) = delete;
-
-
-        [[nodiscard]] std::byte* allocate(vk::Buffer buffer);
-        //std::byte* allocate(const std::vector<vk::Buffer>& buffers);
-
-        void deallocate(std::byte*);
-
-    private:
-        const vk::Device       _device;
-        vk::UniqueDeviceMemory _memory;
-        vk::UniqueBuffer       _buffer;
-    };
-
-    device_local_allocator::device_local_allocator(
-        const context& ctx, size_t bytes, const std::span<std::uint32_t> queue_families)
-        : _device{ ctx.logical_device.get() }
-    {
-        assert(bytes > 0);
-
-        // prototype of typical ubo use case
-        const vk::BufferCreateInfo buffer_info{
-            {},
-            vk::DeviceSize{ bytes },
-            vk::BufferUsageFlagBits::eUniformBuffer | vk::BufferUsageFlagBits::eTransferDst,
-            vk::SharingMode::eConcurrent,
-            static_cast<uint32_t>(std::size(queue_families)),
-            queue_families.data()
-        };
-        _buffer = _device.createBufferUnique(buffer_info);
-
-        const auto specs = _device.getBufferMemoryRequirements(_buffer.get());
-
-        const vk::MemoryAllocateInfo device_alloc_info{
-            specs.size,
-        };
-        _memory = _device.allocateMemoryUnique(device_alloc_info);
-    }
-
-    [[nodiscard]] std::byte* device_local_allocator::allocate(vk::Buffer buffer)
-    {
-        const auto specs = _device.getBufferMemoryRequirements(buffer);
-
-        _device.bindBufferMemory(buffer, _memory.get(), 0);
-    }
-
-
-    // Allocator for buffers with frequent host (CPU) access
-    class host_stack_allocator
-    {
-    public:
-        explicit host_stack_allocator(const context&, const vk::MemoryAllocateInfo&);
-
-        host_stack_allocator(const host_stack_allocator&) = delete;
-        host_stack_allocator& operator=(const host_stack_allocator&) = delete;
-
-        ~host_stack_allocator() noexcept;
-
-        [[nodiscard]] void* allocate(vk::Buffer b) noexcept;
-
-        void deallocate(void* ptr) noexcept;
-
-    private:
-        const vk::Device       _device;
-        vk::UniqueDeviceMemory _memory;
-        std::byte*             _buffer;
-        size_t                 _offset;
-    };
-
-
-    class fixed_host_ubo
-    {
-    };
-
-
-    class fixed_device_ubo
-    {
-    };
 
 } // namespace drako::vulkan
 
