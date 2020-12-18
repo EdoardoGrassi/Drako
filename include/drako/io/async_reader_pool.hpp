@@ -33,7 +33,7 @@ namespace drako::io
 
         struct Request
         {
-            io::handle           src;
+            io::Handle           src;
             std::span<std::byte> dst;
             std::size_t          offset;
         };

@@ -71,7 +71,7 @@ namespace drako::sys
         // using mouse_event_handler = void(*)(const mouse_action_event&);
 
 #if defined(DRAKO_PLT_WIN32)
-        explicit MouseDevice(const desktop_window& context) noexcept
+        explicit MouseDevice(const UniqueDesktopWindow& context) noexcept
             : _context(context) {}
 #endif
         MouseDevice(const MouseDevice&) = delete;
@@ -83,7 +83,8 @@ namespace drako::sys
 
     private:
 #if defined(DRAKO_PLT_WIN32)
-        const desktop_window& _context;
+        // TODO: remove possible dangling reference, use unmanaged handle
+        const UniqueDesktopWindow& _context;
 #endif
     };
 } // namespace drako::sys

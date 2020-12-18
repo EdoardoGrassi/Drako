@@ -32,6 +32,7 @@ enum class _program_options
 
 int main(const int argc, const char* argv[])
 {
+    using namespace drako;
     using namespace drako::file_formats::obj;
 
     //_program_options options;
@@ -58,12 +59,12 @@ int main(const int argc, const char* argv[])
         try
         {
             const std::filesystem::path  path{ argv[i] };
-            drako::io::UniqueInputFile src{ path };
+            io::UniqueInputFile src{ path };
 
             const auto file_size = static_cast<size_t>(std::filesystem::file_size(path));
 
             auto buffer = std::make_unique<char[]>(file_size);
-            src.read(reinterpret_cast<std::byte*>(buffer.get()), file_size);
+            io::read_exact(src, { reinterpret_cast<std::byte*>(buffer.get()), file_size });
 
             std::cout << "Parsing " << path << " ...\n";
             const auto result = parse({ buffer.get(), file_size }, config);

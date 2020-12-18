@@ -46,8 +46,11 @@ add_subdirectory("include/drako/graphics")
 
 
 # Experimental Drako engine with forward renderer
-add_executable(drako-engine WIN32 "./src/vulkan_engine_win32.cpp")
-target_link_libraries(drako-engine PRIVATE drako::vulkan-forward-renderer)
+add_executable(drako-engine "./src/vulkan_engine_win32.cpp")
+target_link_libraries(drako-engine PRIVATE
+    drako::vulkan-forward-renderer
+    drako::system
+    drako::runtime)
 
 
 # Console interface for Drako projects

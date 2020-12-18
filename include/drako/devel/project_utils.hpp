@@ -8,25 +8,32 @@
 #include <filesystem>
 #include <vector>
 
-namespace fs = std::filesystem; // convenient alias
-
 namespace drako::editor
 {
-
-    /// @brief Generate metadata file for an asset.
-    ///
-    /// @param[in] file Source file path
-    ///
-    [[nodiscard]] internal_asset_info make_asset_metafile(const fs::path& file);
+    /// @brief Insert an asset in the project database.
+    void insert(ProjectDatabase&, const std::filesystem::path&, const AssetImportInfo&);
 
 
-    /// @brief Load metadata of an asset.
-    ///
-    /// @param[in] file Metadata file path
-    ///
-    [[nodiscard]] internal_asset_info load_asset_metafile(const fs::path& file);
+    /// @brief Serialize project metadata,
+    void save(const std::filesystem::path&, const ProjectMetaInfo&);
 
-    void load_asset_index_cache(const Project& p);
+    /// @brief Deserialize project metadata.
+    void load(const std::filesystem::path&, ProjectMetaInfo&);
+
+    /// @brief Serialize project data.
+    void save(const std::filesystem::path&, const ProjectDatabase&);
+
+    /// @brief Deserialize project data.
+    void load(const std::filesystem::path&, ProjectDatabase&);
+
+    /// @brief Serialize asset metadata.
+    void save(const std::filesystem::path&, const AssetImportInfo&);
+
+    /// @brief Deserialize asset metadata.
+    void load(const std::filesystem::path&, AssetImportInfo&);
+
+
+    //void load_asset_index_cache(const Project& p);
 
 
     /// @brief Creates the filesystem tree for a new project.
@@ -39,59 +46,13 @@ namespace drako::editor
     ///
     /// @pre @p where must already exist.
     ///
-    void make_project_tree(std::string_view name, const fs::path& where);
+    void create_project_tree(std::string_view name, const std::filesystem::path& where);
 
+    /// @brief Create and import a new asset.
+    void create_asset(const ProjectContext&, ProjectDatabase&, const std::filesystem::path&, const AssetImportInfo&);
 
-    /// @brief Create an imported asset instance.
-    ///
-    /// @param[in] p   Project info
-    /// @param[in] src Input file for the importer
-    ///
-    void import_external_asset(const project_info& p, const fs::path& src);
-
-
-    /// @brief Create an imported asset instance.
-    ///
-    /// @param[in] p       Project info
-    /// @param[in] sources Input files for the importer
-    ///
-    void import_external_asset(const project_info& p, const std::vector<fs::path>& sources);
-
-
-    struct load_importable_result
-    {
-    };
-    [[nodiscard]] load_importable_result load_imported_asset(const project_info& p, const Uuid& asset);
-
-
-    /// @brief Load project base information.
-    ///
-    /// @param[in] root Project root directory
-    ///
-    [[nodiscard]] project_info load_project_info(const fs::path& root);
-
-
-    /// @brief Load full project data from persistent storage.
-    ///
-    /// @param[in] p Project.
-    ///
-    void load_project(Project& p);
-
-
-    /// @brief Save all project data to persisent storage.
-    ///
-    /// @param[in] p Project.
-    ///
-    void save_project(const Project& p);
-
-
-    /// @brief Retrieves the full path to an asset.
-    ///
-    /// @param[in] p     Project header
-    /// @param[in] asset Asset GUID
-    ///
-    [[nodiscard]] fs::path guid_to_path(const project_info& p, const Uuid& asset);
-
+    /// @brief Perform import process of an existing asset.
+    void import_asset(const ProjectContext& ctx, const Uuid&);
 
 } // namespace drako::editor
 

@@ -2,11 +2,11 @@
 #ifndef DRAKO_ASSET_UTILS_HPP
 #define DRAKO_ASSET_UTILS_HPP
 
+#include "drako/devel/asset_bundle_manifest.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/io/input_file_handle.hpp"
 #include "drako/io/output_file_handle.hpp"
 
-#include <iostream>
 #include <limits>
 #include <string>
 #include <tuple>
@@ -28,29 +28,29 @@ namespace drako
     }
     */
 
-    
+
 
     void write_bundle_metadata(const std::filesystem::path& dst);
 
-    /*
-    [[nodiscard]] load_bundles_result load_bundles_list(const std::filesystem::path& src)
+    [[nodiscard]] inline std::vector<AssetBundleID>
+    load_bundles_list(const std::filesystem::path& src)
     {
-        namespace _fs = std::filesystem;
-        using _header = asset_manifest_header;
-        using _entry  = asset_manifest_entry;
+        const auto size   = static_cast<std::size_t>(std::filesystem::file_size(src));
+        auto       memory = std::make_unique<std::byte[]>(size);
 
-        std::ifstream ifs{ src };
-        const auto    file_size = _fs::file_size(src);
-
-        auto local_temp_buffer = std::make_unique<std::byte[]>(file_size);
-        ifs.read(reinterpret_cast<char*>(local_temp_buffer.get()), file_size);
-
-        const auto header = reinterpret_cast<_header*>(local_temp_buffer.get());
-        const auto items  = reinterpret_cast<_entry*>(local_temp_buffer.get() + sizeof(_header));
-        for (auto i = 0; i < header->items_count; ++i)
+        std::span<std::byte> span{ memory.get(), size };
         {
+            io::UniqueInputFile f{ src };
+            io::read_exact(f, span);
         }
-    }*/
+
+        const AssetBundleListView  v{ span };
+        std::vector<AssetBundleID> result;
+        result.resize(std::size(v.ids()));
+        std::memcpy(std::data(result), std::data(v.ids()), std::size(v.ids()));
+
+        return result;
+    }
 
     /*
     [[nodiscard]] std::tuple<bool, std::size_t> find_asset_index(const asset_bundle& b, asset_id a)

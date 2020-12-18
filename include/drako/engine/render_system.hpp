@@ -47,10 +47,10 @@ namespace drako
         struct frame_render_soa
         {
             std::vector<render_id> entities;
-            std::vector<mat4x4>    mvps;
+            std::vector<Mat4x4>    mvps;
         };
 
-        explicit RenderSystem(const vulkan::context& ctx) noexcept;
+        explicit RenderSystem(const vulkan::Context& ctx) noexcept;
 
         //void create(pipeline_id, const vulkan::graphics_pipeline&) noexcept;
         void create(mesh_id, const mesh_create_info&) noexcept;

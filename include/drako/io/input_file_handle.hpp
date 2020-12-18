@@ -28,7 +28,7 @@ namespace drako::io
             : _handle{ handle } {}
 
         explicit UniqueInputFile(const path_type& filename)
-            : _handle{ io::open(filename, mode::read, creation::open_existing) } {}
+            : _handle{ io::open(filename, Mode::read, Create::open_existing) } {}
 
 
         UniqueInputFile(const UniqueInputFile&) = delete;
@@ -53,26 +53,29 @@ namespace drako::io
                 io::close(_handle);
         }
 
-        /// @brief Reads raw bytes from the file.
-        /// @param dst Destination buffer.
-        /// @param bytes Number of bytes to read.
-        void read(std::byte* dst, std::size_t bytes)
+        /// @brief Reads bytes from the file.
+        /// @param buf Destination buffer.
+        [[nodiscard]] auto read(
+            std::span<std::byte> buf)
         {
-            io::read(_handle, dst, bytes);
+            return io::read(_handle, std::data(buf), std::size(buf));
         }
-        void read(std::byte* dst, std::size_t bytes, std::size_t offset)
+        [[nodiscard]] auto read(
+            std::span<std::byte> buf, std::size_t offset)
         {
-            io::read(_handle, dst, bytes, offset);
+            return io::read(_handle, std::data(buf), std::size(buf), offset);
         }
 
-        /// @brief Reads raw bytes from the file.
-        void read(std::byte* dst, std::size_t bytes, std::error_code& ec) noexcept
+        /// @brief Reads bytes from the file.
+        [[nodiscard]] auto read(
+            std::span<std::byte> buf, std::error_code& ec) noexcept
         {
-            io::read(_handle, dst, bytes, ec);
+            return io::read(_handle, std::data(buf), std::size(buf), ec);
         }
-        void read(std::byte* dst, std::size_t bytes, std::size_t offset, std::error_code& ec) noexcept
+        [[nodiscard]] auto read(
+            std::span<std::byte> buf, std::size_t offset, std::error_code& ec) noexcept
         {
-            io::read(_handle, dst, bytes, offset, ec);
+            return io::read(_handle, std::data(buf), std::size(buf), ec);
         }
 
         /// @brief Close the handle.
@@ -87,18 +90,55 @@ namespace drako::io
     private:
         native_handle_type _handle = INVALID_HANDLE_VALUE;
     };
+    static_assert(!std::is_copy_constructible_v<UniqueInputFile>,
+        DRAKO_STRINGIZE(UniqueInputFile) " must be a movable-only type.");
+    static_assert(!std::is_copy_assignable_v<UniqueInputFile>,
+        DRAKO_STRINGIZE(UniqueInputFile) " must be a movable-only type.");
+    static_assert(std::is_nothrow_move_constructible_v<UniqueInputFile>,
+        DRAKO_STRINGIZE(UniqueInputFile) " must be nothrow movable.");
+    static_assert(std::is_nothrow_move_assignable_v<UniqueInputFile>,
+        DRAKO_STRINGIZE(UniqueInputFile) " must be nothrow movable.");
 
-    inline void read(
-        UniqueInputFile input, std::span<std::byte> buffer)
+    /// @brief Read some bytes into a buffer.
+    [[nodiscard]] inline auto read_some(
+        UniqueInputFile& f, std::span<std::byte> buf)
     {
-        input.read(std::data(buffer), std::size(buffer));
+        return f.read(buf);
     }
 
-    inline void read(
-        UniqueInputFile input, std::span<std::byte> buffer, std::error_code& ec) noexcept
+    /// @brief Read some bytes into a buffer.
+    [[nodiscard]] inline auto read_some(
+        UniqueInputFile& f, std::span<std::byte> buf, std::error_code& ec) noexcept
     {
-        input.read(std::data(buffer), std::size(buffer), ec);
+        return f.read(buf, ec);
     }
+
+
+    /// @brief Read bytes into a buffer until is full.
+    [[nodiscard]] inline void read_exact(
+        UniqueInputFile& f, std::span<std::byte> buf)
+    {
+        auto done = 0; // total bytes
+        auto read = 0; // last read
+        do
+        {
+            read = f.read(buf.last(std::size(buf) - done));
+            done += read;
+        } while (read != 0);
+
+        if (done != std::size(buf)) // end of file is not at the expected offset
+            [[unlikely]] throw std::runtime_error{ "Unexpected end of file." };
+    }
+
+    /*
+    /// @brief Read all the bytes from a file.
+    [[nodiscard]] inline std::vector<std::byte> read_to_end(
+        UniqueInputFile& f)
+    {
+        std::vector<std::byte> buffer{};
+        // TODO: implementation
+    }
+    */
 
 
     /// @brief Instantiate an object from raw bytes.

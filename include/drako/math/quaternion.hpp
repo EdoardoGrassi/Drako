@@ -7,40 +7,34 @@
 
 #include <type_traits>
 
-#if defined(DRAKO_API_SIMD)
-#include <intrin.h>
-#endif
-
 namespace drako
 {
-    /// @brief Hamilton quaternion.
-    union alignas(sizeof(float) * 4) quat
+    /// @brief Hamilton Quaternion.
+    union alignas(sizeof(float) * 4) Quat
     {
-        /// @brief Constructs the identity quaternion. 
-        explicit constexpr quat() noexcept
+        /// @brief Constructs the identity Quaternion.
+        explicit constexpr Quat() noexcept
             : x{ 0.f }, y{ 0.f }, z{ 0.f }, w{ 1.f } {}
 
-        explicit constexpr quat(float x, float y, float z, float w) noexcept
+        explicit constexpr Quat(float x, float y, float z, float w) noexcept
             : x{ x }, y{ y }, z{ z }, w{ w } {}
 
-        explicit constexpr quat(const Vec4& xyzw) noexcept
+        explicit constexpr Quat(const Vec4& xyzw) noexcept
             : x{ xyzw.x }, y{ xyzw.y }, z{ xyzw.z }, w{ xyzw.w } {}
 
-        constexpr quat(const quat&) noexcept = default;
-        constexpr quat& operator=(const quat&) noexcept = default;
+        constexpr Quat(const Quat&) noexcept = default;
+        constexpr Quat& operator=(const Quat&) noexcept = default;
 
-        [[nodiscard]] explicit operator mat4x4() const noexcept;
+        friend constexpr Quat operator*(Quat lhs, Quat rhs) noexcept;
 
-        friend constexpr quat operator*(quat lhs, quat rhs) noexcept;
+        [[nodiscard]] friend constexpr bool operator==(Quat, Quat) noexcept = default;
+        [[nodiscard]] friend constexpr bool operator!=(Quat, Quat) noexcept = default;
 
-        [[nodiscard]] friend constexpr bool operator==(quat, quat) noexcept = default;
-        [[nodiscard]] friend constexpr bool operator!=(quat, quat) noexcept = default;
-
-        // Normalizes the quaternion
+        // Normalizes the Quaternion
         constexpr void normalize() noexcept;
 
-        // Returns the quaternion normalized.
-        [[nodiscard]] constexpr quat normalized() const noexcept;
+        // Returns the Quaternion normalized.
+        [[nodiscard]] constexpr Quat normalized() const noexcept;
 
         struct
         {
@@ -48,31 +42,31 @@ namespace drako
         };
         float xyzw[4];
     };
-    static_assert(std::is_standard_layout_v<quat>);
-    static_assert(std::is_trivially_copyable_v<quat>);
-    static_assert(std::is_nothrow_swappable_v<quat>);
-    static_assert(std::is_nothrow_destructible_v<quat>);
+    static_assert(std::is_standard_layout_v<Quat>);
+    static_assert(std::is_trivially_copyable_v<Quat>);
+    static_assert(std::is_nothrow_swappable_v<Quat>);
+    static_assert(std::is_nothrow_destructible_v<Quat>);
 
 
-    // Computes the norm of the quaternion.
-    [[nodiscard]] inline float norm(quat q) noexcept
+    // Computes the norm of the Quaternion.
+    [[nodiscard]] inline float norm(Quat q) noexcept
     {
         return norm(Vec4{ q.xyzw });
     }
 
-    // Computes the conjugate of the quaternion.
-    [[nodiscard]] constexpr quat conjugate(quat q) noexcept
+    // Computes the conjugate of the Quaternion.
+    [[nodiscard]] constexpr Quat conjugate(Quat q) noexcept
     {
-        return quat{ -q.x, -q.y, -q.z, q.w };
+        return Quat{ -q.x, -q.y, -q.z, q.w };
     }
 
-    // Computes the inverse of the quaternion.
-    [[nodiscard]] inline constexpr quat inverse(quat q) noexcept;
+    // Computes the inverse of the Quaternion.
+    [[nodiscard]] inline constexpr Quat inverse(Quat q) noexcept;
 
-    [[nodiscard]] inline constexpr bool normalized(quat q) noexcept;
+    [[nodiscard]] inline constexpr bool normalized(Quat q) noexcept;
 
-    // Checks if the quaternion represents the same rotation.
-    [[nodiscard]] inline constexpr bool equivalent(quat q1, quat q2) noexcept;
+    // Checks if the Quaternion represents the same rotation.
+    [[nodiscard]] inline constexpr bool equivalent(Quat q1, Quat q2) noexcept;
 
 } // namespace drako
 

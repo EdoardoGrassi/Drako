@@ -66,7 +66,7 @@ namespace drako::sys
             Action                    action;
         };
 
-        explicit Keyboard(const desktop_window& context) noexcept
+        explicit Keyboard(const UniqueDesktopWindow& context) noexcept
             : _context{ context }
         {
         }
@@ -80,7 +80,7 @@ namespace drako::sys
 
     private:
 #if defined(DRAKO_PLT_WIN32)
-        const desktop_window& _context;
+        const UniqueDesktopWindow& _context; // TODO: remove reference, unmanaged handle is preferred
 #endif
     };
 

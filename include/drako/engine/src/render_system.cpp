@@ -50,7 +50,7 @@ namespace drako
     {
     }
 
-    _this::RenderSystem(const vulkan::context& ctx) noexcept
+    _this::RenderSystem(const vulkan::Context& ctx) noexcept
         : _renderer(ctx)
     {
     }

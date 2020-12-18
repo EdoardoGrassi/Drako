@@ -13,10 +13,38 @@
 
 namespace drako
 {
+    class AssetBundleListView
+    {
+    public:
+        explicit AssetBundleListView(std::span<const std::byte> data)
+            : _data(std::data(data))
+        {
+            std::memcpy(&_h, std::data(data), sizeof(_h));
+        }
+
+        [[nodiscard]] std::size_t size() const noexcept { return _h.row_count; }
+
+        [[nodiscard]] std::span<const std::byte> ids() const noexcept
+        {
+            return { _data, _h.row_count };
+        }
+
+    private:
+        struct _header
+        {
+            std::uint32_t total_data_size;
+            std::uint32_t row_count;
+            std::uint32_t id_column_offset;
+            //std::uint32_t name_column_offset;
+        };
+        _header          _h;
+        const std::byte* _data;
+    };
+
     class AssetBundleManifest
     {
     public:
-        explicit AssetBundleManifest(const std::span<std::byte> blob);
+        explicit AssetBundleManifest(std::span<const std::byte> data);
 
         //AssetBundleManifest(const AssetBundleManifest&) = delete;
         //AssetBundleManifest& operator=(const AssetBundleManifest&) = delete;
@@ -34,9 +62,9 @@ namespace drako
             std::uint32_t items_count;
         };
 
-        _header                            _header;
-        std::unique_ptr<AssetID[]>         _ids;
-        std::unique_ptr<asset_load_info[]> _infos;
+        _header                          _header;
+        std::unique_ptr<AssetID[]>       _ids;
+        std::unique_ptr<AssetLoadInfo[]> _infos;
     };
 
     /*
@@ -66,36 +94,44 @@ namespace drako
     public:
         explicit AssetBundleManifestView(std::span<const std::byte> bytes)
         {
-            assert(std::size(bytes) > sizeof(_header));
-            std::memcpy(&_size, std::data(bytes), sizeof(decltype(_size)));
-            if (std::size(bytes) != (sizeof(_size) + 2 * _size))
+            if (std::size(bytes) > sizeof(_header))
+                throw std::runtime_error{ "Input bytes can't represent a valid manifest." };
+
+            std::memcpy(&_header, std::data(bytes), sizeof(_header));
+            if (std::size(bytes) != (sizeof(_header.size) + _header.size * (sizeof(AssetID) + sizeof(AssetLoadInfo))))
                 throw std::runtime_error{ "Reported size doesn't match input buffer size." };
 
-            _ids  = std::data(bytes) + sizeof(_size);
-            _meta = std::data(bytes) + sizeof(_size) + _size;
+            _ids  = std::data(bytes) + sizeof(_header_type);
+            _meta = std::data(bytes) + sizeof(_header_type) + _header.size * sizeof(AssetID);
         }
+
+        [[nodiscard]] std::size_t size() const noexcept { return _header.size; }
 
         [[nodiscard]] std::span<const std::byte> ids() const noexcept
         {
-            return { _ids, _size };
+            return { _ids, _header.size };
         }
+
         [[nodiscard]] std::span<const std::byte> metadata() const noexcept
         {
-            return { _meta, _size };
+            return { _meta, _header.size };
         }
 
     private:
-        struct _header
+        struct _header_type
         {
             std::uint32_t size;
+            std::uint32_t ids_column_offset;
+            std::uint32_t meta_column_offset;
 
-            _header(std::span<const std::byte> bytes)
-                : size{ from_le_bytes<decltype(size)>(std::data(bytes)) } {}
+            //_header_type(std::span<const std::byte> bytes)
+            //    : size{ from_le_bytes<decltype(size)>(std::data(bytes)) } {}
         };
+        static_assert(std::is_trivially_copyable_v<_header_type>);
 
+        _header_type     _header;
         const std::byte* _ids;
         const std::byte* _meta;
-        std::size_t      _size;
     };
 
 } // namespace drako

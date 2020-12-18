@@ -9,7 +9,7 @@ namespace drako::vulkan
     class RenderEngine
     {
     public:
-        explicit RenderEngine(const context& ctx);
+        explicit RenderEngine(const Context& ctx);
     private:
     };
 } // namespace drako::vulkan

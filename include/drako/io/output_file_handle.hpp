@@ -26,8 +26,8 @@ namespace drako::io
         explicit constexpr UniqueOutputFile(native_handle_type handle) noexcept
             : _handle{ handle } {}
 
-        explicit UniqueOutputFile(const path_type& filename, creation c = creation::if_needed)
-            : _handle{ io::open(filename, mode::write, c) } {}
+        explicit UniqueOutputFile(const path_type& filename, Create c = Create::if_needed)
+            : _handle{ io::open(filename, Mode::write, c) } {}
 
         ~UniqueOutputFile() noexcept
         {
@@ -53,14 +53,14 @@ namespace drako::io
             return *this;
         }
 
-        void write(const std::byte* src, std::size_t bytes)
+        [[nodiscard]] auto write(std::span<const std::byte> buf)
         {
-            io::write(src, _handle, bytes);
+            return io::write(std::data(buf), _handle, std::size(buf));
         }
 
-        void write(const std::byte* src, std::size_t bytes, std::error_code& ec) noexcept
+        [[nodiscard]] auto write(std::span<const std::byte> buf, std::error_code& ec) noexcept
         {
-            io::write(src, _handle, bytes, ec);
+            return io::write(std::data(buf), _handle, std::size(buf), ec);
         }
 
         void close()
@@ -79,6 +79,19 @@ namespace drako::io
     private:
         native_handle_type _handle = INVALID_HANDLE_VALUE;
     };
+
+
+    /// @brief Write an entire buffer.
+    inline void write_all(UniqueOutputFile& f, std::span<const std::byte> buf)
+    {
+        auto done = 0;
+        while (done < std::size(buf))
+            done += f.write(buf.last(std::size(buf) - done));
+    }
+
+    /// @brief Write an entire buffer.
+    [[nodiscard]] inline std::size_t write_all(
+        UniqueOutputFile& f, std::span<const std::byte> buf, std::error_code& ec) noexcept;
 
 
     /// @brief Write the value representation of an object.

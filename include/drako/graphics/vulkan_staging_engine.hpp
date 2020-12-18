@@ -120,7 +120,7 @@ namespace drako::vulkan
         using transfer_completed_callback = std::function<void()>;
 
         staging_engine(
-            const context& ctx, std::size_t bytes, const transfer_queue& queue);
+            const Context& ctx, std::size_t bytes, const transfer_queue& queue);
 
         staging_engine(const staging_engine&) = delete;
         staging_engine& operator=(const staging_engine&) = delete;
@@ -165,7 +165,7 @@ namespace drako::vulkan
     };
 
     staging_engine::staging_engine(
-        const context& ctx, size_t bytes, const transfer_queue& queue)
+        const Context& ctx, size_t bytes, const transfer_queue& queue)
         : _pdevice(ctx.physical_device)
         , _ldevice(ctx.logical_device.get())
     {

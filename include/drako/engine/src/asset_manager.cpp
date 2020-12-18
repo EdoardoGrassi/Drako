@@ -111,7 +111,7 @@ namespace drako::engine
     {
     }
 
-    _this::AssetManager(const bundle_manifest_soa& bundles, const Config& config)
+    _this::AssetManager(const BundlesArgs& bundles, const ConfigArgs& config)
         : _config{ config }
         , _io_service{ { .workers = 4, .submit_queue_size = 100, .output_queue_size = 100 } }
         , _requests{ 100 }
@@ -120,29 +120,39 @@ namespace drako::engine
 
         assert(!std::empty(bundles.ids));
         assert(!std::empty(bundles.names));
-        assert(!std::empty(bundles.paths));
-
         assert(std::size(bundles.ids) == std::size(bundles.names));
-        assert(std::size(bundles.ids) == std::size(bundles.paths));
 
         assert(_fs::is_directory(config.bundle_manifest_directory));
         assert(_fs::is_directory(config.bundle_data_directory));
 
+        /*
+        { // load serialized bundle list
+            const _fs::path bundle_list = "main_bundle_list.dk";
+            const auto      size        = static_cast<std::size_t>(_fs::file_size(bundle_list));
+            auto            buffer      = std::make_unique<std::byte[]>(size);
+            {
+                io::UniqueInputFile file{ bundle_list };
+                file.read(buffer.get(), size);
+            }
+            const AssetBundleListView view{ { buffer.get(), size } };
+            _available_bundles.ids.resize(std::size(view));
+            std::memcpy(std::data(_available_bundles.ids),
+                std::data(view.ids()), view.ids().size_bytes());
+        }*/
+
         _available_bundles.ids   = bundles.ids;
         _available_bundles.names = bundles.names;
-
-        _available_bundles.sources.reserve(std::size(bundles.paths));
-        for (const auto& p : bundles.paths)
-            _available_bundles.sources.emplace_back(p);
-        _available_bundles.sources.shrink_to_fit();
-
-        _available_bundles.sizes.reserve(std::size(bundles.paths));
-        for (const auto& p : bundles.paths)
+        //_available_bundles.ids.reserve(std::size(bundles.ids));
+        //_available_bundles.sources.reserve(std::size(bundles.ids));
+        for (const auto& id : bundles.ids)
         {
-            const auto size = static_cast<std::size_t>(_fs::file_size(p));
+            const auto path = manifest_filename(id);
+            const auto size = static_cast<std::size_t>(_fs::file_size(path));
+            _available_bundles.sources.emplace_back(path);
             _available_bundles.sizes.push_back(size);
         }
-        _available_bundles.sizes.shrink_to_fit();
+        //_available_bundles.sources.shrink_to_fit();
+        //_available_bundles.sizes.shrink_to_fit();
     }
 
     void _this::update() noexcept

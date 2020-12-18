@@ -3,7 +3,9 @@
 #include "drako/devel/project_types.hpp"
 #include "drako/devel/uuid.hpp"
 #include "drako/devel/uuid_engine.hpp"
-#include "drako/file_formats/dson.hpp"
+#include "drako/file_formats/dson/dson.hpp"
+#include "drako/io/input_file_handle.hpp"
+#include "drako/io/output_file_handle.hpp"
 
 #include <cassert>
 #include <filesystem>
@@ -16,65 +18,67 @@ namespace _fs = std::filesystem;
 namespace drako::editor
 {
 
-    [[nodiscard]] fs::path _external_asset_to_metafile(const _fs::path& source);
-
-    // currently is just the uuid in string form with ".dkmeta" as extension
-    [[nodiscard]] fs::path _guid_to_metafile(const Uuid& guid) noexcept
+    [[nodiscard]] _fs::path _external_asset_to_metafile(const _fs::path& source)
     {
-        return to_string(guid) + ".dkmeta";
+        return _fs::path{ source }.append(".dkmeta");
     }
 
-    void _create_project_info_file(const fs::path& where)
+    void _create_project_info_file(const _fs::path& where);
+
+    void insert(ProjectDatabase& p, const _fs::path& src, const AssetImportInfo& info)
     {
-        std::ofstream ofs{ where / "project.dkproj" };
-        throw std::runtime_error{ "Not implemented." };
+        const auto size = static_cast<std::size_t>(_fs::file_size(src));
+
+        p.assets.ids.push_back(info.id);
+        p.assets.names.push_back(info.name);
+        p.assets.sizes.push_back(size);
+        p.assets.paths.push_back(src);
     }
 
-
-    [[nodiscard]] project_info load_project_info(const _fs::path& metafile)
+    void load(const _fs::path& file, ProjectMetaInfo& info)
     {
-        if (!_fs::exists(metafile))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(metafile) };
+        if (!_fs::exists(file))
+            throw std::invalid_argument{ DRAKO_STRINGIZE(file) };
 
-        if (!_fs::is_regular_file(metafile))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(metafile) };
+        if (!_fs::is_regular_file(file))
+            throw std::invalid_argument{ DRAKO_STRINGIZE(file) };
 
-        std::ifstream file{ metafile };
-        project_info  info;
+        const auto size = static_cast<std::size_t>(_fs::file_size(file));
+        auto       buff = std::make_unique<char[]>(size + 1);
 
-        throw std::runtime_error{ "Not implemented." };
+        std::ifstream{ file }.read(buff.get(), size);
+        buff[size]     = '\0'; // set input stream termination
+        const auto dom = dson::parse({ buff.get(), size + 1 });
+        dom >> info;
     }
 
-    [[nodiscard]] internal_asset_info save_asset_metafile(const _fs::path& metafile)
+    void save(const _fs::path& p, const AssetImportInfo& info)
     {
-        if (!_fs::exists(metafile))
-            throw std::runtime_error{ "File already exists." };
+        // serialize as dson object
+        dson::DOM dom{};
+        dom << info;
+        const auto s = to_string(dom);
 
-        throw std::runtime_error{ DRAKO_STRINGIZE(save_asset_metafile) ": not implemented." };
+        io::UniqueOutputFile f{ p, io::Create::if_needed };
+        io::write_all(f, { reinterpret_cast<const std::byte*>(std::data(s)), std::size(s) });
     }
 
-    [[nodiscard]] internal_asset_info load_asset_metafile(const _fs::path& metafile)
+    void load(const _fs::path& p, AssetImportInfo& info)
     {
-        std::ifstream file{ metafile };
-
         // TODO: remove narrowing conversion, check if the file is too big
-        const auto size  = static_cast<std::size_t>(_fs::file_size(metafile));
-        auto       bytes = std::make_unique<char[]>(size);
+        const auto size = static_cast<std::size_t>(_fs::file_size(p));
+        auto       buff = std::make_unique<char[]>(size + 1);
 
-        file.read(bytes.get(), size);
-        if (!file)
-            throw std::runtime_error{ "Failed deserialization." };
+        io::UniqueInputFile f{ p };
+        io::read_exact(f, { reinterpret_cast<std::byte*>(buff.get()), size });
+        buff[size] = '\0';
 
-        const std::string_view view{ bytes.get(), size };
-        dson::object           serialized{ view };
-
-        internal_asset_info info;
-        serialized >> info;
-        return info;
+        const auto dom = dson::parse({ buff.get(), size });
+        dom >> info;
     }
 
     /*
-    void load_asset_index_cache(const Project& p)
+    void load_asset_index_cache(const ProjectDatabase& p)
     {
         std::ifstream f{ p.cache_directory() / "asset_index" };
         f.exceptions(std::ios_base::failbit | std::ios_base::badbit);
@@ -87,121 +91,98 @@ namespace drako::editor
     }
     */
 
-    void make_project_tree(std::string_view name, const fs::path& root)
+    void create_project_tree(const ProjectContext& ctx, std::string_view name)
     {
         assert(!std::empty(name));
-        assert(fs::is_directory(root));
 
-        const auto dir = root / name;
+        if (!_fs::create_directory(ctx.root()))
+            throw std::runtime_error{ "Root directory already exists." };
+
         try
         {
-            fs::create_directory(dir);
-            fs::create_directory(dir / project_asset_dir);
-            fs::create_directory(dir / project_cache_dir);
-            fs::create_directory(dir / project_meta_dir);
+            _fs::create_directory(ctx.asset_directory());
+            _fs::create_directory(ctx.cache_directory());
+            _fs::create_directory(ctx.meta_directory());
 
-            project_info  info{};
-            std::ofstream ofs{ dir / project_config_file };
+            const ProjectMetaInfo info{
+                .name = std::string{ name }
+            };
+            save(ctx.root() / "project.dkproj", info);
         }
-        catch (const fs::filesystem_error&)
+        catch (const _fs::filesystem_error&)
         {
-            fs::remove_all(dir);
+            _fs::remove_all(ctx.root());
             throw;
         }
     }
 
-    void import_external_asset(const project_info& p, const fs::path& src)
+    void import_asset(const ProjectContext& ctx, const _fs::path& src)
     {
-        /*
-        if (!fs::exists(src) || !fs::is_regular_file(src))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
+        if (!_fs::exists(src) || !_fs::is_regular_file(src))
+            throw std::runtime_error{ "Source isn't a file." };
 
+        const auto id = ctx.generate_asset_uuid();
+
+        const auto meta_file_path = _external_asset_to_metafile(src);
+        if (_fs::exists(meta_file_path))
+            throw std::runtime_error("Conflict with already existing asset");
         try
         {
-            const auto meta_file_path = _external_asset_to_metafile(src);
-            if (fs::exists(meta_file_path))
-                throw std::logic_error("Conflict with already existing asset");
-
-            external_asset_info info{};
+            const AssetImportInfo info{ .id = id };
+            dson::DOM             dom{};
+            dom << info;
 
             std::ofstream meta_file{ meta_file_path };
+            meta_file << dom;
         }
         catch (...)
-        {
-        }*/
-        throw std::runtime_error{ "Not implemented." };
+        { // clean up all the files that may have been generated
+            _fs::remove(meta_file_path);
+            throw;
+        }
     }
 
-    void create_imported_asset(const Project& p,
-        const std::vector<fs::path>&          inputs,
-        const std::vector<fs::path>&          outputs)
+    void create_asset(
+        const ProjectContext& ctx, ProjectDatabase& db, const _fs::path& p, const AssetImportInfo& info)
     {
-        assert(!std::empty(inputs));
-        assert(!std::empty(outputs));
-
-
-        const auto guid = p.generate_asset_uuid();
-
-        // TODO: end impl
-    }
-
-
-    void create_asset(const Project& p, const fs::path& asset)
-    {
-        assert(fs::is_regular_file(asset));
-        const auto guid           = p.generate_asset_uuid();
-        const auto meta_file_path = p.meta_directory() / to_string(guid);
-
+        const auto guid           = ctx.generate_asset_uuid();
+        const auto meta_file_path = ctx.guid_to_metafile(guid);
         try
         {
-            internal_asset_info info{};
-            std::ofstream       os{ meta_file_path };
-            dson::object        serialized;
+            // generate asset metafile on disk
+            save(meta_file_path, info);
 
-            os << (serialized << info);
-
-            // TODO: also load asset in memory database
+            // add asset in memory database
+            insert(db, p, info);
         }
-        catch (...)
+        catch (const std::system_error& e)
         {
+            std::cout << "Asset " << p << " creation failed: " << e.what() << '\n';
             std::filesystem::remove(meta_file_path);
             throw;
         }
     }
 
-
-    [[nodiscard]] Project create_project_tree(const fs::path& where)
-    {
-        if (!fs::is_directory(where))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(where) };
-
-        return Project{ where };
-    }
-
-    void load_project(Project& p)
+    void load(const ProjectContext& ctx, ProjectDatabase& db)
     {
         // scan the whole meta folder for metafiles
-        for (const auto& f : _fs::directory_iterator{ p.meta_directory() })
+        for (const auto& f : _fs::directory_iterator{ ctx.meta_directory() })
         {
             try
             {
                 if (_fs::is_regular_file(f) && f.path().extension() == ".dkmeta")
                 {
-                    const auto info = load_asset_metafile(f);
+                    AssetImportInfo info;
+                    load(f, info);
 
                     _fs::path asset_file{ f.path() };
                     asset_file.replace_extension(); // remove .dkmeta
-                    const auto size = static_cast<std::size_t>(_fs::file_size(asset_file));
-
-                    p.assets.ids.push_back(info.id);
-                    p.assets.names.push_back(info.name);
-                    p.assets.sizes.push_back(size);
-                    p.assets.paths.push_back(asset_file);
+                    insert(db, asset_file, info);
                 }
             }
             catch (const _fs::filesystem_error& e)
             {
-                std::cout << "Error occurred while loading meta file:\n"
+                std::cout << "Error occurred while loading an asset metafile:\n"
                           << '\t' << e.what() << '\n'
                           << "\twith path1: " << e.path1() << '\n'
                           << "\twith path2: " << e.path2() << '\n';
@@ -210,16 +191,11 @@ namespace drako::editor
         std::cout << "Project loaded!\n";
     }
 
-    void save_project(const Project& p)
+    void save(const ProjectContext& ctx, const ProjectDatabase& p)
     {
         throw std::runtime_error{ "Not implemented yet!" };
     }
 
-    [[nodiscard]] fs::path guid_to_path(const Project& p, const Uuid& asset)
-    {
-        return p.cache_directory() / to_string(asset);
-    }
-
-    // build_error build_devel_project(const project_info& p);
+    // build_error build_devel_project(const ProjectMetaInfo& p);
 
 } // namespace drako::editor

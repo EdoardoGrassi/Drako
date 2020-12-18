@@ -3,7 +3,7 @@
 #define DRAKO_MESH_IMPORTERS_HPP
 
 #include "drako/devel/project_types.hpp"
-#include "drako/file_formats/dson.hpp"
+#include "drako/file_formats/dson/dson.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/mesh_utils.hpp"
 
@@ -22,7 +22,7 @@ namespace drako::editor
 
     [[nodiscard]] inline mesh_import_info load_mesh_import(const std::filesystem::path& file)
     {
-        dson::object serialized{};
+        dson::DOM serialized{};
         {
             std::ifstream ifs{ file };
             ifs >> serialized;
@@ -37,7 +37,7 @@ namespace drako::editor
 
     inline void save_mesh_import(const mesh_import_info& info, const std::filesystem::path& file)
     {
-        dson::object serialized;
+        dson::DOM serialized;
         serialized.set("guid", to_string(info.guid));
         serialized.set("name", info.name);
         serialized.set("path", info.path.string());

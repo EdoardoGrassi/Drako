@@ -40,10 +40,10 @@ namespace drako::vulkan
             VK_API_VERSION_1_1
         };
 
-        for (const auto& p : vk::enumerateInstanceLayerProperties())
-            std::cout << "Name:\t" << p.layerName << '\n'
-                      << "Impl:\t" << p.implementationVersion << '\n'
-                      << "Desc:\t" << p.description << '\n';
+        for (const auto& l : vk::enumerateInstanceLayerProperties())
+            std::cout << "Name:\t" << l.layerName << '\n'
+                      << "Impl:\t" << l.implementationVersion << '\n'
+                      << "Desc:\t" << l.description << '\n';
 
         for (const auto& e : vk::enumerateInstanceExtensionProperties())
             std::cout << "Name:\t" << e.extensionName << '\n'
@@ -91,7 +91,8 @@ namespace drako::vulkan
     }
 
 
-    [[nodiscard]] inline vk::UniqueSurfaceKHR make_surface(vk::Instance instance, const sys::desktop_window& w)
+    [[nodiscard]] inline vk::UniqueSurfaceKHR
+    make_surface(vk::Instance instance, const sys::UniqueDesktopWindow& w)
     {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
         const vk::Win32SurfaceCreateInfoKHR surface_create_info{
@@ -194,15 +195,15 @@ namespace drako::vulkan
 
 
     /// @brief Context of a Vulkan application.
-    struct context
+    struct Context
     {
-        explicit context(sys::desktop_window&& w) noexcept;
+        explicit Context(sys::UniqueDesktopWindow&& w) noexcept;
 
-        context(const context&) = delete;
-        context& operator=(const context&) = delete;
+        Context(const Context&) = delete;
+        Context& operator=(const Context&) = delete;
 
-        context(context&&) = delete;
-        context& operator=(context&&) = delete;
+        Context(Context&&) = delete;
+        Context& operator=(Context&&) = delete;
 
         vk::UniqueInstance               instance;
         vk::PhysicalDevice               physical_device;
@@ -210,10 +211,10 @@ namespace drako::vulkan
         vk::UniqueSurfaceKHR             surface;
         vk::DispatchLoaderDynamic        dld;
         vk::UniqueDebugUtilsMessengerEXT debug;
-        sys::desktop_window              window;
+        sys::UniqueDesktopWindow         window;
     };
 
-    context::context(sys::desktop_window&& w) noexcept
+    inline Context::Context(sys::UniqueDesktopWindow&& w) noexcept
         : instance{ make_instance() }, window{ std::move(w) }
     {
         physical_device = make_physical_device(instance.get());
@@ -237,7 +238,7 @@ namespace drako::vulkan
         debug = instance.get().createDebugUtilsMessengerEXTUnique(debug_messenger_info);
     }
 
-    inline void debug_print_queue_families(const context& ctx)
+    inline void debug_print_queue_families(const Context& ctx)
     {
         const auto properties = ctx.physical_device.getQueueFamilyProperties();
         std::cout << "[Vulkan] Available queue families:\n";

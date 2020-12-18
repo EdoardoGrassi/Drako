@@ -29,10 +29,11 @@ C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/engine/CMakeFiles/test.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/engine/CMakeFiles/edit_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/edit_cache.dir
-C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/dson-test.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/bmp.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/json.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/dson_lexer_test.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/dson.dir
+C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/dson_parser_test.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/rebuild_cache.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/CMakeFiles/test.dir
 C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats/png/CMakeFiles/drako-png.dir

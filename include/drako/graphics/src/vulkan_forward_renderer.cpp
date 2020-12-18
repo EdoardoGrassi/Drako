@@ -16,7 +16,7 @@
 namespace drako::vulkan
 {
     forward_renderer::forward_renderer(
-        const context& ctx, uint32_t width, uint32_t height)
+        const Context& ctx, std::uint32_t width, std::uint32_t height)
         : _pdevice(ctx.physical_device)
         , _ldevice(ctx.logical_device.get())
         , _surface(ctx.surface.get())
@@ -272,7 +272,7 @@ namespace drako::vulkan
             _command_buffer.pushConstants(batch.pipeline.pipeline_layout_handle(),
                 vk::ShaderStageFlagBits::eVertex,
                 0,
-                static_cast<uint32_t>(sizeof(mat4x4)),
+                static_cast<uint32_t>(sizeof(Mat4x4)),
                 &batch.mvps[i]);
 
             const vk::Buffer     buffers[] = { batch.meshes[i].vertex_buffer_handle() };

@@ -17,14 +17,12 @@
 
 namespace _fs = std::filesystem;
 
-const std::string PROGRAM_HEADER = "[DRAKO] Project manager console"
-                                   "(built with " DRAKO_CC_VERSION ", " __DATE__ ", " __TIME__ ")";
+const auto PROGRAM_HEADER = "[DRAKO] Project manager console"
+                            "(built with " DRAKO_CC_VERSION ", " __DATE__ ", " __TIME__ ")";
 
-const std::string PROGRAM_HELPER = "Usage: [COMMAND] [ARGS]...\n"
-                                   "Commands:\n"
-                                   "\timport\n"
-                                   "\n"
-                                   "\tbuild-packages  \tGenerates packages for runtime consumption.\n";
+const auto PROGRAM_HELPER = "Usage: [COMMAND] [ARGS]...\n"
+                            "Commands:\n"
+                            "\tcreate <name> <where>\t\tCreate a new project <name> located at <where>.\n";
 
 
 struct _tokenize_line_result
@@ -33,14 +31,14 @@ struct _tokenize_line_result
     std::vector<std::string_view> args;
 };
 
-_tokenize_line_result _tokenize_command_line(const std::string_view line)
+[[nodiscard]] _tokenize_line_result lex_cmd_line(const std::string_view line)
 {
     std::vector<std::string_view> tokens;
 
     const auto begin = std::cbegin(line);
     const auto end   = std::cend(line);
 
-    for (auto c = 0; c < line.size();)
+    for (auto c = 0; c < std::size(line);)
     {
         const auto token_begin = line.find_first_not_of(' ', c);
         const auto token_end   = line.find_first_not_of(' ', token_begin);
@@ -57,17 +55,17 @@ _tokenize_line_result _tokenize_command_line(const std::string_view line)
     return result;
 }
 
-struct _cmd_params
+struct CmdArgs
 {
-    const std::vector<std::string_view> args;
+    std::vector<std::string_view> args;
 };
 
-void cli_exit(_cmd_params params)
+void cli_exit(const CmdArgs params)
 {
     std::exit(EXIT_SUCCESS);
 }
 
-void cli_create_project(_cmd_params params)
+void cli_create_project(const CmdArgs params)
 {
     using namespace drako::editor;
 
@@ -77,7 +75,7 @@ void cli_create_project(_cmd_params params)
     std::cout << "Creating project " << name << " at " << where << '\n';
     try
     {
-        make_project_tree(name, where);
+        create_project_tree(name, where);
         std::cout << "Project created\n";
     }
     catch (const std::exception& e)
@@ -91,13 +89,15 @@ void cli_open_project(const std::filesystem::path& dir)
 {
     using namespace drako::editor;
 
-    Project proj{ dir };
+    ProjectContext ctx{ dir };
     try
     {
-        const auto proj_info = load_project_info(dir);
+        ProjectMetaInfo proj_info;
+        load(dir, proj_info);
         std::cout << "Name: " << proj_info.name << '\n';
 
-        load_project(proj);
+        ProjectDatabase proj{};
+        load(dir, proj);
         std::cout << "Located assets count: " << std::size(proj.assets.ids) << '\n';
     }
     catch (const std::exception& e)
@@ -114,7 +114,7 @@ void cli_open_project(const std::filesystem::path& dir)
             const auto [cmd, args] = _tokenize_command_line(input);
             if (const auto it = commands.find(cmd); it != std::cend(commands))
             {
-                std::invoke(it->second, _cmd_params{ args });
+                std::invoke(it->second, CmdArgs{ args });
             }
             else
             {
@@ -132,7 +132,7 @@ void cli_open_project(const std::filesystem::path& dir)
 
 int main(const int argc, const char* argv[])
 {
-    using _cmd_fun = std::function<void(_cmd_params)>;
+    using CmdFunction = std::function<void(const CmdArgs)>;
 
     /*
     const std::unordered_map<std::string_view, drako::editor::asset_import_function> importers{
@@ -140,7 +140,7 @@ int main(const int argc, const char* argv[])
     };
     */
 
-    const std::unordered_map<std::string_view, _cmd_fun> commands = {
+    const std::unordered_map<std::string_view, CmdFunction> commands = {
         { "create", cli_create_project }
     };
 
@@ -154,6 +154,11 @@ int main(const int argc, const char* argv[])
     { // print program help
         std::cout << PROGRAM_HELPER << '\n';
         std::exit(EXIT_SUCCESS);
+    }
+
+    if (argc == 4 && argv[1] == "create")
+    {
+        cli_create_project({ .args = { argv[2], argv[3] } });
     }
 
     if (argc == 3 && argv[1] == "open")

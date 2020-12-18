@@ -26,13 +26,7 @@ namespace drako
     [[nodiscard]] std::uint32_t crc32c(const std::uint64_t* data, std::size_t size) noexcept;
 
 
-    [[nodiscard]] asset_manifest_entry
-    build_asset_descriptor(const Uuid& id);
-
-
-    [[nodiscard]] std::variant<packaging_result, build_error>
-    build_packages_for_devel(const fs::path& folder, const std::vector<std::string>& names, const std::vector<asset_type>& types);
-
+    [[nodiscard]] AssetManifestRecord build_asset_descriptor(const Uuid& id);
 
     //[[nodiscard]] std::variant<asset_manifest, build_error>
     //build_asset_manifest(const fs::path& build_folder);

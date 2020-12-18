@@ -8,7 +8,7 @@
 
 int main()
 {
-    drako::sys::desktop_window      main(L"Keyboard Test App");
+    drako::sys::UniqueDesktopWindow      main(L"Keyboard Test App");
     const std::chrono::milliseconds timeout{ 100 };
     drako::sys::Keyboard     keyboard{ main };
 

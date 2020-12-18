@@ -296,7 +296,7 @@ namespace drako::vulkan
             {
                 vk::ShaderStageFlagBits::eVertex, // vertex shader
                 0,                                // binding number
-                sizeof(::drako::mat4x4)           // stride
+                sizeof(drako::Mat4x4)          // stride
             }
         };
         const vk::PipelineLayoutCreateInfo pipeline_layout_info{

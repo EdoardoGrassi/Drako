@@ -23,7 +23,7 @@ namespace drako
 
 
     /// @brief Single item of an asset manifest.
-    struct asset_manifest_entry
+    struct AssetManifestRecord
     {
         AssetID       asset_guid;
         uint32_t      packed_size_bytes;
@@ -49,7 +49,7 @@ namespace drako
 
 
     // Metadata descriptor related to storage settings.
-    class asset_load_info
+    class AssetLoadInfo
     {
     public:
         /// @brief Descriptor of an asset packaged uncompressed.
@@ -58,7 +58,7 @@ namespace drako
         /// @param[in] bytes  Size of the asset as bytes.
         ///
         /// @return
-        explicit asset_load_info(std::uint32_t offset, std::uint32_t bytes) noexcept
+        explicit AssetLoadInfo(std::uint32_t offset, std::uint32_t bytes) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ bytes }
             , _unpacked_size_bytes{ bytes }
@@ -74,7 +74,7 @@ namespace drako
         /// @param[in] f        Format options.
         ///
         /// @return
-        explicit asset_load_info(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
+        explicit AssetLoadInfo(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
             asset_storage_flags s, asset_format_flags f) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ packed }
@@ -107,14 +107,14 @@ namespace drako
         asset_storage_flags _storage_flags;
         asset_format_flags  _format_flags;
     };
-    static_assert(sizeof(asset_load_info) == 16,
+    static_assert(sizeof(AssetLoadInfo) == 16,
         "Bad class layout: required internal padding bits.");
-    static_assert(alignof(asset_load_info) <= sizeof(asset_load_info),
+    static_assert(alignof(AssetLoadInfo) <= sizeof(AssetLoadInfo),
         "Bad class layout: required external padding bits.");
 
 
     /// @brief Metadata descriptor of an asset bundle.
-    struct asset_bundle_meta
+    struct AssetBundleMeta
     {
         // Name of the bundle.
         char name[16];
@@ -131,7 +131,7 @@ namespace drako
 
 
 
-    struct asset_bundle
+    struct AssetBundle
     {
 
     public:
@@ -142,13 +142,13 @@ namespace drako
 
 
     /// @brief Manifest file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path manifest_filename(AssetBundleID b)
+    [[nodiscard]] inline std::filesystem::path manifest_filename(const AssetBundleID& b)
     {
         return "bundle_" + std::to_string(b) + ".manifest.drako";
     }
 
     /// @brief Storage file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path storage_filename(AssetBundleID b)
+    [[nodiscard]] inline std::filesystem::path storage_filename(const AssetBundleID& b)
     {
         return "bundle_" + std::to_string(b) + ".storage.drako";
     }

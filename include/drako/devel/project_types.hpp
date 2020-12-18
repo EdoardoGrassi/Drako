@@ -6,7 +6,7 @@
 #include "drako/devel/asset_types.hpp"
 #include "drako/devel/uuid.hpp"
 #include "drako/devel/uuid_engine.hpp"
-#include "drako/file_formats/dson.hpp"
+#include "drako/file_formats/dson/dson.hpp"
 
 #include <filesystem>
 #include <iosfwd>
@@ -35,43 +35,65 @@ namespace drako::editor
     // |- ./meta
     //
 
-    struct project_info
+    /// @brief Metadata of a project.
+    struct ProjectMetaInfo
     {
-        Version     version = current_api_version();
         std::string name;
-        std::string author;
-        //_fs::file_time_type last_project_scan;
+        //std::string author;
+        Version version = current_api_version();
     };
 
-    std::istream& operator>>(std::istream&, project_info&);
-    std::ostream& operator<<(std::ostream&, const project_info&);
+    //std::istream& operator>>(std::istream&, ProjectMetaInfo&);
+    //std::ostream& operator<<(std::ostream&, const ProjectMetaInfo&);
 
-    dson::object& operator>>(dson::object&, project_info&);
-    dson::object& operator<<(dson::object&, const project_info&);
+    const dson::DOM& operator>>(const dson::DOM&, ProjectMetaInfo&);
+    dson::DOM&       operator<<(dson::DOM&, const ProjectMetaInfo&);
 
 
-    class Project
+    /// @brief Project instance.
+    class ProjectContext
     {
     public:
-        explicit Project(const std::filesystem::path& file);
+        explicit ProjectContext(const std::filesystem::path& root)
+            : _root{ root } {}
 
-        Project(const Project&) = delete;
-        Project& operator=(const Project&) = delete;
+        ProjectContext(const ProjectContext&) = delete;
+        ProjectContext& operator=(const ProjectContext&) = delete;
 
-        Project(Project&&) = delete;
-        Project& operator=(Project&&) = delete;
+        ProjectContext(ProjectContext&&) = delete;
+        ProjectContext& operator=(ProjectContext&&) = delete;
 
-        [[nodiscard]] std::filesystem::path asset_directory() const;
 
-        [[nodiscard]] std::filesystem::path cache_directory() const;
+        /// @brief Root folder of a project.
+        [[nodiscard]] std::filesystem::path root() const { return _root; }
 
-        [[nodiscard]] std::filesystem::path meta_directory() const;
+        /// @brief Main asset folder.
+        [[nodiscard]] std::filesystem::path asset_directory() const { return _root / "assets"; }
 
-        [[nodiscard]] Uuid generate_asset_uuid() const noexcept;
+        /// @brief Cached datafiles folder.
+        [[nodiscard]] std::filesystem::path cache_directory() const { return _root / "cache"; }
 
-        void package_assets_as_single_bundle(const std::filesystem::path& where);
+        /// @brief Main metafiles folder.
+        [[nodiscard]] std::filesystem::path meta_directory() const { return _root / "meta"; }
 
-    public:
+        /// @brief Map an asset id to the corresponding datafile path.
+        [[nodiscard]] std::filesystem::path guid_to_datafile(const Uuid&) const;
+
+        /// @brief Map an asset id to the corresponding metafile path.
+        [[nodiscard]] std::filesystem::path guid_to_metafile(const Uuid&) const;
+
+        /// @brief Generates a new UUID.
+        [[nodiscard]] Uuid generate_asset_uuid() const noexcept { return _engine(); }
+
+    private:
+        std::filesystem::path _root;   // Root of the project tree.
+        UuidMacEngine         _engine; // Reusable generator for uuids.
+    };
+
+
+    /// @brief Project database object.
+    struct ProjectDatabase
+    {
         /// @brief Database-like table of available assets.
         struct asset_table_t
         {
@@ -87,19 +109,12 @@ namespace drako::editor
             /// @brief Assets binary size on local disk.
             std::vector<std::size_t> sizes;
         } assets;
-
-    private:
-        using _project_config = std::unordered_map<std::string, std::string>;
-
-        /// @brief Root of project tree.
-        std::filesystem::path _tree_root;
-
-        _project_config _config;
-
-        UuidMacEngine _generator;
     };
 
+    void package_assets_as_single_bundle(
+        const ProjectDatabase& db, const std::filesystem::path& where);
 
+    /*
     /// @brief Internal asset descriptor.
     ///
     /// Holds information about an asset stored as engine-ready file.
@@ -122,26 +137,28 @@ namespace drako::editor
     //std::istream& load(std::istream&, internal_asset_info&);
     //std::ostream& save(std::ostream&, const internal_asset_info&);
 
-    dson::object& operator>>(dson::object&, internal_asset_info&);
-    dson::object& operator<<(dson::object&, const internal_asset_info&);
+    dson::DOM& operator>>(dson::DOM&, internal_asset_info&);
+    dson::DOM& operator<<(dson::DOM&, const internal_asset_info&);
+    */
 
 
-    /// @ brief External asset descriptor.
+    /// @brief External asset descriptor.
     ///
-    /// Holds information about an asset stored as native file.
+    /// Holds information for the import process of an extern file.
     ///
-    struct external_asset_info
+    struct AssetImportInfo
     {
-        Uuid                  uuid = {};
+        Uuid                  id;
         std::filesystem::path path;
+        std::string           name;
         Version               version = current_api_version();
     };
 
-    std::istream& load(std::istream&, external_asset_info&);
-    std::ostream& save(std::ostream&, const external_asset_info&);
+    //std::istream& load(std::istream&, AssetImportInfo&);
+    //std::ostream& save(std::ostream&, const AssetImportInfo&);
 
-    dson::object& operator>>(dson::object&, external_asset_info&);
-    dson::object& operator<<(dson::object&, const external_asset_info&);
+    const dson::DOM& operator>>(const dson::DOM&, AssetImportInfo&);
+    dson::DOM&       operator<<(dson::DOM&, const AssetImportInfo&);
 
 
     struct AssetImportContext
@@ -150,7 +167,26 @@ namespace drako::editor
         std::vector<std::string>                     flags;
     };
 
-    using AssetImportFunction = void (*)(const project_info&, const std::filesystem::path&, const AssetImportContext&);
+    using AssetImportFunction = void (*)(const ProjectContext&, const std::filesystem::path&, const AssetImportContext&);
+
+
+    /// @brief Stack of objects that interact with assets on import.
+    class AssetImportStack
+    {
+    public:
+        AssetImportStack(const std::unordered_map<std::string, AssetImportFunction>& importers)
+            : _importers{ importers } {}
+
+        /// @brief Retrieve the importer associated to a file extension.
+        [[nodiscard]] AssetImportFunction importer(const std::string& extension)
+        {
+            return _importers.at(extension);
+        }
+
+    private:
+        std::unordered_map<std::string, AssetImportFunction> _importers;
+    };
+
 } // namespace drako::editor
 
 #endif // !DRAKO_PROJECT_TYPES_HPP

@@ -17,7 +17,7 @@ namespace drako::vulkan
     class GlobalAllocator
     {
     public:
-        explicit GlobalAllocator(const context& ctx);
+        explicit GlobalAllocator(const Context& ctx);
 
         GlobalAllocator(const GlobalAllocator&) = delete;
         GlobalAllocator& operator=(const GlobalAllocator&) = delete;
@@ -38,13 +38,13 @@ namespace drako::vulkan
         std::array<vk::UniqueDeviceMemory, VK_MAX_MEMORY_TYPES> _mem_pools;
     };
 
-    GlobalAllocator::GlobalAllocator(const context& ctx)
+    GlobalAllocator::GlobalAllocator(const Context& ctx)
         : _pdevice(ctx.physical_device), _ldevice(ctx.logical_device.get())
     {
         const auto properties = _pdevice.getMemoryProperties();
         for (uint32_t heap_index = 0; heap_index < properties.memoryHeapCount; ++heap_index)
         {
-            const auto heap = properties.memoryHeaps[heap_index];
+            const auto& heap = properties.memoryHeaps[heap_index];
 
             const vk::MemoryAllocateInfo alloc_info{
                 vk::DeviceSize{ heap.size / 2 }, // reserve half of heap capacity

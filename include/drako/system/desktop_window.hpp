@@ -10,12 +10,12 @@
 #endif
 
 #include <string_view>
+#include <type_traits>
 
 namespace drako::sys
 {
-    // Handle of an os-specific native gui window.
-    //
-    class desktop_window
+    /// @brief Handle of an os-specific native gui window.
+    class UniqueDesktopWindow
     {
     public:
 #if defined(DRAKO_PLT_WIN32)
@@ -23,14 +23,14 @@ namespace drako::sys
         using native_context_type = HINSTANCE;
 #endif
 
-        explicit desktop_window(std::wstring_view title);
-        ~desktop_window() noexcept;
+        explicit UniqueDesktopWindow(std::wstring_view title);
+        ~UniqueDesktopWindow() noexcept;
 
-        desktop_window(const desktop_window&) = delete;
-        desktop_window& operator=(const desktop_window&) = delete;
+        UniqueDesktopWindow(const UniqueDesktopWindow&) = delete;
+        UniqueDesktopWindow& operator=(const UniqueDesktopWindow&) = delete;
 
-        desktop_window(desktop_window&&) noexcept;
-        desktop_window& operator=(desktop_window&&) noexcept;
+        UniqueDesktopWindow(UniqueDesktopWindow&&) noexcept;
+        UniqueDesktopWindow& operator=(UniqueDesktopWindow&&) noexcept;
 
         // Hides the window.
         void hide() noexcept;
@@ -66,6 +66,15 @@ namespace drako::sys
         HWND      _window;
 #endif
     };
+    static_assert(!std::is_copy_constructible_v<UniqueDesktopWindow>,
+        DRAKO_STRINGIZE(UniqueDesktopWindow) " must be a movable-only type.");
+    static_assert(!std::is_copy_assignable_v<UniqueDesktopWindow>,
+        DRAKO_STRINGIZE(UniqueDesktopWindow) " must be a movable-only type.");
+    static_assert(std::is_nothrow_move_constructible_v<UniqueDesktopWindow>,
+        DRAKO_STRINGIZE(UniqueDesktopWindow) " must be nothrow movable.");
+    static_assert(std::is_nothrow_move_assignable_v<UniqueDesktopWindow>,
+        DRAKO_STRINGIZE(UniqueDesktopWindow) " must be nothrow movable.");
+
 } // namespace drako::sys
 
 #endif // !DRAKO_NATIVE_WINDOW_HPP

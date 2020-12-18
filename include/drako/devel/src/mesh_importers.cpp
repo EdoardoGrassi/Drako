@@ -1,6 +1,6 @@
 #include "drako/devel/mesh_importers.hpp"
 
-#include "drako/file_formats/dson.hpp" // NOTE: for the time being we use Drakoson format
+#include "drako/file_formats/dson/dson.hpp" // NOTE: for the time being we use Drakoson format
 #include "drako/file_formats/wavefront/object.hpp"
 #include "drako/file_formats/wavefront/parser.hpp"
 

@@ -41,7 +41,7 @@ include CMakeFiles\rules.ninja
 #############################################
 # Order-only phony target for drako-engine
 
-build cmake_object_order_depends_target_drako-engine: phony || cmake_object_order_depends_target_vulkan-forward-renderer
+build cmake_object_order_depends_target_drako-engine: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_drako-runtime cmake_object_order_depends_target_drako-system cmake_object_order_depends_target_vulkan-forward-renderer
 
 build CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj: CXX_COMPILER__drako-engine_Debug ..\..\..\src\vulkan_engine_win32.cpp || cmake_object_order_depends_target_drako-engine
   DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -60,10 +60,10 @@ build CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj: CXX_COMPILER_
 #############################################
 # Link the executable ..\..\..\build\drako-engine.exe
 
-build ..\..\..\build\drako-engine.exe: CXX_EXECUTABLE_LINKER__drako-engine_Debug CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj | include\drako\graphics\vulkan-forward-renderer.lib C$:\VulkanSDK\1.1.130.0\Lib\vulkan-1.lib || include\drako\graphics\vulkan-forward-renderer.lib
+build ..\..\..\build\drako-engine.exe: CXX_EXECUTABLE_LINKER__drako-engine_Debug CMakeFiles\drako-engine.dir\src\vulkan_engine_win32.cpp.obj | include\drako\graphics\vulkan-forward-renderer.lib include\drako\system\drako-system.lib include\drako\engine\drako-runtime.lib C$:\VulkanSDK\1.1.130.0\Lib\vulkan-1.lib include\drako\io\dk-io.lib || include\drako\engine\drako-runtime.lib include\drako\graphics\vulkan-forward-renderer.lib include\drako\io\dk-io.lib include\drako\system\drako-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
-  LINK_LIBRARIES = include\drako\graphics\vulkan-forward-renderer.lib  C:\VulkanSDK\1.1.130.0\Lib\vulkan-1.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\graphics\vulkan-forward-renderer.lib  include\drako\system\drako-system.lib  include\drako\engine\drako-runtime.lib  C:\VulkanSDK\1.1.130.0\Lib\vulkan-1.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\drako-engine.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -79,7 +79,7 @@ build ..\..\..\build\drako-engine.exe: CXX_EXECUTABLE_LINKER__drako-engine_Debug
 #############################################
 # Order-only phony target for drako-cli-editor
 
-build cmake_object_order_depends_target_drako-cli-editor: phony || cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
+build cmake_object_order_depends_target_drako-cli-editor: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
 
 build CMakeFiles\drako-cli-editor.dir\src\drako_cli_editor.cpp.obj: CXX_COMPILER__drako-cli-editor_Debug ..\..\..\src\drako_cli_editor.cpp || cmake_object_order_depends_target_drako-cli-editor
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -98,10 +98,10 @@ build CMakeFiles\drako-cli-editor.dir\src\drako_cli_editor.cpp.obj: CXX_COMPILER
 #############################################
 # Link the executable D:\Desktop\drako_test_zone\projects\drako-cli-editor.exe
 
-build D$:\Desktop\drako_test_zone\projects\drako-cli-editor.exe: CXX_EXECUTABLE_LINKER__drako-cli-editor_Debug CMakeFiles\drako-cli-editor.dir\src\drako_cli_editor.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib
+build D$:\Desktop\drako_test_zone\projects\drako-cli-editor.exe: CXX_EXECUTABLE_LINKER__drako-cli-editor_Debug CMakeFiles\drako-cli-editor.dir\src\drako_cli_editor.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\drako-cli-editor.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -458,7 +458,7 @@ build include\drako\concurrency\edit_cache: phony include\drako\concurrency\CMak
 #############################################
 # Order-only phony target for drako-devel
 
-build cmake_object_order_depends_target_drako-devel: phony || cmake_object_order_depends_target_dson
+build cmake_object_order_depends_target_drako-devel: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_dson
 
 build include\drako\devel\CMakeFiles\drako-devel.dir\src\build_utils.cpp.obj: CXX_COMPILER__drako-devel_Debug ..\..\..\include\drako\devel\src\build_utils.cpp || cmake_object_order_depends_target_drako-devel
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -522,7 +522,7 @@ build include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj:
 #############################################
 # Link the static library include\drako\devel\drako-devel.lib
 
-build include\drako\devel\drako-devel.lib: CXX_STATIC_LIBRARY_LINKER__drako-devel_Debug include\drako\devel\CMakeFiles\drako-devel.dir\src\build_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_types.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid_engine.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj || include\drako\file_formats\dson.lib
+build include\drako\devel\drako-devel.lib: CXX_STATIC_LIBRARY_LINKER__drako-devel_Debug include\drako\devel\CMakeFiles\drako-devel.dir\src\build_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_types.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\project_utils.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\uuid_engine.cpp.obj include\drako\devel\CMakeFiles\drako-devel.dir\src\mesh_importers.cpp.obj || include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\devel\CMakeFiles\drako-devel.dir
@@ -539,7 +539,7 @@ build include\drako\devel\drako-devel.lib: CXX_STATIC_LIBRARY_LINKER__drako-deve
 #############################################
 # Order-only phony target for crc32_test
 
-build cmake_object_order_depends_target_crc32_test: phony || cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
+build cmake_object_order_depends_target_crc32_test: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
 
 build include\drako\devel\CMakeFiles\crc32_test.dir\test\crc32_test.cpp.obj: CXX_COMPILER__crc32_test_Debug ..\..\..\include\drako\devel\test\crc32_test.cpp || cmake_object_order_depends_target_crc32_test
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -558,10 +558,10 @@ build include\drako\devel\CMakeFiles\crc32_test.dir\test\crc32_test.cpp.obj: CXX
 #############################################
 # Link the executable ..\..\..\build\crc32_test.exe
 
-build ..\..\..\build\crc32_test.exe: CXX_EXECUTABLE_LINKER__crc32_test_Debug include\drako\devel\CMakeFiles\crc32_test.dir\test\crc32_test.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib
+build ..\..\..\build\crc32_test.exe: CXX_EXECUTABLE_LINKER__crc32_test_Debug include\drako\devel\CMakeFiles\crc32_test.dir\test\crc32_test.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = include\drako\devel\CMakeFiles\crc32_test.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -577,7 +577,7 @@ build ..\..\..\build\crc32_test.exe: CXX_EXECUTABLE_LINKER__crc32_test_Debug inc
 #############################################
 # Order-only phony target for uuid-test1-exe
 
-build cmake_object_order_depends_target_uuid-test1-exe: phony || cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
+build cmake_object_order_depends_target_uuid-test1-exe: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson
 
 build include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj: CXX_COMPILER__uuid-test1-exe_Debug ..\..\..\include\drako\devel\test\uuid_test1.cpp || cmake_object_order_depends_target_uuid-test1-exe
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -596,10 +596,10 @@ build include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj:
 #############################################
 # Link the executable ..\..\..\build\uuid-test1-exe.exe
 
-build ..\..\..\build\uuid-test1-exe.exe: CXX_EXECUTABLE_LINKER__uuid-test1-exe_Debug include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib
+build ..\..\..\build\uuid-test1-exe.exe: CXX_EXECUTABLE_LINKER__uuid-test1-exe_Debug include\drako\devel\CMakeFiles\uuid-test1-exe.dir\test\uuid_test1.cpp.obj | include\drako\devel\drako-devel.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib || include\drako\devel\drako-devel.lib include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  include\drako\file_formats\dson.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = include\drako\devel\CMakeFiles\uuid-test1-exe.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -691,7 +691,7 @@ build include\drako\engine\render-system.lib: CXX_STATIC_LIBRARY_LINKER__render-
 #############################################
 # Order-only phony target for drako-runtime
 
-build cmake_object_order_depends_target_drako-runtime: phony || include\drako\engine\CMakeFiles\drako-runtime.dir
+build cmake_object_order_depends_target_drako-runtime: phony || cmake_object_order_depends_target_dk-io
 
 build include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_manager.cpp.obj: CXX_COMPILER__drako-runtime_Debug ..\..\..\include\drako\engine\src\asset_manager.cpp || cmake_object_order_depends_target_drako-runtime
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
@@ -710,7 +710,7 @@ build include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_manager.cpp.ob
 #############################################
 # Link the static library include\drako\engine\drako-runtime.lib
 
-build include\drako\engine\drako-runtime.lib: CXX_STATIC_LIBRARY_LINKER__drako-runtime_Debug include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_manager.cpp.obj
+build include\drako\engine\drako-runtime.lib: CXX_STATIC_LIBRARY_LINKER__drako-runtime_Debug include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_manager.cpp.obj || include\drako\io\dk-io.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir
@@ -770,44 +770,6 @@ build include\drako\file_formats\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
   restat = 1
 
 build include\drako\file_formats\edit_cache: phony include\drako\file_formats\CMakeFiles\edit_cache.util
-
-# =============================================================================
-# Object build statements for EXECUTABLE target dson-test
-
-
-#############################################
-# Order-only phony target for dson-test
-
-build cmake_object_order_depends_target_dson-test: phony || cmake_object_order_depends_target_dson
-
-build include\drako\file_formats\CMakeFiles\dson-test.dir\test\dson_test.cpp.obj: CXX_COMPILER__dson-test_Debug ..\..\..\include\drako\file_formats\test\dson_test.cpp || cmake_object_order_depends_target_dson-test
-  DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
-  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson-test.dir
-  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson-test.dir\test
-  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson-test.dir\
-  TARGET_PDB = ..\..\..\build\dson-test.pdb
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target dson-test
-
-
-#############################################
-# Link the executable ..\..\..\build\dson-test.exe
-
-build ..\..\..\build\dson-test.exe: CXX_EXECUTABLE_LINKER__dson-test_Debug include\drako\file_formats\CMakeFiles\dson-test.dir\test\dson_test.cpp.obj | include\drako\file_formats\dson.lib || include\drako\file_formats\dson.lib
-  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\file_formats\dson.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson-test.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson-test.dir\
-  TARGET_FILE = ..\..\..\build\dson-test.exe
-  TARGET_IMPLIB = include\drako\file_formats\dson-test.lib
-  TARGET_PDB = ..\..\..\build\dson-test.pdb
 
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target bmp
@@ -882,20 +844,67 @@ build include\drako\file_formats\json.lib: CXX_STATIC_LIBRARY_LINKER__json_Debug
   TARGET_PDB = include\drako\file_formats\json.pdb
 
 # =============================================================================
+# Object build statements for EXECUTABLE target dson_lexer_test
+
+
+#############################################
+# Order-only phony target for dson_lexer_test
+
+build cmake_object_order_depends_target_dson_lexer_test: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_dson
+
+build include\drako\file_formats\CMakeFiles\dson_lexer_test.dir\dson\test\dson_lexer_test.cpp.obj: CXX_COMPILER__dson_lexer_test_Debug ..\..\..\include\drako\file_formats\dson\test\dson_lexer_test.cpp || cmake_object_order_depends_target_dson_lexer_test
+  DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson_lexer_test.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson_lexer_test.dir\dson\test
+  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson_lexer_test.dir\
+  TARGET_PDB = ..\..\..\build\dson_lexer_test.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target dson_lexer_test
+
+
+#############################################
+# Link the executable ..\..\..\build\dson_lexer_test.exe
+
+build ..\..\..\build\dson_lexer_test.exe: CXX_EXECUTABLE_LINKER__dson_lexer_test_Debug include\drako\file_formats\CMakeFiles\dson_lexer_test.dir\dson\test\dson_lexer_test.cpp.obj | include\drako\file_formats\dson.lib include\drako\io\dk-io.lib || include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\file_formats\dson.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson_lexer_test.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson_lexer_test.dir\
+  TARGET_FILE = ..\..\..\build\dson_lexer_test.exe
+  TARGET_IMPLIB = include\drako\file_formats\dson_lexer_test.lib
+  TARGET_PDB = ..\..\..\build\dson_lexer_test.pdb
+
+# =============================================================================
 # Object build statements for STATIC_LIBRARY target dson
 
 
 #############################################
 # Order-only phony target for dson
 
-build cmake_object_order_depends_target_dson: phony || include\drako\file_formats\CMakeFiles\dson.dir
+build cmake_object_order_depends_target_dson: phony || cmake_object_order_depends_target_dk-io
 
-build include\drako\file_formats\CMakeFiles\dson.dir\src\dson.cpp.obj: CXX_COMPILER__dson_Debug ..\..\..\include\drako\file_formats\src\dson.cpp || cmake_object_order_depends_target_dson
+build include\drako\file_formats\CMakeFiles\dson.dir\dson\src\dson.cpp.obj: CXX_COMPILER__dson_Debug ..\..\..\include\drako\file_formats\dson\src\dson.cpp || cmake_object_order_depends_target_dson
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
   INCLUDES = -I..\..\..\include
   OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson.dir
-  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson.dir\src
+  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson.dir\dson\src
+  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson.dir\dson.pdb
+  TARGET_PDB = include\drako\file_formats\dson.pdb
+
+build include\drako\file_formats\CMakeFiles\dson.dir\dson\src\dson_lexer.cpp.obj: CXX_COMPILER__dson_Debug ..\..\..\include\drako\file_formats\dson\src\dson_lexer.cpp || cmake_object_order_depends_target_dson
+  DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson.dir\dson\src
   TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson.dir\dson.pdb
   TARGET_PDB = include\drako\file_formats\dson.pdb
 
@@ -907,7 +916,7 @@ build include\drako\file_formats\CMakeFiles\dson.dir\src\dson.cpp.obj: CXX_COMPI
 #############################################
 # Link the static library include\drako\file_formats\dson.lib
 
-build include\drako\file_formats\dson.lib: CXX_STATIC_LIBRARY_LINKER__dson_Debug include\drako\file_formats\CMakeFiles\dson.dir\src\dson.cpp.obj
+build include\drako\file_formats\dson.lib: CXX_STATIC_LIBRARY_LINKER__dson_Debug include\drako\file_formats\CMakeFiles\dson.dir\dson\src\dson.cpp.obj include\drako\file_formats\CMakeFiles\dson.dir\dson\src\dson_lexer.cpp.obj || include\drako\io\dk-io.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson.dir
@@ -916,6 +925,44 @@ build include\drako\file_formats\dson.lib: CXX_STATIC_LIBRARY_LINKER__dson_Debug
   TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson.dir\dson.pdb
   TARGET_FILE = include\drako\file_formats\dson.lib
   TARGET_PDB = include\drako\file_formats\dson.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target dson_parser_test
+
+
+#############################################
+# Order-only phony target for dson_parser_test
+
+build cmake_object_order_depends_target_dson_parser_test: phony || cmake_object_order_depends_target_dk-io cmake_object_order_depends_target_dson
+
+build include\drako\file_formats\CMakeFiles\dson_parser_test.dir\dson\test\dson_parser_test.cpp.obj: CXX_COMPILER__dson_parser_test_Debug ..\..\..\include\drako\file_formats\dson\test\dson_parser_test.cpp || cmake_object_order_depends_target_dson_parser_test
+  DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include
+  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson_parser_test.dir
+  OBJECT_FILE_DIR = include\drako\file_formats\CMakeFiles\dson_parser_test.dir\dson\test
+  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson_parser_test.dir\
+  TARGET_PDB = ..\..\..\build\dson_parser_test.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target dson_parser_test
+
+
+#############################################
+# Link the executable ..\..\..\build\dson_parser_test.exe
+
+build ..\..\..\build\dson_parser_test.exe: CXX_EXECUTABLE_LINKER__dson_parser_test_Debug include\drako\file_formats\CMakeFiles\dson_parser_test.dir\dson\test\dson_parser_test.cpp.obj | include\drako\file_formats\dson.lib include\drako\io\dk-io.lib || include\drako\file_formats\dson.lib include\drako\io\dk-io.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = include\drako\file_formats\dson.lib  include\drako\io\dk-io.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = include\drako\file_formats\CMakeFiles\dson_parser_test.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = include\drako\file_formats\CMakeFiles\dson_parser_test.dir\
+  TARGET_FILE = ..\..\..\build\dson_parser_test.exe
+  TARGET_IMPLIB = include\drako\file_formats\dson_parser_test.lib
+  TARGET_PDB = ..\..\..\build\dson_parser_test.pdb
 
 
 #############################################
@@ -2024,6 +2071,15 @@ build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_m
   TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\vulkan-forward-renderer.pdb
   TARGET_PDB = include\drako\graphics\vulkan-forward-renderer.pdb
 
+build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_runtime_context.cpp.obj: CXX_COMPILER__vulkan-forward-renderer_Debug ..\..\..\include\drako\graphics\src\vulkan_runtime_context.cpp || cmake_object_order_depends_target_vulkan-forward-renderer
+  DEFINES = -DNOMINMAX -DVK_USE_PLATFORM_WIN32_KHR -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -IC:\VulkanSDK\1.1.130.0\Include
+  OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
+  OBJECT_FILE_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src
+  TARGET_COMPILE_PDB = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\vulkan-forward-renderer.pdb
+  TARGET_PDB = include\drako\graphics\vulkan-forward-renderer.pdb
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target vulkan-forward-renderer
@@ -2032,7 +2088,7 @@ build include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_m
 #############################################
 # Link the static library include\drako\graphics\vulkan-forward-renderer.lib
 
-build include\drako\graphics\vulkan-forward-renderer.lib: CXX_STATIC_LIBRARY_LINKER__vulkan-forward-renderer_Debug include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_forward_renderer.cpp.obj include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_memory_allocator.cpp.obj
+build include\drako\graphics\vulkan-forward-renderer.lib: CXX_STATIC_LIBRARY_LINKER__vulkan-forward-renderer_Debug include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_forward_renderer.cpp.obj include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_memory_allocator.cpp.obj include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir\src\vulkan_runtime_context.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\graphics\CMakeFiles\vulkan-forward-renderer.dir
@@ -2174,11 +2230,15 @@ build drako-system.lib: phony include\drako\system\drako-system.lib
 
 build dson: phony include\drako\file_formats\dson.lib
 
-build dson-test: phony ..\..\..\build\dson-test.exe
-
-build dson-test.exe: phony ..\..\..\build\dson-test.exe
-
 build dson.lib: phony include\drako\file_formats\dson.lib
+
+build dson_lexer_test: phony ..\..\..\build\dson_lexer_test.exe
+
+build dson_lexer_test.exe: phony ..\..\..\build\dson_lexer_test.exe
+
+build dson_parser_test: phony ..\..\..\build\dson_parser_test.exe
+
+build dson_parser_test.exe: phony ..\..\..\build\dson_parser_test.exe
 
 build input-system: phony include\drako\input\input-system.lib
 
@@ -2266,7 +2326,7 @@ build include\drako\engine\all: phony include\drako\engine\render-system.lib inc
 #############################################
 # Folder: C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug/include/drako/file_formats
 
-build include\drako\file_formats\all: phony ..\..\..\build\dson-test.exe include\drako\file_formats\bmp.lib include\drako\file_formats\json.lib include\drako\file_formats\dson.lib include\drako\file_formats\png\all include\drako\file_formats\wave\all include\drako\file_formats\wavefront\all
+build include\drako\file_formats\all: phony include\drako\file_formats\bmp.lib include\drako\file_formats\json.lib ..\..\..\build\dson_lexer_test.exe include\drako\file_formats\dson.lib ..\..\..\build\dson_parser_test.exe include\drako\file_formats\png\all include\drako\file_formats\wave\all include\drako\file_formats\wavefront\all
 
 # =============================================================================
 

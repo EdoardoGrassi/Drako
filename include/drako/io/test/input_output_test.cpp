@@ -8,6 +8,8 @@
 
 int main()
 {
+    using namespace drako;
+
     const auto file     = "asasadsafsaifaosfhoahsodasuof";
     const auto temp     = std::filesystem::temp_directory_path();
     const auto fullpath = temp / file;
@@ -20,13 +22,13 @@ int main()
     std::copy(original.cbegin(), original.cend(), result.begin());
 
     {
-        drako::io::UniqueOutputFile ofs{ fullpath };
-        ofs.write(original.data(), original.size());
+        io::UniqueOutputFile f{ fullpath };
+        io::write_all(f, { original.data(), original.size() });
     }
 
     {
-        drako::io::UniqueInputFile ifs{ fullpath };
-        ifs.read(result.data(), result.size());
+        io::UniqueInputFile f{ fullpath };
+        io::read_exact(f, { result.data(), result.size() });
     }
 
     std::filesystem::remove(fullpath);

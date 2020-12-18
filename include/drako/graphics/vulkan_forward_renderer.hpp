@@ -16,7 +16,8 @@ namespace drako::vulkan
     class forward_renderer
     {
     public:
-        explicit forward_renderer(const context& ctx, uint32_t width, uint32_t height);
+        explicit forward_renderer(
+            const Context& ctx, std::uint32_t width, std::uint32_t height);
 
         ~forward_renderer() noexcept;
 
@@ -34,7 +35,7 @@ namespace drako::vulkan
         struct draw_batch_soa
         {
             material_pipeline   pipeline;
-            std::vector<mat4x4> mvps;
+            std::vector<Mat4x4> mvps;
             std::vector<mesh>   meshes;
         };
         void draw(const draw_batch_soa&) noexcept;
@@ -42,7 +43,7 @@ namespace drako::vulkan
         struct draw_batch_mtl_soa
         {
             material_pipeline              pipeline;
-            std::vector<mat4x4>            mvps;
+            std::vector<Mat4x4>            mvps;
             std::vector<mesh>              meshes;
             std::vector<material_instance> materials;
         };

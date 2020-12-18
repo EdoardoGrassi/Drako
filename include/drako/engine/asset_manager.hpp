@@ -20,14 +20,13 @@ namespace drako::engine
     class AssetManager
     {
     public:
-        struct bundle_manifest_soa
+        struct BundlesArgs
         {
-            std::vector<AssetBundleID>         ids;
-            std::vector<std::string>           names;
-            std::vector<std::filesystem::path> paths;
+            std::vector<AssetBundleID> ids;
+            std::vector<std::string>   names;
         };
 
-        struct Config
+        struct ConfigArgs
         {
             /// @brief Directory where asset bundles manifests are located.
             std::filesystem::path bundle_manifest_directory;
@@ -38,7 +37,7 @@ namespace drako::engine
 
         //using bundle_loaded_callback = void(*)();
 
-        explicit AssetManager(const bundle_manifest_soa&, const Config&);
+        explicit AssetManager(const BundlesArgs&, const ConfigArgs&);
 
         AssetManager(const AssetManager&) = delete;
         AssetManager& operator=(const AssetManager&) = delete;
@@ -54,13 +53,13 @@ namespace drako::engine
         /// Notify that a bundle is no longer required.
         ///
         void unload_bundle(const AssetBundleID id) noexcept;
-        //void unload_bundle(const std::vector<asset_bundle_id>& ids) noexcept;
+        //void unload_bundle(const std::span<const AssetBundleID>) noexcept;
 
         void load_asset(const AssetID) noexcept;
-        //void load_asset(std::span<const uuid>) noexcept;
+        //void load_asset(std::span<const AssetID>) noexcept;
 
         void unload_asset(const AssetID) noexcept;
-        //void unload_asset(std::span<const uuid>) noexcept;
+        //void unload_asset(std::span<const AssetID>) noexcept;
 
         /// @brief Executes pending asynchronous requests.
         void update() noexcept;
@@ -76,7 +75,7 @@ namespace drako::engine
         using _bid        = AssetBundleID;
         using _request_id = std::uint32_t;
 
-        const Config _config;
+        const ConfigArgs _config;
 
         io::AsyncReaderPool _io_service;
 
@@ -106,16 +105,16 @@ namespace drako::engine
 
         struct _available_bundles_table
         {
-            std::vector<_bid>                  ids;
+            std::vector<_bid>                ids;
             std::vector<io::UniqueInputFile> sources;
-            std::vector<std::size_t>           sizes;
-            std::vector<std::string>           names;
+            std::vector<std::size_t>         sizes;
+            std::vector<std::string>         names;
         } _available_bundles;
 
         struct _loaded_bundles_table
         {
             std::vector<_bid>          ids;
-            std::vector<asset_bundle>  bundles;
+            std::vector<AssetBundle>   bundles;
             std::vector<std::uint16_t> refcount;
         } _loaded_bundles;
 

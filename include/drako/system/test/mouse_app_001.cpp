@@ -7,7 +7,7 @@
 
 int main()
 {
-    drako::sys::desktop_window main(L"Main window");
+    drako::sys::UniqueDesktopWindow main(L"Main window");
     main.show();
 
     drako::sys::MouseDevice mouse(main);

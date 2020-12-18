@@ -1,0 +1,602 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						3,
+						10,
+						11,
+						13
+					]
+				},
+				{
+					"build" : "include/drako/audio",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/audio",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				},
+				{
+					"build" : "include/drako/core",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/core",
+					"targetIndexes" : 
+					[
+						14
+					]
+				},
+				{
+					"build" : "include/drako/concurrency",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/concurrency"
+				},
+				{
+					"build" : "include/drako/devel",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/devel",
+					"targetIndexes" : 
+					[
+						4,
+						12,
+						32
+					]
+				},
+				{
+					"build" : "include/drako/engine",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/engine",
+					"targetIndexes" : 
+					[
+						20,
+						30
+					]
+				},
+				{
+					"build" : "include/drako/file_formats",
+					"childIndexes" : 
+					[
+						7,
+						8,
+						9
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/file_formats",
+					"targetIndexes" : 
+					[
+						2,
+						24,
+						25,
+						26,
+						29
+					]
+				},
+				{
+					"build" : "include/drako/file_formats/png",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "include/drako/file_formats/png",
+					"targetIndexes" : 
+					[
+						19
+					]
+				},
+				{
+					"build" : "include/drako/file_formats/wave",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "include/drako/file_formats/wave",
+					"targetIndexes" : 
+					[
+						34,
+						35
+					]
+				},
+				{
+					"build" : "include/drako/file_formats/wavefront",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "include/drako/file_formats/wavefront",
+					"targetIndexes" : 
+					[
+						15,
+						16,
+						17
+					]
+				},
+				{
+					"build" : "include/drako/input",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/input",
+					"targetIndexes" : 
+					[
+						5,
+						6,
+						27
+					]
+				},
+				{
+					"build" : "include/drako/io",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/io",
+					"targetIndexes" : 
+					[
+						7,
+						8,
+						9
+					]
+				},
+				{
+					"build" : "include/drako/jobs",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/jobs",
+					"targetIndexes" : 
+					[
+						28
+					]
+				},
+				{
+					"build" : "include/drako/physics",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/physics",
+					"targetIndexes" : 
+					[
+						18
+					]
+				},
+				{
+					"build" : "include/drako/system",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/system",
+					"targetIndexes" : 
+					[
+						21,
+						22,
+						23,
+						31
+					]
+				},
+				{
+					"build" : "include/drako/graphics",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include/drako/graphics",
+					"targetIndexes" : 
+					[
+						33
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					],
+					"name" : "drako",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						32,
+						33,
+						34,
+						35
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "audio::@b0248db5064016fb0636",
+					"jsonFile" : "target-audio-Debug-5a79dcfeeefc19a06215.json",
+					"name" : "audio",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "audio_test::@b0248db5064016fb0636",
+					"jsonFile" : "target-audio_test-Debug-f71887fe5d1b889422f9.json",
+					"name" : "audio_test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "bmp::@58f94dd73e3e169101dc",
+					"jsonFile" : "target-bmp-Debug-4eac8afbf0386785bf50.json",
+					"name" : "bmp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "clang-format::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-clang-format-Debug-f709742031db56a52e47.json",
+					"name" : "clang-format",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "crc32_test::@b7f4927b13849f67cf77",
+					"jsonFile" : "target-crc32_test-Debug-744fa5f512a855a65248.json",
+					"name" : "crc32_test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "device-system::@cf81bd0203eac15e1d91",
+					"jsonFile" : "target-device-system-Debug-eae0eccdaeac988e2bf3.json",
+					"name" : "device-system",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "device-system-test-app::@cf81bd0203eac15e1d91",
+					"jsonFile" : "target-device-system-test-app-Debug-483ce31125459827471b.json",
+					"name" : "device-system-test-app",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "dk-io::@7745b2c5c5d0819bb2f3",
+					"jsonFile" : "target-dk-io-Debug-9fb93a850cd7f27f8093.json",
+					"name" : "dk-io",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "dk-io-test_1::@7745b2c5c5d0819bb2f3",
+					"jsonFile" : "target-dk-io-test_1-Debug-698a4c8c2a36a7d3fff1.json",
+					"name" : "dk-io-test_1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "dk-io-test_2::@7745b2c5c5d0819bb2f3",
+					"jsonFile" : "target-dk-io-test_2-Debug-2b3b3c33bf6d530b3221.json",
+					"name" : "dk-io-test_2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "drako-builder::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-drako-builder-Debug-ee92da57718ee0961f32.json",
+					"name" : "drako-builder",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "drako-cli-editor::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-drako-cli-editor-Debug-6fd85bf89fa5901185f9.json",
+					"name" : "drako-cli-editor",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "drako-devel::@b7f4927b13849f67cf77",
+					"jsonFile" : "target-drako-devel-Debug-4cd522b76804602e38c5.json",
+					"name" : "drako-devel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "drako-engine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-drako-engine-Debug-2f0b5dfe39ddda0344d6.json",
+					"name" : "drako-engine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "drako-intrinsics-test::@4e60bab314c8c9393eb7",
+					"jsonFile" : "target-drako-intrinsics-test-Debug-18d6cae4a9f3fcb1f58b.json",
+					"name" : "drako-intrinsics-test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "drako-obj::@0471bd90eddddaace742",
+					"jsonFile" : "target-drako-obj-Debug-19951ed8fa367c4a0acd.json",
+					"name" : "drako-obj",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "drako-obj-test-1::@0471bd90eddddaace742",
+					"jsonFile" : "target-drako-obj-test-1-Debug-aae4b7677f42cd20081c.json",
+					"name" : "drako-obj-test-1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "drako-obj-viewer::@0471bd90eddddaace742",
+					"jsonFile" : "target-drako-obj-viewer-Debug-5d6d39754799d3d6bfcc.json",
+					"name" : "drako-obj-viewer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "drako-physics::@ea1c97f60a3a247cec6e",
+					"jsonFile" : "target-drako-physics-Debug-2e4051c27f8175f3424a.json",
+					"name" : "drako-physics",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "drako-png::@4c4ab6d383401ec87249",
+					"jsonFile" : "target-drako-png-Debug-333cb4d12f350ed490a1.json",
+					"name" : "drako-png",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "drako-runtime::@7d2b3442a5e4b40cd910",
+					"jsonFile" : "target-drako-runtime-Debug-1846c723b8d15ea69c24.json",
+					"name" : "drako-runtime",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "drako-sys-keyboard-app::@2610a9d69b46b4972eaf",
+					"jsonFile" : "target-drako-sys-keyboard-app-Debug-40f0c5e064fb042c1cbe.json",
+					"name" : "drako-sys-keyboard-app",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "drako-sys-mouse-app::@2610a9d69b46b4972eaf",
+					"jsonFile" : "target-drako-sys-mouse-app-Debug-934853232a8a0439609e.json",
+					"name" : "drako-sys-mouse-app",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "drako-system::@2610a9d69b46b4972eaf",
+					"jsonFile" : "target-drako-system-Debug-403a0ca789f7a4cf383d.json",
+					"name" : "drako-system",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "dson::@58f94dd73e3e169101dc",
+					"jsonFile" : "target-dson-Debug-6e02303c987e2b81fc47.json",
+					"name" : "dson",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "dson_lexer_test::@58f94dd73e3e169101dc",
+					"jsonFile" : "target-dson_lexer_test-Debug-1efaea712c05b0cf8bcc.json",
+					"name" : "dson_lexer_test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "dson_parser_test::@58f94dd73e3e169101dc",
+					"jsonFile" : "target-dson_parser_test-Debug-5e184b4fe6593e0852cd.json",
+					"name" : "dson_parser_test",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "input-system::@cf81bd0203eac15e1d91",
+					"jsonFile" : "target-input-system-Debug-b9059c2e3d7224001fe2.json",
+					"name" : "input-system",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "jobs-test-1::@122d5ca66debb65cb7b5",
+					"jsonFile" : "target-jobs-test-1-Debug-2e284b240c3e9f15e8d1.json",
+					"name" : "jobs-test-1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "json::@58f94dd73e3e169101dc",
+					"jsonFile" : "target-json-Debug-f76bc967d24ed8f00ad1.json",
+					"name" : "json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "render-system::@7d2b3442a5e4b40cd910",
+					"jsonFile" : "target-render-system-Debug-33bcf437c98463877076.json",
+					"name" : "render-system",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "thread-test-001::@2610a9d69b46b4972eaf",
+					"jsonFile" : "target-thread-test-001-Debug-62b632bf5e4a7196d5ed.json",
+					"name" : "thread-test-001",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "uuid-test1-exe::@b7f4927b13849f67cf77",
+					"jsonFile" : "target-uuid-test1-exe-Debug-6f1d7f8e4f7a84b8d86f.json",
+					"name" : "uuid-test1-exe",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 15,
+					"id" : "vulkan-forward-renderer::@851974be3d61c848a7e4",
+					"jsonFile" : "target-vulkan-forward-renderer-Debug-aef6c3734f9ac1e1cf55.json",
+					"name" : "vulkan-forward-renderer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "wave::@3f3d886b4b550a271763",
+					"jsonFile" : "target-wave-Debug-b98677d8132efc5f55aa.json",
+					"name" : "wave",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "wave-viewer::@3f3d886b4b550a271763",
+					"jsonFile" : "target-wave-viewer-Debug-e1cf73f91836afdd9be8.json",
+					"name" : "wave-viewer",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework/out/build/x64-Debug",
+		"source" : "C:/Users/Edoardo Grassi/Source/Repos/drako_framework"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 1
+	}
+}

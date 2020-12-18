@@ -20,12 +20,12 @@ namespace drako::io
 #error Not supported on current platform.
 #endif
 
-    using handle = native_handle_type;
+    using Handle = native_handle_type;
 
 
     /// @brief Allowed file operations.
     /// @note Combinations of different flags are accepted.
-    enum class mode : std::uint8_t
+    enum class Mode : std::uint8_t
     {
         /// @brief Only read operations.
         read = (1 << 0),
@@ -40,7 +40,7 @@ namespace drako::io
 
     /// @brief File sharing mode.
     /// @note Combinations of different flags are accepted.
-    enum class share_mode : std::uint8_t
+    enum class Share : std::uint8_t
     {
         // Prevents sharing of the file.
         exclusive = 0,
@@ -62,37 +62,64 @@ namespace drako::io
     };
 
     /// @brief Action performed when opening a file.
-    enum class creation
+    enum class Create
     {
         /// @brief Open only already existing files.
         open_existing,
 
-        /// @brief Create file if doesn't exist.
+        /// @brief Create the file if it doesn't exists.
         if_needed,
 
         /// @brief Truncate only already existing files.
-        truncate_existing
+        truncate_existing,
+
+        /// @brief Create the file and abort if it already exists.
+        require_new
     };
 
 
 
-    [[nodiscard]] handle open(const path_type& filename, mode m, creation c);
+    [[nodiscard]] Handle open(const path_type& filename, Mode m, Create c);
 
-    void read(handle src, std::byte* dst, std::size_t bytes);
-    void read(handle src, std::byte* dst, std::size_t bytes, std::size_t offset);
+    /// @brief Read bytes from a file.
+    [[nodiscard]] std::size_t read(Handle src, std::byte* dst, std::size_t bytes);
 
-    void read(handle src, std::byte* dst, std::size_t bytes, std::error_code& ec) noexcept;
-    void read(handle src, std::byte* dst, std::size_t bytes, std::size_t offset, std::error_code& ec) noexcept;
+    /// @brief Read bytes from a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t read(Handle src, std::byte* dst, std::size_t bytes, std::size_t offset);
 
-    void write(const std::byte* src, handle dst, std::size_t bytes);
-    void write(const std::byte* src, handle dst, std::size_t bytes, std::size_t offset);
+    /// @brief Read bytes from a file.
+    [[nodiscard]] std::size_t read(Handle src, std::byte* dst,
+        std::size_t bytes, std::error_code& ec) noexcept;
 
-    void write(const std::byte* src, handle dst, std::size_t bytes, std::error_code& ec) noexcept;
-    void write(const std::byte* src, handle dst, std::size_t bytes, std::size_t offset, std::error_code& ec) noexcept;
+    /// @brief Read bytes from a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t read(Handle src, std::byte* dst,
+        std::size_t bytes, std::size_t offset, std::error_code& ec) noexcept;
 
-    void flush(handle h);
 
-    void close(handle h);
+    /// @brief Write bytes to a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t write(const std::byte* src, Handle dst, std::size_t bytes);
+
+    /// @brief Write bytes to a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t write(const std::byte* src, Handle dst, std::size_t bytes, std::size_t offset);
+
+    /// @brief Write bytes to a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t write(const std::byte* src, Handle dst,
+        std::size_t bytes, std::error_code& ec) noexcept;
+
+    /// @brief Write bytes to a file.
+    /// @note The OS file pointer is not modified.
+    [[nodiscard]] std::size_t write(const std::byte* src, Handle dst,
+        std::size_t bytes, std::size_t offset, std::error_code& ec) noexcept;
+
+
+    void flush(Handle h);
+
+    void close(Handle h);
 
 
 } // namespace drako::io

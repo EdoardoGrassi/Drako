@@ -17,7 +17,7 @@
 
 namespace drako::sys
 {
-    static LRESULT CALLBACK _window_message_handler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    LRESULT CALLBACK _window_message_handler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         switch (uMsg)
         {
@@ -50,7 +50,7 @@ namespace drako::sys
         return ERROR_SUCCESS;
     }
 
-    desktop_window::desktop_window(std::wstring_view title)
+    UniqueDesktopWindow::UniqueDesktopWindow(std::wstring_view title)
         : _instance(::GetModuleHandleW(nullptr))
     {
         assert(!std::empty(title));
@@ -84,21 +84,20 @@ namespace drako::sys
             [[unlikely]] throw std::system_error(::GetLastError(), std::system_category());
     }
 
-    desktop_window::~desktop_window() noexcept
+    UniqueDesktopWindow::~UniqueDesktopWindow() noexcept
     {
         if (_window != NULL)
             if (!::DestroyWindow(_window))
                 [[unlikely]] std::terminate();
     }
 
-    desktop_window::desktop_window(desktop_window&& other) noexcept
-        : _instance(other._instance)
-        , _window(other._window)
+    UniqueDesktopWindow::UniqueDesktopWindow(UniqueDesktopWindow&& other) noexcept
+        : _instance(other._instance), _window(other._window)
     {
         other._window = NULL;
     }
 
-    desktop_window& desktop_window::operator=(desktop_window&& other) noexcept
+    UniqueDesktopWindow& UniqueDesktopWindow::operator=(UniqueDesktopWindow&& other) noexcept
     {
         if (this != std::addressof(other))
         {
@@ -109,17 +108,17 @@ namespace drako::sys
         return *this;
     }
 
-    void desktop_window::hide() noexcept
+    void UniqueDesktopWindow::hide() noexcept
     {
         ::ShowWindow(_window, SW_HIDE);
     }
 
-    void desktop_window::show() noexcept
+    void UniqueDesktopWindow::show() noexcept
     {
         ::ShowWindow(_window, SW_SHOW);
     }
 
-    bool desktop_window::update() noexcept
+    bool UniqueDesktopWindow::update() noexcept
     {
         bool has_close_msg;
         if (MSG msg; has_close_msg = ::PeekMessageW(&msg, _window, WM_CLOSE, WM_CLOSE, PM_REMOVE))
