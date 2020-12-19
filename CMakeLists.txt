@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set output folders for binaries, executables and libraries.
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
+#set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
 
 if(MSVC)
@@ -44,13 +44,14 @@ add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
 add_subdirectory("include/drako/graphics")
 
-
+#[[
 # Experimental Drako engine with forward renderer
 add_executable(drako-engine "./src/vulkan_engine_win32.cpp")
 target_link_libraries(drako-engine PRIVATE
     drako::vulkan-forward-renderer
     drako::system
     drako::runtime)
+#]]
 
 
 # Console interface for Drako projects

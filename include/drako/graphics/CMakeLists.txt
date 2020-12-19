@@ -35,7 +35,7 @@ if(NOT Vulkan_FOUND)
 	endif()
 endif()
 
-
+#[[
 add_library(vulkan-forward-renderer STATIC
 	"src/vulkan_forward_renderer.cpp"
 	"src/vulkan_memory_allocator.cpp"
@@ -49,6 +49,7 @@ target_link_libraries(vulkan-forward-renderer PUBLIC ${Vulkan_LIBRARIES})
 if(WIN32)
 	target_compile_definitions(vulkan-forward-renderer PUBLIC VK_USE_PLATFORM_WIN32_KHR)
 endif()
+#]]
 
 # Disable exceptions in Vulkan headers.
 # target_compile_definitions(vulkan-forward-renderer PRIVATE VULKAN_HPP_NO_EXCEPTIONS)

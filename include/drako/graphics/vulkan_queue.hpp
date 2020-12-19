@@ -54,7 +54,7 @@ namespace drako::vulkan
         for (const auto& pdevice : pdevices)
         {
             const auto properties = pdevice.getProperties();
-            DRAKO_LOG_INFO("[Vulkan] device name" + std::string(properties.deviceName));
+            DRAKO_LOG_INFO("[Vulkan] device name" + std::string{ properties.deviceName });
 
             const auto features = pdevice.getFeatures();
             //DRAKO_LOG_INFO("[Vulkan] " + to_string(features));
