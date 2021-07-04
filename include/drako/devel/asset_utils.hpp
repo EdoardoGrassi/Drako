@@ -4,8 +4,6 @@
 
 #include "drako/devel/asset_bundle_manifest.hpp"
 #include "drako/devel/asset_types.hpp"
-#include "drako/io/input_file_handle.hpp"
-#include "drako/io/output_file_handle.hpp"
 
 #include <limits>
 #include <string>

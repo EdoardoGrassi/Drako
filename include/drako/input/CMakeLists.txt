@@ -19,10 +19,15 @@ endif()
 add_library(drako::devices ALIAS device-system)
 
 
-add_library(input-system STATIC "src/input_system.cpp")
+add_library(input-system STATIC
+    "src/input_system.cpp"
+    "src/input_system_types.cpp")
 target_link_libraries(input-system PRIVATE drako::devices)
 add_library(drako::input ALIAS input-system)
 
 
-add_executable(device-system-test-app "test/device_test_app.cpp")
-target_link_libraries(device-system-test-app PRIVATE drako::devices drako::input)
+add_executable(device_system_testrun "test/device_system_testrun.cpp")
+target_link_libraries(device_system_testrun PRIVATE drako::devices drako::input)
+
+add_executable(input_system_testrun "test/input_system_testrun.cpp")
+target_link_libraries(input_system_testrun PRIVATE drako::input)

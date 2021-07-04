@@ -26,14 +26,11 @@ namespace drako::dson
         DOM(const DOM&) = default;
         DOM& operator=(const DOM&) = default;
 
-        //std::string& operator[](const std::string_view key);
-
         [[nodiscard]] std::string get(const std::string& key) const;
         [[nodiscard]] std::string get_or_default(
             const std::string& key, const std::string& def) const noexcept;
 
         void set(const std::string& key, const std::string& value);
-
 
         [[nodiscard]] iterator       begin() noexcept;
         [[nodiscard]] const_iterator begin() const noexcept;
@@ -46,14 +43,10 @@ namespace drako::dson
         friend std::istream& operator>>(std::istream&, DOM&);
         friend std::ostream& operator<<(std::ostream&, const DOM&);
 
-        friend void load(const std::filesystem::path&, DOM&);
-        friend void save(const std::filesystem::path&, const DOM&);
-
     private:
         // TODO: maybe use a single allocation for both buffers
         std::vector<std::string> _keys;
         std::vector<std::string> _vals;
-
 
     public:
         class iterator
@@ -191,12 +184,10 @@ namespace drako::dson
         return { std::data(_keys) + std::size(_keys), std::data(_vals) + std::size(_vals) };
     }
 
-    void load(const std::filesystem::path&, DOM&);
-    void save(const std::filesystem::path&, const DOM&);
 
     [[nodiscard]] DOM parse(std::span<const char> text);
 
-    [[nodiscard]] std::string to_string(const DOM&);
+    //[[nodiscard]] inline std::string to_string(const DOM&);
 
 } // namespace drako::dson
 

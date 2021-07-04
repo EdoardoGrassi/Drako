@@ -2,7 +2,6 @@
 #include "drako/devel/build_utils.hpp"
 #include "drako/devel/mesh_importers.hpp"
 #include "drako/devel/project_utils.hpp"
-#include "drako/devel/uuid.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/mesh_utils.hpp"
 
@@ -72,10 +71,11 @@ void cli_create_project(const CmdArgs params)
     const auto& name  = params.args[0];
     const auto& where = params.args[1];
 
+    const ProjectContext ctx{ where };
     std::cout << "Creating project " << name << " at " << where << '\n';
     try
     {
-        create_project_tree(name, where);
+        create_project_tree(ctx, where);
         std::cout << "Project created\n";
     }
     catch (const std::exception& e)
@@ -89,16 +89,15 @@ void cli_open_project(const std::filesystem::path& dir)
 {
     using namespace drako::editor;
 
-    ProjectContext ctx{ dir };
+    const ProjectContext ctx{ dir };
     try
     {
-        ProjectMetaInfo proj_info;
-        load(dir, proj_info);
+        ProjectManifest proj_info;
         std::cout << "Name: " << proj_info.name << '\n';
 
-        ProjectDatabase proj{};
-        load(dir, proj);
-        std::cout << "Located assets count: " << std::size(proj.assets.ids) << '\n';
+        ProjectDatabase db{ ctx };
+        //load_all_assets(ctx, db);
+        //std::cout << "Located assets count: " << std::size(db.assets.ids) << '\n';
     }
     catch (const std::exception& e)
     {
@@ -127,6 +126,29 @@ void cli_open_project(const std::filesystem::path& dir)
         }
     }
     */
+}
+
+void cli_scan_assets(const std::filesystem::path& dir)
+{
+    using namespace drako::editor;
+    const ProjectContext ctx{ dir };
+
+    std::cout << "Scanning directory " << ctx.meta_directory() << " ...\n";
+    const auto scan = ctx.scan_all_assets();
+
+    std::cout << "# assets:\n";
+    for (const auto& a : scan.assets)
+    {
+        std::cout << "name:    " << a.id << '\n'
+                  << "uuid:    " << a.id << '\n'
+                  << "path:    " << a.path << '\n'
+                  << "version: " << a.version.string() << "\n\n";
+    }
+
+    std::cout << "# errors:\n";
+    for (const auto& e : scan.errors)
+        std::cout << "path: " << e.asset << '\n'
+                  << "info: " << e.message << '\n\n';
 }
 
 

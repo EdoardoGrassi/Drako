@@ -2,49 +2,63 @@
 #ifndef DRAKO_DEVICE_SYSTEM_TYPES_HPP
 #define DRAKO_DEVICE_SYSTEM_TYPES_HPP
 
+#include "drako/core/platform.hpp"
+#include "drako/core/typed_handle.hpp"
+
+#if defined(DRAKO_PLT_WIN32)
+#include <Windows.h>
+#include <Xinput.h> // VK_PAD_* codes
+#endif
+
 #include <array>
 #include <bitset>
 
 namespace drako
 {
-    using device_id = std::uint32_t;
-    //class device_id final : public handle<std::uint32_t> {};
+    DRAKO_DEFINE_TYPED_ID(DeviceID, std::uint32_t);
+
+    using NativeGamepadControlID = std::uint32_t;
+
+    using GamepadPlayerPort = std::uint32_t;
 
     // Metadata for an input device.
-    struct device_info
+    struct DeviceInstanceInfo
     {
-        std::string api;
-        std::string description;
-        device_id   port;
+        std::string       api;
+        std::string       description;
+        GamepadPlayerPort port;
     };
 
     // Describes the current state of an input device.
-    struct device_input_state
+    struct DeviceInputState
     {
         std::bitset<14>      buttons;
         std::array<float, 6> axes;
     };
 
-    // Describes an event occured on an input device.
-    struct device_button_event
-    {
-    };
-
     // Describe  av event at system level.
-    struct device_change_event
+    struct DeviceChangeEvent
     {
-        device_id id;
+        DeviceID id;
     };
 
-    struct device_output_state
+    struct DeviceOutputState
     {
         float left_rumble;
         float right_rumble;
     };
 
+    /// @brief Unique identifier of a physical axis on a gamepad.
+    using GamepadAxisID = std::uint32_t;
+
+    /// @brief Unique identifier of a physical button on a gamepad.
+    using GamepadButtonID = std::uint32_t;
+
+    /// @brief Unique identifier of a physical key on a keyboard.
+    using KeyboardKeyID = std::uint32_t;
 
     /// @brief Platform indipendent gamepad axes names.
-    enum vaxis : std::uint32_t
+    enum VAxis : std::uint32_t
     {
         left_thumb_horizontal,
         xbox_ls_x = left_thumb_horizontal,
@@ -67,7 +81,7 @@ namespace drako
 
 
     /// @brief Platform indipendent gamepad buttons names.
-    enum vkey : std::uint32_t
+    enum VKey : std::uint32_t
     {
         /// @brief Upward direction on the frontal d-pad.
         dpad_up = 0u,

@@ -1,0 +1,3 @@
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/uuid-cpp-subbuild/CMakeFiles/uuid-cpp-populate.dir
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/uuid-cpp-subbuild/CMakeFiles/edit_cache.dir
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/uuid-cpp-subbuild/CMakeFiles/rebuild_cache.dir

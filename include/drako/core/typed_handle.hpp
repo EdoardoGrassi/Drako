@@ -8,32 +8,23 @@
 namespace drako
 {
     template <typename T, typename Int>
-    requires std::is_unsigned_v<Int> class basic_typed_handle
+    requires std::is_unsigned_v<Int> class BasicTypedHandle
     {
     public:
-        using _this = basic_typed_handle;
+        explicit constexpr BasicTypedHandle() noexcept = default;
 
-        explicit constexpr basic_typed_handle() noexcept = default;
-
-        explicit constexpr basic_typed_handle(const Int key) noexcept
+        explicit constexpr BasicTypedHandle(const Int key) noexcept
             : _key{ key } {}
 
-        constexpr basic_typed_handle(const _this& other) noexcept = default;
-        constexpr _this& operator=(const _this& other) noexcept = default;
+        constexpr BasicTypedHandle(const BasicTypedHandle&) noexcept = default;
+        constexpr BasicTypedHandle& operator=(const BasicTypedHandle&) noexcept = default;
 
-        [[nodiscard]] constexpr friend bool operator==(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator!=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator<(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator>(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator<=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator>=(const _this, const _this) noexcept = default;
-
-        //[[nodiscard]] constexpr bool operator==(const basic_typed_handle& rhs) const noexcept { return _key == rhs._key; }
-        //[[nodiscard]] constexpr bool operator!=(const basic_typed_handle& rhs) const noexcept { return _key != rhs._key; }
-        //[[nodiscard]] constexpr bool operator>(const basic_typed_handle& rhs) const noexcept { return _key > rhs._key; }
-        //[[nodiscard]] constexpr bool operator<(const basic_typed_handle& rhs) const noexcept { return _key < rhs._key; }
-        //[[nodiscard]] constexpr bool operator>=(const basic_typed_handle& rhs) const noexcept { return _key >= rhs._key; }
-        //[[nodiscard]] constexpr bool operator<=(const basic_typed_handle& rhs) const noexcept { return _key <= rhs._key; }
+        //[[nodiscard]] friend bool operator==(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator!=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator<(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator>(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator<=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator>=(const _this, const _this) noexcept = default;
 
         [[nodiscard]] constexpr operator bool() const noexcept { return _key != 0; }
 
@@ -41,82 +32,37 @@ namespace drako
         Int _key = 0;
     };
 
-    template <typename T>
-    using handle = basic_typed_handle<T, std::uint32_t>;
 
-#define DRAKO_DEFINE_TYPED_HANDLE(type, representation)          \
-    class type : public basic_typed_handle<type, representation> \
+    /// @brief Defines a strongly typed handle with name Type and storage Integer.
+#define DRAKO_DEFINE_TYPED_HANDLE(Type, Integer)                 \
+    class Type : public BasicTypedHandle<Type, Integer>          \
     {                                                            \
-        using _base = basic_typed_handle<representation>;        \
-        using _base::_base;                                      \
-    }
-
-
-    template <typename T, typename Int>
-    requires std::is_unsigned_v<Int> class basic_typed_id
-    {
-    public:
-        using _this = basic_typed_id;
-
-        explicit constexpr basic_typed_id() noexcept = default;
-
-        explicit constexpr basic_typed_id(const Int key) noexcept
-            : _key{ key } {}
-
-        constexpr basic_typed_id(const _this&) noexcept = default;
-        constexpr _this& operator=(const _this&) noexcept = default;
-
-        [[nodiscard]] constexpr friend bool operator==(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator!=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator<(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator>(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator<=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator>=(const _this, const _this) noexcept = default;
-
-        //[[nodiscard]] constexpr bool operator==(const basic_typed_id rhs) const noexcept { return _key == rhs._key; }
-        //[[nodiscard]] constexpr bool operator!=(const basic_typed_id rhs) const noexcept { return _key != rhs._key; }
-        //[[nodiscard]] constexpr bool operator>(const basic_typed_id rhs) const noexcept { return _key > rhs._key; }
-        //[[nodiscard]] constexpr bool operator<(const basic_typed_id rhs) const noexcept { return _key < rhs._key; }
-        //[[nodiscard]] constexpr bool operator>=(const basic_typed_id rhs) const noexcept { return _key >= rhs._key; }
-        //[[nodiscard]] constexpr bool operator<=(const basic_typed_id rhs) const noexcept { return _key <= rhs._key; }
-
-        [[nodiscard]] constexpr operator bool() const noexcept { return _key != 0; }
-
-    private:
-        Int _key = 0;
-    };
-
-    template <typename T>
-    using id = basic_typed_id<T, std::uint32_t>;
+        using BasicTypedHandle<Type, Integer>::BasicTypedHandle; \
+    };                                                           \
+    static_assert(std::is_nothrow_copy_assignable_v<Type>,       \
+        "Generated type doesn't meet Handle requirement.");      \
+    static_assert(std::is_nothrow_copy_constructible_v<Type>,    \
+        "Generated type doesn't meet Handle requirement.");
 
 
     template <typename Int>
-    requires std::is_unsigned_v<Int> class basic_untyped_id
+    requires std::is_unsigned_v<Int> class BasicTypedID
     {
     public:
-        using _this = basic_untyped_id;
+        explicit constexpr BasicTypedID() noexcept = default;
 
-        explicit constexpr basic_untyped_id() noexcept = default;
-
-        explicit constexpr basic_untyped_id(const Int key) noexcept
+        explicit constexpr BasicTypedID(const Int key) noexcept
             : _key{ key } {}
 
-        constexpr basic_untyped_id(const _this&) noexcept = default;
-        constexpr _this& operator=(const _this&) noexcept = default;
+        constexpr BasicTypedID(const BasicTypedID&) noexcept = default;
+        constexpr BasicTypedID& operator=(const BasicTypedID&) noexcept = default;
 
-        [[nodiscard]] constexpr friend bool operator==(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator!=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator<(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator>(const _this, const _this) noexcept  = default;
-        [[nodiscard]] constexpr friend bool operator<=(const _this, const _this) noexcept = default;
-        [[nodiscard]] constexpr friend bool operator>=(const _this, const _this) noexcept = default;
-
-        //[[nodiscard]] constexpr bool operator==(const basic_typed_id rhs) const noexcept { return _key == rhs._key; }
-        //[[nodiscard]] constexpr bool operator!=(const basic_typed_id rhs) const noexcept { return _key != rhs._key; }
-        //[[nodiscard]] constexpr bool operator>(const basic_typed_id rhs) const noexcept { return _key > rhs._key; }
-        //[[nodiscard]] constexpr bool operator<(const basic_typed_id rhs) const noexcept { return _key < rhs._key; }
-        //[[nodiscard]] constexpr bool operator>=(const basic_typed_id rhs) const noexcept { return _key >= rhs._key; }
-        //[[nodiscard]] constexpr bool operator<=(const basic_typed_id rhs) const noexcept { return _key <= rhs._key; }
+        //[[nodiscard]] friend bool operator==(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator!=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator<(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator>(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator<=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator>=(const _this, const _this) noexcept = default;
 
         [[nodiscard]] constexpr operator bool() const noexcept { return _key != 0; }
 
@@ -124,13 +70,77 @@ namespace drako
         Int _key = 0;
     };
 
-    /// @brief Defines a typed id with type T and backing storage S.
-#define DRAKO_DEFINE_TYPED_ID(type, storage)      \
-    class type : public basic_untyped_id<storage> \
-    {                                             \
-        using _base = basic_untyped_id<storage>;  \
-        using _base::_base;                       \
-    }
+
+    /// @brief Defines a strongly typed id with name Type and storage Integer.
+#define DRAKO_DEFINE_TYPED_ID(Type, Integer)                  \
+    class Type : public BasicTypedID<Integer>                 \
+    {                                                         \
+        using BasicTypedID<Integer>::BasicTypedID;            \
+    };                                                        \
+    static_assert(std::is_nothrow_copy_assignable_v<Type>,    \
+        "Generated type doesn't meet ID requirement.");       \
+    static_assert(std::is_nothrow_copy_constructible_v<Type>, \
+        "Generated type doesn't meet ID requirement.");
+
+
+    /*
+/// @brief Defines a strongly typed id with name Type and storage Integer.
+#define DRAKO_DEFINE_TYPED_ID(Type, Integer)                                         \
+    requires std::is_unsigned_v<Integer> class Type                                  \
+    {                                                                                \
+    public:                                                                          \
+        explicit constexpr Type() noexcept = default;                                \
+        explicit constexpr Type(const Integer key) noexcept : _key{ key } {}         \
+                                                                                     \
+        constexpr Type(const Type&) noexcept = default;                              \
+        constexpr Type& operator=(const Type&) noexcept = default;                   \
+                                                                                     \
+        [[nodiscard]] constexpr operator bool() const noexcept { return _key != 0; } \
+                                                                                     \
+    private:                                                                         \
+        Integer _key = 0;                                                            \
+    };                                                                               \
+    static_assert(std::is_nothrow_copy_assignable_v<Type>,                           \
+        "Generated type doesn't meet ID requirement.");                              \
+    static_assert(std::is_nothrow_copy_constructible_v<Type>,                        \
+        "Generated type doesn't meet ID requirement.");*/
+
+
+    template <typename Int>
+    requires std::is_unsigned_v<Int> class BasicUntypedID
+    {
+    public:
+        explicit constexpr BasicUntypedID() noexcept = default;
+
+        explicit constexpr BasicUntypedID(const Int key) noexcept
+            : _key{ key } {}
+
+        constexpr BasicUntypedID(const BasicUntypedID&) noexcept = default;
+        constexpr BasicUntypedID& operator=(const BasicUntypedID&) noexcept = default;
+
+        //[[nodiscard]] friend bool operator==(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator!=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator<(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator>(const _this, const _this) noexcept  = default;
+        //[[nodiscard]] friend bool operator<=(const _this, const _this) noexcept = default;
+        //[[nodiscard]] friend bool operator>=(const _this, const _this) noexcept = default;
+
+        [[nodiscard]] constexpr operator bool() const noexcept { return _key != 0; }
+
+    private:
+        Int _key = 0;
+    };
+
+    /// @brief Defines a weakly typed id with name T and storage S.
+#define DRAKO_DEFINE_UNTYPED_ID(type, representation)         \
+    class type : public BasicUntypedID<representation>        \
+    {                                                         \
+        using BasicUntypedID::BasicUntypedID                  \
+    };                                                        \
+    static_assert(std::is_nothrow_copy_assignable_v<type>,    \
+        "Generated type doesn't meet ID requirement.");       \
+    static_assert(std::is_nothrow_copy_constructible_v<type>, \
+        "Generated type doesn't meet ID requirement.");
 
 } // namespace drako
 

@@ -14,10 +14,10 @@ namespace drako::formats::png
     };
 
     /// @brief Exception emitted on parsing errors.
-    class parser_error : public std::runtime_error
+    class ParserError : public std::runtime_error
     {
     public:
-        explicit parser_error(const char* msg)
+        explicit ParserError(const char* msg)
             : std::runtime_error(msg) {}
     };
 

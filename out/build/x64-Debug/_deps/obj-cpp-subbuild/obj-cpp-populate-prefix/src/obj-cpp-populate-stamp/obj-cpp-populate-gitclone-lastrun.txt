@@ -1,0 +1,3 @@
+repository='https://github.com/EdoardoGrassi/obj-cpp.git'
+module=''
+tag='origin'

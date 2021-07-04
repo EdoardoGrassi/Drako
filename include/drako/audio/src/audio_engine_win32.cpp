@@ -1,7 +1,6 @@
 #include "drako/audio/audio_engine.hpp"
 
 #include "drako/audio/audio_types.hpp"
-#include "drako/core/typed_handle.hpp"
 
 #include <cassert>
 #include <vector>

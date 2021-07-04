@@ -1,7 +1,6 @@
 #include "drako/file_formats/wave/wave.hpp"
 
 #include "drako/core/byte_utils.hpp"
-#include "drako/io/memory_stream.hpp"
 
 #include <array>
 #include <iostream>
@@ -98,8 +97,6 @@ namespace drako::file_formats::wave
 
     [[nodiscard]] content parse(const std::span<const std::byte> bytes)
     {
-        io::memory_stream_reader stream{ bytes }; // TODO: << maybe use this
-
         std::vector<std::byte> data{};
 
         auto seek = bytes.data();

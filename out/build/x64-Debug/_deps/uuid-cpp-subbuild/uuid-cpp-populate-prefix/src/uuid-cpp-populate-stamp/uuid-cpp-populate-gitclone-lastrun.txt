@@ -1,0 +1,3 @@
+repository='https://github.com/EdoardoGrassi/uuid-cpp.git'
+module=''
+tag='origin'

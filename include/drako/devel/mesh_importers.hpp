@@ -12,42 +12,22 @@
 
 namespace drako::editor
 {
-    struct mesh_import_info
+    struct MeshImportInfo
     {
-        Uuid                  guid;
+        uuid::Uuid            guid;
         std::string           name;
         std::filesystem::path path;
     };
 
+    const dson::DOM& operator>>(const dson::DOM&, MeshImportInfo&);
+    dson::DOM&       operator<<(dson::DOM&, const MeshImportInfo&);
 
-    [[nodiscard]] inline mesh_import_info load_mesh_import(const std::filesystem::path& file)
+
+    struct ObjImportConfig
     {
-        dson::DOM serialized{};
-        {
-            std::ifstream ifs{ file };
-            ifs >> serialized;
-        }
-
-        mesh_import_info info;
-        parse(serialized.get("guid"), info.guid);
-        info.name = serialized.get("name");
-        info.path = serialized.get("path");
-        return info;
-    }
-
-    inline void save_mesh_import(const mesh_import_info& info, const std::filesystem::path& file)
-    {
-        dson::DOM serialized;
-        serialized.set("guid", to_string(info.guid));
-        serialized.set("name", info.name);
-        serialized.set("path", info.path.string());
-
-        std::ofstream ofs{ file };
-        ofs << serialized;
-    }
-
-    using properties = std::vector<std::pair<std::string, std::string>>;
-    using flags      = std::vector<std::string>;
+        std::vector<std::pair<std::string, std::string>> props;
+        std::vector<std::string>                         flags;
+    };
 
     /// @brief Import assets from .obj file.
     ///
@@ -55,10 +35,9 @@ namespace drako::editor
     ///     --discard-normals   remove normals data from output
     ///     --discard-uvs       remove texture uvs data from output
     ///
-    void import_obj_file(
-        const std::filesystem::path& src,
-        const std::filesystem::path& dst,
-        const properties& p, const flags& f);
+    [[nodiscard]] Mesh compile(const obj::MeshData& obj, const ObjImportConfig& config);
+
+    [[nodiscard]] Mesh compile(const obj::MeshData& md, bool discard_normals);
 
 } // namespace drako::editor
 

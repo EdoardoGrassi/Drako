@@ -12,16 +12,9 @@
 
 namespace drako
 {
-    using _this = device_system;
-
-    [[nodiscard]] constexpr bool _valid(const std::uint32_t h) noexcept
+    [[nodiscard]] bool _xinput_valid_port(GamepadPlayerPort port)
     {
-        return h != 0; //std::numeric_limits<decltype(h)>::max();
-    }
-
-    [[nodiscard]] bool _xinput_valid_port(device_port dev)
-    {
-        return (dev >= 0) & (dev < XUSER_MAX_COUNT);
+        return (port >= 0) && (port < XUSER_MAX_COUNT);
     }
 
     [[nodiscard]] float _xinput_process_thumb(SHORT raw) noexcept
@@ -35,9 +28,9 @@ namespace drako
     }
 
 
-    [[nodiscard]] std::vector<device_info> query_active_devices() noexcept
+    [[nodiscard]] std::vector<DeviceInstanceInfo> query_active_devices() noexcept
     {
-        std::vector<device_info> result;
+        std::vector<DeviceInstanceInfo> result;
 
         for (auto i = 0; i < XUSER_MAX_COUNT; ++i)
         {
@@ -46,59 +39,61 @@ namespace drako
             {
                 result.push_back({ .api = "XInput",
                     .description        = "Player " + std::to_string(i + 1) + " controller",
-                    .port               = static_cast<device_port>(i) });
+                    .port               = static_cast<GamepadPlayerPort>(i) });
             }
         }
         return result;
     }
 
-    [[nodiscard]] std::vector<device_info> query_all_devices() noexcept
+    [[nodiscard]] std::vector<DeviceInstanceInfo> query_all_devices() noexcept
     {
-        std::vector<device_info> result;
+        std::vector<DeviceInstanceInfo> result;
 
         for (auto i = 0; i < XUSER_MAX_COUNT; ++i)
         {
             result.push_back({ .api = "XInput",
                 .description        = "Player " + std::to_string(i + 1) + " controller",
-                .port               = static_cast<device_port>(i) });
+                .port               = static_cast<GamepadPlayerPort>(i) });
         }
         return result;
     }
 
 
-    [[nodiscard]] device_read_result read(const device_id id) noexcept
+    [[nodiscard]] DeviceStateResult query_gamepad_state(const GamepadPlayerPort port) noexcept
     {
+        assert(_xinput_valid_port(port));
+
         XINPUT_STATE xs = {};
-        switch (const auto ec = ::XInputGetState(id, &xs); ec)
+        switch (const auto ec = ::XInputGetState(port, &xs); ec)
         {
             case ERROR_SUCCESS:
             {
-                device_input_state s{};
+                DeviceInputState s{};
 
                 const auto& gp           = xs.Gamepad;
-                s.axes[vaxis::xbox_ls_x] = _xinput_process_thumb(gp.sThumbLX);
-                s.axes[vaxis::xbox_ls_y] = _xinput_process_thumb(gp.sThumbLY);
-                s.axes[vaxis::xbox_rs_x] = _xinput_process_thumb(gp.sThumbRX);
-                s.axes[vaxis::xbox_rs_y] = _xinput_process_thumb(gp.sThumbRY);
-                s.axes[vaxis::xbox_lt]   = _xinput_process_trigger(gp.bLeftTrigger);
-                s.axes[vaxis::xbox_rt]   = _xinput_process_trigger(gp.bRightTrigger);
+                s.axes[VAxis::xbox_ls_x] = _xinput_process_thumb(gp.sThumbLX);
+                s.axes[VAxis::xbox_ls_y] = _xinput_process_thumb(gp.sThumbLY);
+                s.axes[VAxis::xbox_rs_x] = _xinput_process_thumb(gp.sThumbRX);
+                s.axes[VAxis::xbox_rs_y] = _xinput_process_thumb(gp.sThumbRY);
+                s.axes[VAxis::xbox_lt]   = _xinput_process_trigger(gp.bLeftTrigger);
+                s.axes[VAxis::xbox_rt]   = _xinput_process_trigger(gp.bRightTrigger);
 
-                s.buttons[vkey::dpad_up]        = gp.wButtons & XINPUT_GAMEPAD_DPAD_UP;
-                s.buttons[vkey::dpad_down]      = gp.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
-                s.buttons[vkey::dpad_left]      = gp.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
-                s.buttons[vkey::dpad_right]     = gp.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
-                s.buttons[vkey::xbox_a]         = gp.wButtons & XINPUT_GAMEPAD_A;
-                s.buttons[vkey::xbox_b]         = gp.wButtons & XINPUT_GAMEPAD_B;
-                s.buttons[vkey::xbox_x]         = gp.wButtons & XINPUT_GAMEPAD_X;
-                s.buttons[vkey::xbox_y]         = gp.wButtons & XINPUT_GAMEPAD_Y;
-                s.buttons[vkey::xbox_start]     = gp.wButtons & XINPUT_GAMEPAD_START;
-                s.buttons[vkey::xbox_back]      = gp.wButtons & XINPUT_GAMEPAD_BACK;
-                s.buttons[vkey::shoulder_left]  = gp.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER;
-                s.buttons[vkey::shoulder_right] = gp.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
-                s.buttons[vkey::thumb_left]     = gp.wButtons & XINPUT_GAMEPAD_LEFT_THUMB;
-                s.buttons[vkey::thumb_right]    = gp.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB;
+                s.buttons[VKey::dpad_up]        = gp.wButtons & XINPUT_GAMEPAD_DPAD_UP;
+                s.buttons[VKey::dpad_down]      = gp.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
+                s.buttons[VKey::dpad_left]      = gp.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
+                s.buttons[VKey::dpad_right]     = gp.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+                s.buttons[VKey::xbox_a]         = gp.wButtons & XINPUT_GAMEPAD_A;
+                s.buttons[VKey::xbox_b]         = gp.wButtons & XINPUT_GAMEPAD_B;
+                s.buttons[VKey::xbox_x]         = gp.wButtons & XINPUT_GAMEPAD_X;
+                s.buttons[VKey::xbox_y]         = gp.wButtons & XINPUT_GAMEPAD_Y;
+                s.buttons[VKey::xbox_start]     = gp.wButtons & XINPUT_GAMEPAD_START;
+                s.buttons[VKey::xbox_back]      = gp.wButtons & XINPUT_GAMEPAD_BACK;
+                s.buttons[VKey::shoulder_left]  = gp.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER;
+                s.buttons[VKey::shoulder_right] = gp.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
+                s.buttons[VKey::thumb_left]     = gp.wButtons & XINPUT_GAMEPAD_LEFT_THUMB;
+                s.buttons[VKey::thumb_right]    = gp.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB;
 
-                return { {}, s };
+                return { s, {} };
             }
 
             case ERROR_DEVICE_NOT_CONNECTED:
@@ -106,19 +101,72 @@ namespace drako
                 [[fallthrough]];
 
             default:
-                return { std::error_code(ec, std::system_category()), {} };
+                return { {}, std::error_code(ec, std::system_category()) };
+        }
+    }
+
+    [[nodiscard]] DeviceEventsResult query_gamepad_events(const GamepadPlayerPort port) noexcept
+    {
+        assert(_xinput_valid_port(port));
+
+        std::vector<NativeGamepadControlID> dw, up;
+
+        XINPUT_KEYSTROKE xk = {};
+        DWORD            ec;
+        while ((ec = ::XInputGetKeystroke(port, {}, &xk)) == ERROR_SUCCESS)
+        {
+            // NOTE: for the time being we discard autorepeat events
+            // (the ones marked with the flag XINPUT_KEYSTROKE_REPEAT).
+            switch (xk.Flags)
+            {
+                case XINPUT_KEYSTROKE_KEYDOWN:
+                    dw.push_back(xk.VirtualKey);
+                    break;
+
+                case XINPUT_KEYSTROKE_KEYUP:
+                    up.push_back(xk.VirtualKey);
+                    break;
+            }
+        }
+        if (ec == ERROR_EMPTY) // read all the input reports
+            return { .pressed = dw, .released = up, .ec = {} };
+        else
+            return { .pressed = dw, .released = up, .ec = std::error_code(ec, std::system_category()) };
+    }
+
+    std::string translate_native_code(NativeGamepadControlID c)
+    {
+        switch (c)
+        {
+            case VK_PAD_A: return "XBox (A)";
+            case VK_PAD_B: return "XBox (B)";
+            case VK_PAD_X: return "XBox (X)";
+            case VK_PAD_Y: return "XBox (Y)";
+            case VK_PAD_RSHOULDER: return "XBox (RS)";
+            case VK_PAD_LSHOULDER: return "XBox (LS)";
+            case VK_PAD_LTRIGGER: return "XBox (LT)";
+            case VK_PAD_RTRIGGER: return "XBox (RT)";
+            case VK_PAD_DPAD_UP: return "XBox (DPAD-U)";
+            case VK_PAD_DPAD_DOWN: return "XBox (DPAD-D)";
+            case VK_PAD_DPAD_LEFT: return "XBox (DPAD-L)";
+            case VK_PAD_DPAD_RIGHT: return "XBox (DPAD-R)";
+            case VK_PAD_START: return "XBox (START)";
+            case VK_PAD_BACK: return "XBox (BACK)";
+            case VK_PAD_LTHUMB_PRESS: return "XBox (LT-PRESS)";
+            case VK_PAD_RTHUMB_PRESS: return "XBox (RT_PRESS)";
+            default: return "Unknown";
         }
     }
 
 
-    _this::device_system(const configuration& config)
+    DeviceSystem::DeviceSystem(const Configuration& config)
         : _config{ config }
         , _clock{}
         , _last_poll_time{ _clock.now() }
     {
     }
 
-    _this::~device_system() noexcept
+    DeviceSystem::~DeviceSystem() noexcept
     {
         for (auto i = 0; i < XUSER_MAX_COUNT; ++i)
         {
@@ -142,35 +190,35 @@ namespace drako
         }
     }
 
-    void _this::enable(const device_port dev) noexcept
+    void DeviceSystem::enable(const GamepadPlayerPort p) noexcept
     {
-        if (_xinput_valid_port(dev))
-            _enabled[dev] = true;
+        if (_xinput_valid_port(p))
+            _enabled[p] = true;
     }
 
-    void _this::disable(const device_port dev) noexcept
+    void DeviceSystem::disable(const GamepadPlayerPort p) noexcept
     {
-        if (_xinput_valid_port(dev))
-            _enabled[dev] = false;
+        if (_xinput_valid_port(p))
+            _enabled[p] = false;
     }
 
-    void _this::attach_state_callback(device_port p, listener_id l, device_state_callback c) noexcept
+    void DeviceSystem::attach_state_callback(GamepadPlayerPort p, HandlerID h, DeviceStateCallback c) noexcept
     {
-        assert(_valid(p));
-        assert(_valid(l));
-        assert(c != nullptr);
+        assert(p);
+        assert(h);
+        assert(c);
 
-        _state_event[p].ids.push_back(p);
+        _state_event[p].ids.push_back(h);
         _state_event[p].callbacks.push_back(c);
     }
 
-    void _this::detach_state_callback(device_port p, listener_id l) noexcept
+    void DeviceSystem::detach_state_callback(GamepadPlayerPort p, HandlerID h) noexcept
     {
-        assert(_valid(p));
-        assert(_valid(l));
+        assert(p);
+        assert(h);
 
         if (const auto found = std::find(
-                std::cbegin(_state_event[p].ids), std::cend(_state_event[p].ids), l);
+                std::cbegin(_state_event[p].ids), std::cend(_state_event[p].ids), h);
             found != std::cend(_state_event[p].ids))
         {
             const auto index = std::distance(std::cbegin(_state_event[p].ids), found);
@@ -181,21 +229,23 @@ namespace drako
             DRAKO_LOG_ERROR("Couldn't find matching listener");
     }
 
-    void _this::attach_device_arrival_callback(listener_id l, device_change_callback c) noexcept
+    void DeviceSystem::attach_device_arrival_callback(GamepadPlayerPort p, HandlerID h, DeviceChangeCallback c) noexcept
     {
-        assert(_valid(l));
-        assert(c != nullptr);
+        assert(p);
+        assert(h);
+        assert(c);
 
-        _dev_arrival.listeners.push_back(l);
+        _dev_arrival.listeners.push_back(h);
         _dev_arrival.callbacks.push_back(c);
     }
 
-    void _this::detach_device_arrival_callback(listener_id l) noexcept
+    void DeviceSystem::detach_device_arrival_callback(GamepadPlayerPort p, HandlerID h) noexcept
     {
-        assert(_valid(l));
+        assert(p);
+        assert(h);
 
         if (const auto found = std::find(
-                std::cbegin(_dev_arrival.listeners), std::cend(_dev_arrival.listeners), l);
+                std::cbegin(_dev_arrival.listeners), std::cend(_dev_arrival.listeners), h);
             found != std::cend(_dev_arrival.listeners))
         {
             const auto index = std::distance(std::cbegin(_dev_arrival.listeners), found);
@@ -206,21 +256,23 @@ namespace drako
             DRAKO_LOG_ERROR("Couldn't find matching listener");
     }
 
-    void _this::attach_device_removal_callback(listener_id l, device_change_callback c) noexcept
+    void DeviceSystem::attach_device_removal_callback(GamepadPlayerPort p, HandlerID h, DeviceChangeCallback c) noexcept
     {
-        assert(_valid(l));
-        assert(c != nullptr);
+        assert(p);
+        assert(h);
+        assert(c);
 
-        _dev_removal.listeners.push_back(l);
+        _dev_removal.listeners.push_back(h);
         _dev_removal.callbacks.push_back(c);
     }
 
-    void _this::detach_device_removal_callback(listener_id l) noexcept
+    void DeviceSystem::detach_device_removal_callback(GamepadPlayerPort p, HandlerID h) noexcept
     {
-        assert(_valid(l));
+        assert(p);
+        assert(h);
 
         if (const auto found = std::find(
-                std::cbegin(_dev_removal.listeners), std::cend(_dev_removal.listeners), l);
+                std::cbegin(_dev_removal.listeners), std::cend(_dev_removal.listeners), h);
             found != std::cend(_dev_removal.listeners))
         {
             const auto index = std::distance(std::cbegin(_dev_removal.listeners), found);
@@ -231,7 +283,7 @@ namespace drako
             DRAKO_LOG_ERROR("Couldn't find matching listener");
     }
 
-    void _this::update() noexcept
+    void DeviceSystem::update() noexcept
     {
         if (const auto now = _clock.now();
             (now - _last_poll_time) > _config.devices_poll_rate)
@@ -241,9 +293,9 @@ namespace drako
             // TODO: impl
         }
 
-        for (auto i = 0; i < XUSER_MAX_COUNT; ++i)
+        for (std::uint32_t i = 0; i < XUSER_MAX_COUNT; ++i)
         {
-            if (!_enabled[i] | !_connected[i])
+            if (!_enabled[i] || !_connected[i])
                 continue;
 
             XINPUT_STATE current_state = {};
@@ -257,7 +309,7 @@ namespace drako
 
                     last_state = current_state;
 
-                    device_input_state result{};
+                    DeviceInputState result{};
 
                     const auto& gp = last_state.Gamepad;
                     result.axes[0] = _xinput_process_thumb(gp.sThumbLX);
@@ -288,8 +340,9 @@ namespace drako
                 case ERROR_DEVICE_NOT_CONNECTED:
                 {
                     _connected[i] = false;
+                    const DeviceChangeEvent context{ .id = DeviceID{ i } };
                     for (auto c : _dev_removal.callbacks)
-                        std::invoke(c, device_change_event{ .id = static_cast<device_id>(i) });
+                        std::invoke(c, context);
                     break;
                 }
 
@@ -302,7 +355,7 @@ namespace drako
         }
     }
 
-    void _this::set(device_port p, const device_output_state& s) noexcept
+    void DeviceSystem::set(GamepadPlayerPort p, const DeviceOutputState& s) noexcept
     {
         using _left  = decltype(XINPUT_VIBRATION::wLeftMotorSpeed);
         using _right = decltype(XINPUT_VIBRATION::wRightMotorSpeed);
@@ -324,7 +377,7 @@ namespace drako
     }
 
 #if !defined(DRAKO_API_RELEASE)
-    void _this::dbg_print_listeners() const
+    void DeviceSystem::debug_print_handlers() const
     {
         std::cout << "[INFO] Device System [subscribed state listeners]:\n";
         for (auto i = 0; i < XUSER_MAX_COUNT; ++i)

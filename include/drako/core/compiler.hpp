@@ -168,6 +168,7 @@
 #define DRAKO_NOALIAS
 #endif
 
+/*
 
 // MACRO: function attribute.
 // Declares that the function:
@@ -204,5 +205,6 @@
 #define DRAKO_PURE_LOCAL
 #endif
 
+*/
 
 #endif // !DRAKO_COMPILER_HPP

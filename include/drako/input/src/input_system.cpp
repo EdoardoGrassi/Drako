@@ -8,57 +8,38 @@
 
 namespace drako::input
 {
-    using _this = input_system;
-
-    _this::input_system(std::span<const on_press> p, std::span<const on_release> r)
-    {
-        for (const auto& x : p)
-        {
-            _on_press.events.push_back(x.event);
-            _on_press.vkeys.push_back(x.key);
-        }
-        for (const auto& x : r)
-        {
-            _on_release.events.push_back(x.event);
-            _on_release.vkeys.push_back(x.key);
-        }
-    }
-
-    /*
-    void _this::create(const on_press& a) noexcept
-    {
-        assert(a.instance);
-        _on_press.pending_create.push_back(a);
-    }
-    */
-
-    /*
-    void _this::create(const on_release& a) noexcept
-    {
-        assert(a.instance);
-        _on_release.pending_create.push_back(a);
-    }
-    */
-
-    void _this::create(const action& a) noexcept
+    void InputSystemRuntime::create(const Action& a)
     {
         assert(a.instance);
         _actions.pending_create.push_back(a);
     }
 
-    void _this::destroy(const action::id id) noexcept
+    void InputSystemRuntime::create(const GamepadButtonBinding& b)
+    {
+        assert(b.id);
+        assert(b.button);
+        assert(b.control);
+
+        auto& t = _gamepad_button_bindings;
+        t.binding.push_back(b.id);
+        t.button.push_back(b.button);
+        t.control.push_back(b.control);
+        t.name.push_back(b.name);
+    }
+
+    void InputSystemRuntime::destroy(const Action::ID id) noexcept
     {
         assert(id);
         _actions.pending_destroy.push_back(id);
     }
 
-    void _this::enable(const action::id id) noexcept
+    void InputSystemRuntime::enable(const Action::ID id) noexcept
     {
         assert(id);
         _actions.pending_enable.push_back(id);
     }
 
-    void _this::disable(const action::id id) noexcept
+    void InputSystemRuntime::disable(const Action::ID id) noexcept
     {
         assert(id);
         _actions.pending_enable.push_back(id);
@@ -90,7 +71,40 @@ namespace drako::input
     }
     */
 
-    void _this::update() noexcept
+    void InputSystemRuntime::bind(BindingID b, GamepadButtonID button) noexcept
+    {
+        auto& t = _gamepad_button_bindings;
+        if (const auto f = std::find(std::cbegin(t.binding), std::cend(t.binding), b);
+            f != std::cend(t.binding))
+        {
+            const auto index = static_cast<std::size_t>(std::distance(std::cbegin(t.binding), f));
+            t.button[index]  = button;
+        }
+    }
+
+    void InputSystemRuntime::create_press_gesture(const Gesture& g)
+    {
+        assert(g.control);
+        assert(g.event);
+
+        auto& t = _on_press;
+        t.control.push_back(g.control);
+        t.event.push_back(g.event);
+        t.name.push_back(g.name);
+    }
+
+    void InputSystemRuntime::create_release_gesture(const Gesture& g)
+    {
+        assert(g.control);
+        assert(g.event);
+
+        auto& t = _on_release;
+        t.control.push_back(g.control);
+        t.event.push_back(g.event);
+        t.name.push_back(g.name);
+    }
+
+    void InputSystemRuntime::update() noexcept
     {
         /*
         for (const auto& a : _on_press.pending_create)
@@ -110,94 +124,101 @@ namespace drako::input
 
         for (const auto& a : _actions.pending_create)
         {
-            _actions.instances.push_back(a.instance);
-            _actions.events.push_back(a.event);
-            _actions.names.push_back(a.name);
-            _actions.callbacks.push_back(a.reaction);
+            _actions.action.push_back(a.instance);
+            _actions.event.push_back(a.event);
+            _actions.name.push_back(a.name);
+            _actions.callback.push_back(a.reaction);
         }
         _actions.pending_create.clear();
 
-        std::vector<vkey> pressed;  // could use alloca() instead
-        std::vector<vkey> released; // ^^^
-
-        const auto [ec, state] = read(device_id{ 0 });
+        const auto [state, ec] = query_gamepad_state(GamepadPlayerPort{ 0 });
         if (ec)
             return;
+
+        std::vector<BooleanControlID> pressed, released; // could use alloca() instead
 
         const auto changed_from_last_update = _last_state.buttons ^ state.buttons;
         {
             const auto mask = changed_from_last_update & state.buttons;
-            for (auto i = 0; i < std::size(mask); ++i)
+            for (std::uint32_t i = 0; i < std::size(mask); ++i)
                 if (mask.test(i))
-                    pressed.push_back(vkey(i));
+                    pressed.push_back(BooleanControlID{ i });
         }
         {
             const auto mask = changed_from_last_update & (~state.buttons);
-            for (auto i = 0; i < std::size(mask); ++i)
+            for (std::uint32_t i = 0; i < std::size(mask); ++i)
                 if (mask.test(i))
-                    released.push_back(vkey(i));
+                    released.push_back(BooleanControlID{ i });
         }
         _last_state = state;
 
         _temp_event_buffer.clear(); // could use alloca() instead
         for (const auto c : pressed)
-            for (auto i = 0; i < std::size(_on_press.vkeys); ++i)
-                if (_on_press.vkeys[i] == c)
-                    _temp_event_buffer.push_back(_on_press.events[i]);
+            for (auto i = 0; i < std::size(_on_press.control); ++i)
+                if (_on_press.control[i] == c)
+                    _temp_event_buffer.push_back(_on_press.event[i]);
 
         for (const auto c : released)
-            for (auto i = 0; i < std::size(_on_release.vkeys); ++i)
-                if (_on_release.vkeys[i] == c)
-                    _temp_event_buffer.push_back(_on_release.events[i]);
+            for (auto i = 0; i < std::size(_on_release.control); ++i)
+                if (_on_release.control[i] == c)
+                    _temp_event_buffer.push_back(_on_release.event[i]);
 
-        // join selected actions with matching callbacks from action table
+        /*vvv join selected actions with matching callbacks from actions table vvv*/
         _temp_invoke_buffer.clear();
-        for (auto e : _temp_event_buffer)
-            for (auto i = 0; i < std::size(_actions.instances); ++i)
-                if (e == _actions.events[i])
-                    _temp_invoke_buffer.push_back(_actions.callbacks[i]);
+        for (const auto e : _temp_event_buffer)
+            for (auto i = 0; i < std::size(_actions.action); ++i)
+                if (e == _actions.event[i])
+                    _temp_invoke_buffer.push_back(_actions.callback[i]);
 
         for (auto c : _temp_invoke_buffer)
             std::invoke(c);
     }
 
-    void _this::dbg_print_actions() const noexcept
+    void InputSystemRuntime::debug_print_actions() const noexcept
     {
-        std::cout << "[INFO] Input System [<actions> table]:\n"
-                  << "\t[instance-id]\t[name]\n";
-        for (auto i = 0; i < std::size(_actions.instances); ++i)
-            std::cout << '\t' << _actions.instances[i]
-                      << '\t' << _actions.names[i]
+        std::cout << "[INFO] Input System [actions] table:\n"
+                  << "\t[instance-id]\t[name]\t[event]\n";
+        for (auto i = 0; i < std::size(_actions.action); ++i)
+            std::cout << '\t' << _actions.action[i]
+                      << '\t' << _actions.name[i]
+                      << '\t' << _actions.event[i]
                       << std::endl;
     }
 
-    void _this::dbg_print_bindings() const noexcept
+    void InputSystemRuntime::debug_print_gamepad_bindings() const noexcept
     {
-        std::cout << "[INFO] Input System [<bindings> table]:\n"
-                  << "\t[name]\t[keycode]\n";
-        for (auto i = 0; i < std::size(_bindings.names); ++i)
-            std::cout << '\t' << _bindings.names[i]
-                      << '\t' << _bindings.vkeys[i]
+        const auto& t = _gamepad_button_bindings;
+        std::cout << "[INFO] Input System [gamepad-bindings] table:\n"
+                  << "\t[name]\t[id]\t[button]\t[control]\n";
+        for (auto i = 0; i < std::size(t.name); ++i)
+            std::cout << '\t' << t.name[i]
+                      << '\t' << t.binding[i]
+                      << '\t' << t.button[i]
+                      << '\t' << t.control[i]
+                      << std::endl;
+
+        // TODO: also print axis table
+    }
+
+    void InputSystemRuntime::debug_print_on_press_table() const noexcept
+    {
+        const auto& t = _on_press;
+        std::cout << "[INFO] Input System [on-press] table:\n"
+                  << "\t[Event ID]\t[Control ID]\n";
+        for (auto i = 0; i < std::size(t.event); ++i)
+            std::cout << '\t' << t.event[i]
+                      << '\t' << t.control[i]
                       << std::endl;
     }
 
-    void _this::dbg_print_on_press_table() const noexcept
+    void InputSystemRuntime::debug_print_on_release_table() const noexcept
     {
-        std::cout << "[INFO] Input System [<on-press> table]:\n"
-                  << "\t[event]\t[keycode]\n";
-        for (auto i = 0; i < std::size(_on_press.events); ++i)
-            std::cout << '\t' << _on_press.events[i]
-                      << '\t' << _on_press.vkeys[i]
-                      << std::endl;
-    }
-
-    void _this::dbg_print_on_release_table() const noexcept
-    {
-        std::cout << "[INFO] Input System [<on-release> table]:\n"
-                  << "\t[event]\t[keycode]\n";
-        for (auto i = 0; i < std::size(_on_release.events); ++i)
-            std::cout << '\t' << _on_release.events[i]
-                      << '\t' << _on_release.vkeys[i]
+        const auto& t = _on_release;
+        std::cout << "[INFO] Input System [on-release] table:\n"
+                  << "\t[Event ID]\t[Control ID]\n";
+        for (auto i = 0; i < std::size(t.event); ++i)
+            std::cout << '\t' << t.event[i]
+                      << '\t' << t.control[i]
                       << std::endl;
     }
 

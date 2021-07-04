@@ -4,7 +4,8 @@
 
 #include "drako/core/drako_api_defs.hpp"
 #include "drako/core/typed_handle.hpp"
-#include "drako/devel/uuid.hpp"
+
+#include <uuid-cpp/uuid.hpp>
 
 #include <cstddef>
 #include <filesystem>
@@ -18,32 +19,32 @@ namespace drako
 {
     //DRAKO_DEFINE_TYPED_ID(AssetID, std::uint32_t);
     //DRAKO_DEFINE_TYPED_ID(AssetBundleID, std::uint32_t);
-    using AssetID       = Uuid; // allows direct usage with the editor assets
-    using AssetBundleID = Uuid; // allows direct usage with the editor bundles
+    using AssetID       = uuid::Uuid; // allows direct usage with the editor assets
+    using AssetBundleID = uuid::Uuid; // allows direct usage with the editor bundles
 
 
     /// @brief Single item of an asset manifest.
     struct AssetManifestRecord
     {
         AssetID       asset_guid;
-        uint32_t      packed_size_bytes;
-        uint32_t      unpacked_size_bytes;
+        std::uint32_t packed_size_bytes;
+        std::uint32_t unpacked_size_bytes;
         AssetBundleID bundle_guid;
     };
 
 
-    enum class asset_type : std::uint8_t
+    enum class AssetType : std::uint8_t
     {
         mesh,
         texture
     };
 
-    enum class asset_storage_flags : std::uint8_t
+    enum class AssetStorageFlags : std::uint8_t
     {
         uncompressed
     };
 
-    enum class asset_format_flags : std::uint8_t
+    enum class AssetFormatFlags : std::uint8_t
     {
     };
 
@@ -62,7 +63,7 @@ namespace drako
             : _package_offset{ offset }
             , _packed_size_bytes{ bytes }
             , _unpacked_size_bytes{ bytes }
-            , _storage_flags{ asset_storage_flags::uncompressed }
+            , _storage_flags{ AssetStorageFlags::uncompressed }
             , _format_flags{} {}
 
         /// @brief Descriptor of a packaged asset.
@@ -73,9 +74,8 @@ namespace drako
         /// @param[in] s        Storage options.
         /// @param[in] f        Format options.
         ///
-        /// @return
         explicit AssetLoadInfo(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
-            asset_storage_flags s, asset_format_flags f) noexcept
+            AssetStorageFlags s, AssetFormatFlags f) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ packed }
             , _unpacked_size_bytes{ unpacked }
@@ -95,22 +95,24 @@ namespace drako
         [[nodiscard]] std::size_t packed_size_bytes() const noexcept;
 
         // Storage settings.
-        [[nodiscard]] asset_storage_flags storage_flags() const noexcept;
+        [[nodiscard]] AssetStorageFlags storage_flags() const noexcept;
 
         // Format of the data payload.
-        [[nodiscard]] asset_format_flags format_flags() const noexcept;
+        [[nodiscard]] AssetFormatFlags format_flags() const noexcept;
 
     private:
-        std::uint32_t       _package_offset;
-        std::uint32_t       _packed_size_bytes;
-        std::uint32_t       _unpacked_size_bytes;
-        asset_storage_flags _storage_flags;
-        asset_format_flags  _format_flags;
+        std::uint32_t     _package_offset;
+        std::uint32_t     _packed_size_bytes;
+        std::uint32_t     _unpacked_size_bytes;
+        AssetStorageFlags _storage_flags;
+        AssetFormatFlags  _format_flags;
     };
     static_assert(sizeof(AssetLoadInfo) == 16,
         "Bad class layout: required internal padding bits.");
     static_assert(alignof(AssetLoadInfo) <= sizeof(AssetLoadInfo),
         "Bad class layout: required external padding bits.");
+
+
 
 
     /// @brief Metadata descriptor of an asset bundle.

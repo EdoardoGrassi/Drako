@@ -1,0 +1,15 @@
+# ninja log v5
+3	19	0	C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	b4f926e523f43e24
+26	802	6471357909072822	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/directives.cpp.obj	ce48fd71266d1174
+24	813	6471357909252713	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/binary.cpp.obj	544c0beaa902d5af
+31	940	6471357910297736	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.obj	8928a31b0a5b2ee5
+28	948	6471357910792374	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/emit.cpp.obj	335459d8f0d12cc7
+22	1043	6471357911702034	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/convert.cpp.obj	fcf8fbf19cdc3d85
+18	1144	6471357912770623	_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj	cd28ce01e32760be
+12	1317	6471357914501417	_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj	3e6ec1a230cdfa85
+803	1337	6471357914704844	_deps/yaml-cpp-build/CMakeFiles/yaml-cpp.dir/src/memory.cpp.obj	f1a0214d594eda52
+16	1582	6471357917075466	_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj	dc099ff028d8dd04
+10	1654	6471357917843700	_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock-all.cc.obj	12117cce22319ad7
+8	2226	6471357923540555	_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/__/googletest/src/gtest-all.cc.obj	8f38f919882aabe1
+14	2231	6471357923610448	_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/__/googletest/src/gtest-all.cc.obj	cc1aa60d0725b2d6
+20	2262	6471357923929318	_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj	d4e7a3339fecef56

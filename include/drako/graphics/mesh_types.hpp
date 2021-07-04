@@ -33,18 +33,18 @@ namespace drako
     };
 
 
-    // Primitive topology of the mesh.
-    enum class mesh_topology : std::uint8_t
-    {
-        undefined = 0,
-        triangle_list,
-        triangle_strip,
-        triangle_fan
-    };
-
     // Structure specifying format and layout of the data stored by a mesh asset.
-    struct mesh_desc_t
+    struct MeshMetaInfo
     {
+        // Primitive topology of the mesh.
+        enum class Topology : std::uint8_t
+        {
+            undefined = 0,
+            triangle_list,
+            triangle_strip,
+            triangle_fan
+        };
+
         // Number of vertices in the mesh vertex buffer.
         std::uint32_t vertex_count = 0;
 
@@ -58,21 +58,21 @@ namespace drako
         std::uint8_t index_size_bytes = 0;
 
         // Topology of the mesh.
-        mesh_topology topology = mesh_topology::undefined;
+        Topology topology = Topology::undefined;
     };
 
-    class mesh_view
+    class MeshView
     {
     public:
-        explicit constexpr mesh_view() noexcept = default;
+        explicit constexpr MeshView() noexcept = default;
 
-        explicit constexpr mesh_view(
+        explicit constexpr MeshView(
             std::span<const std::byte> verts,
             std::span<const std::byte> index) noexcept
             : _verts{ verts }, _index{ index } {}
 
-        mesh_view(const mesh_view&) noexcept = default;
-        mesh_view& operator=(const mesh_view&) noexcept = default;
+        MeshView(const MeshView&) noexcept = default;
+        MeshView& operator=(const MeshView&) noexcept = default;
 
         [[nodiscard]] std::span<const std::byte> vertex_buffer() const noexcept { return _verts; }
 
@@ -86,25 +86,26 @@ namespace drako
 
 
     /// @brief Mesh asset.
-    class mesh
+    class Mesh
     {
     public:
-        explicit constexpr mesh() noexcept = default;
+        explicit constexpr Mesh() noexcept = default;
 
-        explicit mesh(const mesh_desc_t& meta,
-            std::span<const std::byte>   verts,
-            std::span<const std::byte>   index) noexcept
-            : _meta{ meta }, _verts{ verts }, _index{ index } {}
+        explicit Mesh(const MeshMetaInfo& meta,
+            std::span<const std::byte>    verts,
+            std::span<const std::byte>    index) noexcept
+            : _meta{ meta }
+            , _verts{ std::cbegin(verts), std::cend(verts) }
+            , _index{ std::cbegin(index), std::cend(index) }
+        {}
 
-        mesh(const mesh&) noexcept = default;
-        mesh& operator=(const mesh&) noexcept = default;
+        Mesh(const Mesh&) noexcept = default;
+        Mesh& operator=(const Mesh&) noexcept = default;
 
-        /*
-        [[nodiscard]] explicit operator mesh_view() const noexcept
+        [[nodiscard]] explicit operator MeshView() const noexcept
         {
-            return mesh_view{ vertex_buffer(), index_buffer() };
+            return MeshView{ vertex_buffer(), index_buffer() };
         }
-        */
 
         //[[nodiscard]] std::span<const std::byte> vertex_buffer() noexcept { return _verts; }
         [[nodiscard]] std::span<const std::byte> vertex_buffer() const noexcept { return _verts; }
@@ -113,9 +114,9 @@ namespace drako
         [[nodiscard]] std::span<const std::byte> index_buffer() const noexcept { return _index; }
 
     private:
-        mesh_desc_t                _meta;
-        std::span<const std::byte> _verts; // mesh vertices raw data
-        std::span<const std::byte> _index; // mesh indices raw data
+        std::vector<std::byte> _verts; // mesh vertices raw data
+        std::vector<std::byte> _index; // mesh indices raw data
+        MeshMetaInfo           _meta;
     };
 
 } // namespace drako

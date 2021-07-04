@@ -10,6 +10,8 @@
 #include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/math/mat4x4.hpp"
 
+#include <glm/mat4x4.hpp>
+
 #include <vector>
 
 namespace drako
@@ -47,7 +49,7 @@ namespace drako
         struct frame_render_soa
         {
             std::vector<render_id> entities;
-            std::vector<Mat4x4>    mvps;
+            std::vector<glm::mat4>    mvps;
         };
 
         explicit RenderSystem(const vulkan::Context& ctx) noexcept;

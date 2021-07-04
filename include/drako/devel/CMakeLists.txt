@@ -1,27 +1,45 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 enable_testing()
 
-add_library(drako-devel STATIC
-    "./src/build_utils.cpp"
-    "./src/project_types.cpp"
-    "./src/project_utils.cpp"
-    "./src/uuid.cpp"
-    "./src/uuid_engine.cpp"
-    "./src/mesh_importers.cpp")
 
-if(WIN32)
-    find_library(IPHLPAPI "iphlpapi" REQUIRED)
-    message(STATUS "iphlpaipi found at ${IPHLPAPI}")
-    target_link_libraries(drako-devel PRIVATE ${IPHLPAPI})
-endif()
-target_link_libraries(drako-devel PRIVATE drako::dson)
+include(FetchContent)
+
+FetchContent_Declare(
+    obj-cpp
+    GIT_REPOSITORY https://github.com/EdoardoGrassi/obj-cpp.git
+)
+set(OBJCPP_BUILD_TESTS OFF)
+
+FetchContent_Declare(
+    uuid-cpp
+    GIT_REPOSITORY https://github.com/EdoardoGrassi/uuid-cpp.git
+)
+set(UUID_BUILD_TESTS OFF)
+
+FetchContent_MakeAvailable(obj-cpp uuid-cpp)
+
+add_library(drako-devel STATIC
+    "src/crc.cpp"
+    "src/project_types.cpp"
+    "src/project_utils.cpp"
+    "src/mesh_importers.cpp")
+
+target_link_libraries(drako-devel
+    PRIVATE drako::dson obj-cpp uuid-cpp yaml-cpp
+)
 add_library(drako::devel ALIAS drako-devel)
 
 # vvv test executables vvv
-add_executable(uuid-test1-exe "./test/uuid_test1.cpp")
-target_link_libraries(uuid-test1-exe PRIVATE drako::devel)
-add_test(NAME "uuid-test1" COMMAND uuid-test1-exe)
+#find_package(GTest)
 
-add_executable(crc32_test "test/crc32_test.cpp")
-target_link_libraries(crc32_test PRIVATE drako::devel)
-add_test(NAME "crc32_test" COMMAND crc32_test)
+add_executable(crc32_test "test/crc32_tests.cpp")
+target_link_libraries(crc32_test PRIVATE drako::devel gtest_main)
+#gtest_discover_tests(crc32_test)
+
+add_executable(project_utils_test "test/project_utils_test.cpp")
+target_link_libraries(project_utils_test PRIVATE drako::devel gtest_main)
+#gtest_discover_tests(project_utils_test)
+
+add_executable(asset_tests "test/asset_tests.cpp")
+target_link_libraries(asset_tests PRIVATE drako::devel gtest_main)
+#gtest_discover_tests(asset_tests)

@@ -57,7 +57,7 @@ namespace drako::formats::png
         image& state, const _chunk_begin& begin, const std::span<std::byte> data)
     {
         if (begin.length % 3 != 0)
-            throw parser_error{ "Invalid PLTE chunck length." };
+            throw ParserError{ "Invalid PLTE chunck length." };
 
         std::vector<rgb> palette;
         palette.reserve(begin.length);

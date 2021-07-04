@@ -1,17 +1,19 @@
 #pragma once
-#ifndef DRAKO_MESH_UTILS_HPP_
-#define DRAKO_MESH_UTILS_HPP_
+#ifndef DRAKO_MESH_UTILS_HPP
+#define DRAKO_MESH_UTILS_HPP
 
-#include "drako/file_formats/wavefront/object.hpp"
 #include "drako/graphics/mesh_types.hpp"
+
+#include <obj-cpp/obj.hpp>
 
 #include <iterator>
 
 namespace drako
 {
+    /*
     template <typename VertexAttributeIter>
-    [[nodiscard]] mesh from_obj_source(VertexAttributeIter first, VertexAttributeIter last,
-        const file_formats::obj::object& source)
+    [[nodiscard]] Mesh from_obj_source(VertexAttributeIter first, VertexAttributeIter last,
+        const obj::Object& source)
     {
         using _vadesc = vertex_attribute_descriptor;
         using _traits = std::iterator_traits<VertexAttributeIter>;
@@ -23,8 +25,17 @@ namespace drako
 
         // TODO: end impl
         throw std::runtime_error{ "Not implemented" };
-    }
+    }*/
+
+
+    struct ObjImportConfig
+    {
+        std::vector<std::pair<std::string, std::string>> props;
+        std::vector<std::string>                         flags;
+    };
+
+    [[nodiscard]] Mesh compile(const obj::MeshData& obj, const ObjImportConfig& config);
 
 } // namespace drako
 
-#endif // !DRAKO_MESH_UTILS_HPP_
+#endif // !DRAKO_MESH_UTILS_HPP

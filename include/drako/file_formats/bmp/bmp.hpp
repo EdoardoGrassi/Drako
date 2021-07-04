@@ -21,10 +21,10 @@ namespace drako::file_formats::bmp
     };
 
 
-    class parser_error : std::runtime_error
+    class ParserError : std::runtime_error
     {
     public:
-        explicit parser_error(const char* msg)
+        explicit ParserError(const char* msg)
             : std::runtime_error{ msg }
         {
         }

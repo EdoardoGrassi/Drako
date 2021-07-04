@@ -1,8 +1,6 @@
 #include "drako/file_formats/dson/dson.hpp"
 
 #include "drako/file_formats/dson/src/dson_lexer.hpp"
-#include "drako/io/input_file_handle.hpp"
-#include "drako/io/output_file_handle.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -19,77 +17,7 @@ namespace drako::dson
         return std::find(std::cbegin(meta), std::end(meta), c) != std::cend(meta);
     }
 
-    void _output_with_escaping() noexcept
-    {
-    }
-
-    void DOM::set(const std::string& key, const std::string& val)
-    {
-        for (std::size_t i = 0; i < std::size(_keys); ++i)
-            if (_keys[i] == key)
-            {
-                _vals[i] = val;
-                return;
-            }
-
-        _keys.emplace_back(key);
-        _vals.emplace_back(val);
-    }
-
-    [[nodiscard]] std::string DOM::get(const std::string& key) const
-    {
-        for (std::size_t i = 0; i < std::size(_keys); ++i)
-            if (_keys[i] == key)
-                return _vals[i];
-        throw std::runtime_error{ "Key " + key + " not found." };
-    }
-
-    [[nodiscard]] std::string DOM::get_or_default(
-        const std::string& key, const std::string& def) const noexcept
-    {
-        for (std::size_t i = 0; i < std::size(_keys); ++i)
-            if (_keys[i] == key)
-                return _vals[i];
-        return def;
-    }
-
-    std::istream& operator>>(std::istream& is, DOM& dson)
-    {
-        for (auto i = 0; is; ++i)
-        {
-            std::string line;
-            std::getline(is, line);
-
-            const auto sepl = line.find('=');
-            const auto sepr = line.rfind('=');
-
-            if (line[0] == '=')
-                throw std::runtime_error{ "Malformed input at line " + std::to_string(i) };
-            if (line[line.size() - 1] == '=')
-                throw std::runtime_error{ "Malformed input at line " + std::to_string(i) };
-            if (sepl != sepr)
-                throw std::runtime_error{ "Malformed input at line " + std::to_string(i) };
-
-            dson.set(line.substr(0, sepl - 1), line.substr(sepr + 1));
-        }
-        return is;
-    }
-
-    std::ostream& operator<<(std::ostream& os, const DOM& dson)
-    {
-        for (const auto& [key, val] : dson)
-        {
-            if (key.find('=') != std::string::npos)
-                throw std::invalid_argument{ "Key contains forbidden '=' character" };
-            if (val.find('=') != std::string::npos)
-                throw std::invalid_argument{ "Value contains forbidden '=' character" };
-
-            os << key << '=' << val << '\n';
-        }
-        return os;
-    }
-
-    [[nodiscard]] DOM parse(std::span<const char> source)
+    [[nodiscard]] DOM _safe_parse(std::span<const char> source)
     {
         using TT = detail::Token::Type;
         DOM dom{};
@@ -113,12 +41,12 @@ namespace drako::dson
                 t += 4;
                 continue;
             }
-            throw std::runtime_error{ "Parsing error: unexpected token." };
+            throw std::runtime_error{ "dson : parsing error : unexpected token." };
         }
         return dom;
     }
 
-    [[nodiscard]] std::string to_string(const DOM& dom)
+    [[nodiscard]] std::string _safe_print(const DOM& dom)
     {
         // output formatted as key=value\n
         std::size_t chars = 0;
@@ -128,16 +56,47 @@ namespace drako::dson
         std::string s{};
         s.reserve(chars);
         for (const auto& [key, val] : dom)
-        {
-            s += key;
-            s += '=';
-            s += val;
-            s += '\n';
-        }
+            s.append(key + '=' + val + '\n');
+
         return s;
     }
 
-    void save(const _fs::path& file, const DOM& dom)
+    void DOM::set(const std::string& key, const std::string& val)
+    {
+        if (key.find('-') != std::string::npos)
+            throw std::invalid_argument{ "dson : forbidden metachar '=' in key " + key };
+        if (val.find('=') != std::string::npos)
+            throw std::invalid_argument{ "dson : forbidden metachar '=' in value " + val };
+
+        for (std::size_t i = 0; i < std::size(_keys); ++i)
+            if (_keys[i] == key)
+            {
+                _vals[i] = val;
+                return;
+            }
+
+        _keys.emplace_back(key);
+        _vals.emplace_back(val);
+    }
+
+    [[nodiscard]] std::string DOM::get(const std::string& key) const
+    {
+        for (std::size_t i = 0; i < std::size(_keys); ++i)
+            if (_keys[i] == key)
+                return _vals[i];
+        throw std::runtime_error{ "dson::DOM : key <" + key + "> not found." };
+    }
+
+    [[nodiscard]] std::string DOM::get_or_default(
+        const std::string& key, const std::string& def) const noexcept
+    {
+        for (std::size_t i = 0; i < std::size(_keys); ++i)
+            if (_keys[i] == key)
+                return _vals[i];
+        return def;
+    }
+
+    /*void save(const _fs::path& file, const DOM& dom)
     {
         std::size_t chars = 0;
         for (const auto& key : dom._keys)
@@ -168,6 +127,52 @@ namespace drako::dson
 
         io::UniqueOutputFile f{ file, io::Create::require_new };
         io::write_all(f, { reinterpret_cast<std::byte*>(buffer.get()), chars });
+    }*/
+
+    std::istream& operator>>(std::istream& is, DOM& dson)
+    {
+        /*std::string line;
+        for (auto i = 0; std::getline(is, line); ++i)
+        {
+            const auto sepl = line.find('=');
+            const auto sepr = line.rfind('=');
+
+            if (line.front() == '=')
+                throw std::runtime_error{ "dson : expected <key> at line" + std::to_string(i) };
+            if (line.back() == '=')
+                throw std::runtime_error{ "dson : expected <value> at line " + std::to_string(i) };
+            if (sepl != sepr)
+                throw std::runtime_error{ "dson : multiple separators at line " + std::to_string(i) };
+
+            assert(sepl == sepr);
+            dson.set(line.substr(0, sepl - 1), line.ssubstr(sepl + 1));
+        }
+        return is;*/
+
+        std::string text{ std::istreambuf_iterator(is), {} };
+        dson = _safe_parse(text);
+        return is;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const DOM& dom)
+    {
+        /*for (const auto& [key, val] : dson)
+        {
+            if (key.find('=') != std::string::npos)
+                throw std::invalid_argument{ "dson : key contains forbidden '=' character" };
+            if (val.find('=') != std::string::npos)
+                throw std::invalid_argument{ "dson : value contains forbidden '=' character" };
+
+            os << key << '=' << val << '\n';
+        }
+        return os;*/
+
+        return os << _safe_print(dom);
+    }
+
+    [[nodiscard]] DOM parse(std::span<const char> s)
+    {
+        return _safe_parse(s);
     }
 
 } // namespace drako::dson

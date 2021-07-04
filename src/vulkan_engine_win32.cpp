@@ -1,5 +1,6 @@
-#include "drako/engine/asset_manager.hpp"
+#include "drako/engine/asset_system.hpp"
 #include "drako/engine/render_system.hpp"
+#include "drako/engine/scene.hpp"
 #include "drako/graphics/transform.hpp"
 #include "drako/graphics/vulkan_runtime_context.hpp"
 #include "drako/graphics/vulkan_wireframe_pipeline.hpp"
@@ -12,7 +13,7 @@ using namespace drako;
 
 int main()
 {
-    engine::AssetManager am{ {}, {} };
+    engine::AssetSystemRuntime asset_system{ {}, {} };
 
     sys::UniqueDesktopWindow render_window(L"Drako Engine");
     render_window.show();

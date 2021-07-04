@@ -1,60 +1,68 @@
 #include "drako/devel/mesh_importers.hpp"
 
-#include "drako/file_formats/dson/dson.hpp" // NOTE: for the time being we use Drakoson format
-#include "drako/file_formats/wavefront/object.hpp"
-#include "drako/file_formats/wavefront/parser.hpp"
+#include <obj-cpp/obj.hpp>
 
-#include <filesystem>
-#include <fstream>
+#include <vector>
 
 namespace drako::editor
 {
-    void import_obj_file(
-        const std::filesystem::path& src,
-        const std::filesystem::path& dst,
-        const properties& p, const flags& f)
+    const dson::DOM& operator>>(const dson::DOM& dom, MeshImportInfo& info)
     {
-        namespace _fs  = std::filesystem;
-        namespace _obj = drako::file_formats::obj;
+        info.guid = uuid::Uuid{ dom.get("guid") };
+        info.name = dom.get("name");
+        info.path = dom.get("path");
+        return dom;
+    }
 
-        if (!_fs::is_regular_file(src))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
-        if (!_fs::is_directory(dst))
-            throw std::invalid_argument{ DRAKO_STRINGIZE(src) };
+    dson::DOM& operator<<(dson::DOM& dom, const MeshImportInfo& info)
+    {
+        dom.set("guid", to_string(info.guid));
+        dom.set("name", info.name);
+        dom.set("path", info.path.string());
+        return dom;
+    }
 
-        std::ifstream ifs{ src };
-        if (!ifs)
+
+    //[[nodiscard]] Mesh compile(const obj::MeshData& md, const ObjImportConfig& config)
+
+    [[nodiscard]] Mesh compile(const obj::MeshData& md, bool discard_normals)
+    {
+        std::vector<std::byte> verts_data;
+        verts_data.resize(std::size(md.v) * sizeof(float) * 3);
+
+        for (const auto& v : md.v)
         {
-            std::clog << "[DRAKO] Couldn't open " << src << '\n';
-            return;
-        }
-
-        std::ofstream ofs{ dst, std::ofstream::trunc };
-        if (!ofs)
-        {
-            std::clog << "[DRAKO] Couldn't open " << dst << '\n';
-            return;
-        }
-
-        const auto src_bytes = _fs::file_size(src);
-        const auto data      = std::make_unique<char[]>(src_bytes);
-        ifs.read(data.get(), src_bytes);
-
-        // const _obj::parser_config config{};
-        const auto result = _obj::parse({ data.get(), src_bytes }, {});
-        for (const auto& object : result.objects)
-        {
-            std::clog << "Processing object " << object.name << '\n';
-            if (!std::empty(object.faces))
+            for (const auto& c : { v.x, v.y, v.z })
             {
-                // worst case scenario: each data point is never reused
-                const auto size   = sizeof(float) * 3 * std::size(object.faces);
-                auto       buffer = std::make_unique<std::byte[]>(size);
+                const auto bytes = std::bit_cast<std::array<std::byte, 4>>(c);
+                verts_data.insert(std::end(verts_data),
+                    std::cbegin(bytes), std::cend(bytes));
             }
         }
 
+        std::vector<std::byte> index_data;
+        index_data.resize(std::size(md.faces) * sizeof(std::uint32_t) * 3);
 
-        throw std::runtime_error{ "Not implemented." };
+        for (const auto& f : md.faces)
+        {
+            for (const auto& c : { f.triplets[0].v, f.triplets[1].v, f.triplets[2].v })
+            {
+                const auto bytes = std::bit_cast<std::array<std::byte, 4>>(c);
+                index_data.insert(std::end(verts_data),
+                    std::cbegin(bytes), std::cend(bytes));
+            }
+        }
+
+        const MeshMetaInfo meta{
+            .vertex_count      = std::size(md.v),
+            .index_count       = std::size(md.faces),
+            .vertex_size_bytes = sizeof(float) * 3,
+            .index_size_bytes  = sizeof(std::uint32_t),
+            .topology          = MeshMetaInfo::Topology::triangle_list
+        };
+
+        return Mesh{ meta, std::move(verts_data), std::move(index_data) };
+        //throw std::runtime_error{ "Not implemented" };
     }
 
 } // namespace drako::editor

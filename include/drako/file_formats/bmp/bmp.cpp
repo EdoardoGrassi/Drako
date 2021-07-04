@@ -178,9 +178,9 @@ namespace drako::file_formats::bmp
         const _file_header file_header{ file_header_bytes };
 
         if (file_header.file_type != 0x424d) // 'BM'
-            throw parser_error{ "File signature doesn't match .bmp signature." };
+            throw ParserError{ "File signature doesn't match .bmp signature." };
         if (file_header.file_size_bytes != data.size_bytes())
-            throw parser_error{ "File lenght doesn't match provided data buffer." };
+            throw ParserError{ "File lenght doesn't match provided data buffer." };
 
         const auto         core_header_data = file_header_data + sizeof(file_header_bytes);
         _core_header_bytes core_header_bytes;

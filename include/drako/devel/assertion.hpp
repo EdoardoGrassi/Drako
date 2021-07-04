@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DRAKO_ASSERTION_HPP_
-#define DRAKO_ASSERTION_HPP_
+#ifndef DRAKO_ASSERTION_HPP
+#define DRAKO_ASSERTION_HPP
 
 /// @file
 /// @brief   Functions and macro definitions that implement runtime assertions.
@@ -114,4 +114,4 @@ namespace drako
 // \brief   Declares that an assertion is tested as part of a function postcondition invariant.
 #define DRAKO_POSTCON(condition) DRAKO_ASSERT(condition)
 
-#endif // !DRAKO_ASSERTIONS_HPP_
+#endif // !DRAKO_ASSERTIONS_HPP

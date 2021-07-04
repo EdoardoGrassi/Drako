@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project("drako" VERSION 0.1.0 LANGUAGES CXX)
+project("drako" VERSION 1.0.0 LANGUAGES CXX)
 enable_testing()
 
 # Set required c++ standard.
@@ -31,18 +31,55 @@ if(WIN32)
     add_compile_definitions(NOMINMAX)
 endif()
 
+
+# get GoogleTest suite
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.10.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(gtest_build_gmock OFF)
+FetchContent_MakeAvailable(googletest)
+#add_subdirectory(${gtest_SOURCE_DIR})
+
+
+# get yaml-cpp library
+include(FetchContent)
+FetchContent_Declare(
+    yaml-cpp
+    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_TAG yaml-cpp-0.6.3
+)
+#set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "not include tests")
+#set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "not include tools")
+FetchContent_MakeAvailable(yaml-cpp)
+#target_link_libraries(${TARGET} yaml-cpp)
+
+
+# get GLM math library
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 0.9.9.8
+)
+FetchContent_MakeAvailable(glm)
+
+
+
 add_subdirectory("include/drako/audio")
 add_subdirectory("include/drako/core")
 add_subdirectory("include/drako/concurrency")
 add_subdirectory("include/drako/devel")
 add_subdirectory("include/drako/engine")
 add_subdirectory("include/drako/file_formats")
+add_subdirectory("include/drako/graphics")
 add_subdirectory("include/drako/input")
-add_subdirectory("include/drako/io")
 add_subdirectory("include/drako/jobs")
 add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
-add_subdirectory("include/drako/graphics")
+add_subdirectory("include/drako/vm")
 
 #[[
 # Experimental Drako engine with forward renderer
@@ -58,7 +95,8 @@ target_link_libraries(drako-engine PRIVATE
 add_executable(drako-cli-editor "./src/drako_cli_editor.cpp")
 set_target_properties(drako-cli-editor PROPERTIES
     OUTPUT_NAME "drako-cli-editor"
-    RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects")
+    #RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects"
+    )
 target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 
 

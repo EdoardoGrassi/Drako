@@ -4,8 +4,6 @@
 
 #include "drako/core/byte_utils.hpp"
 #include "drako/devel/asset_types.hpp"
-#include "drako/io/input_file_handle.hpp"
-#include "drako/io/output_file_handle.hpp"
 
 #include <cassert>
 #include <memory>
@@ -41,31 +39,68 @@ namespace drako
         const std::byte* _data;
     };
 
+
     class AssetBundleManifest
     {
     public:
+        explicit AssetBundleManifest() = default;
         explicit AssetBundleManifest(std::span<const std::byte> data);
 
         //AssetBundleManifest(const AssetBundleManifest&) = delete;
         //AssetBundleManifest& operator=(const AssetBundleManifest&) = delete;
 
-        void load_from_file(io::UniqueInputFile);
-
-        void save_to_file(io::UniqueOutputFile);
+        friend std::istream& operator>>(std::istream& is, AssetBundleManifest& a);
+        friend std::ostream& operator<<(std::ostream&, const AssetBundleManifest&);
 
     private:
         /// @brief Header section of an asset manifest
-        struct _header
+        struct Header
         {
             Version       version = current_api_version();
             std::uint32_t crc;
             std::uint32_t items_count;
         };
+        static_assert(std::is_trivially_copyable_v<Header>,
+            "Required for direct serialization in memory.");
 
-        _header                          _header;
-        std::unique_ptr<AssetID[]>       _ids;
-        std::unique_ptr<AssetLoadInfo[]> _infos;
+
+        Header                    _header;
+        std::vector<AssetID>       _ids;
+        std::vector<AssetLoadInfo> _infos;
     };
+    static_assert(std::is_trivially_copyable_v<AssetID>,
+        "Required for direct serialization in memory.");
+    static_assert(std::is_trivially_copyable_v<AssetLoadInfo>,
+        "Required for direct serialization in memory.");
+
+
+    inline std::istream& operator>>(std::istream& is, AssetBundleManifest& a)
+    {
+        is.read(reinterpret_cast<char*>(&a._header), sizeof(a._header));
+
+        a._ids.resize(a._header.items_count);
+        is.read(reinterpret_cast<char*>(std::data(a._ids)), std::size(a._ids) * sizeof(AssetID));
+
+        a._infos.resize(a._header.items_count);
+        is.read(reinterpret_cast<char*>(std::data(a._infos)), std::size(a._infos) * sizeof(AssetLoadInfo));
+    }
+
+    std::ostream& operator<<(std::ostream& os, const AssetBundleManifest& a)
+    {
+        {
+            const auto bytes = std::as_bytes(std::span{ &a._header, 1 });
+            os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
+        }
+        {
+            const auto bytes = std::as_bytes(std::span{ a._ids });
+            os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
+        }
+        {
+            const auto bytes = std::as_bytes(std::span{ a._infos });
+            os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
+        }
+    }
+
 
     /*
     void asset_bundle_manifest::load_from_file(io::UniqueInputFile is)
