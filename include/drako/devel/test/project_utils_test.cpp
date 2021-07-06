@@ -1,6 +1,6 @@
 #include "drako/devel/project_utils.hpp"
-#include "drako/devel/uuid_engine.hpp"
 
+#include "uuid-cpp/uuid.hpp"
 #include "gtest/gtest.h"
 
 #include <filesystem>
@@ -14,14 +14,15 @@ namespace fs = std::filesystem;
     return fs::temp_directory_path() / ("drako_project_" + std::to_string(std::random_device()()));
 }
 
+/*
 GTEST_TEST(ProjectDevel, AssetImportSerializationCycle)
 {
     const std::string unique_name = std::tmpnam(nullptr);
 
     const fs::path file = fs::temp_directory_path() / ("drako_" + unique_name);
 
-    const drako::UuidMacEngine gen{};
-    const AssetImportInfo      before{
+    const uuid::SystemEngine gen{};
+    const AssetImportInfo    before{
         .id      = gen(),
         .path    = std::to_string(std::random_device{}()),
         .name    = std::to_string(std::random_device{}()),
@@ -31,6 +32,20 @@ GTEST_TEST(ProjectDevel, AssetImportSerializationCycle)
 
     AssetImportInfo after{};
     load_by_path(file, after);
+
+    ASSERT_EQ(before, after);
+}
+*/
+
+GTEST_TEST(Project, AssetImportInfoSerialization)
+{
+    YAML::Node yaml{};
+
+    const AssetImportInfo before{};
+    yaml << before;
+
+    AssetImportInfo after{};
+    yaml >> after;
 
     ASSERT_EQ(before, after);
 }
@@ -76,7 +91,7 @@ GTEST_TEST(ProjectDevel, AssetImportSerializationCycle)
     }
 }*/
 
-GTEST_TEST(ProjectDevel, FullAssetScan)
+/* GTEST_TEST(ProjectDevel, FullAssetScan)
 {
     const auto tempdir = temp_project_directory();
     try
@@ -96,4 +111,4 @@ GTEST_TEST(ProjectDevel, FullAssetScan)
         fs::remove_all(tempdir);
         throw;
     }
-}
+} */

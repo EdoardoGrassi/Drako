@@ -1,0 +1,14 @@
+# Target labels
+ rio-populate
+# Source files and their labels
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/CMakeFiles/rio-populate
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/CMakeFiles/rio-populate.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/CMakeFiles/rio-populate-complete.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-build.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-configure.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-download.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-install.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-mkdir.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-patch.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-test.rule
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-subbuild/rio-populate-prefix/src/rio-populate-stamp/rio-populate-update.rule

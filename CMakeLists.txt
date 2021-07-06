@@ -52,8 +52,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
     GIT_TAG yaml-cpp-0.6.3
 )
-#set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "not include tests")
-#set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "not include tools")
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "not include tests")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "not include tools")
 FetchContent_MakeAvailable(yaml-cpp)
 #target_link_libraries(${TARGET} yaml-cpp)
 
@@ -93,23 +93,27 @@ target_link_libraries(drako-engine PRIVATE
 
 # Console interface for Drako projects
 add_executable(drako-cli-editor "./src/drako_cli_editor.cpp")
-set_target_properties(drako-cli-editor PROPERTIES
-    OUTPUT_NAME "drako-cli-editor"
-    #RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects"
-    )
+set_target_properties(drako-cli-editor
+    PROPERTIES
+        OUTPUT_NAME "drako-cli-editor"
+        #RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects"
+)
 target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 
 
 # Compiler for runtime resources consumed by the Drako engine
 add_executable(drako-builder "./src/drako_resource_compiler.cpp")
-set_target_properties(drako-builder PROPERTIES OUTPUT_NAME "drako-builder")
+set_target_properties(drako-builder
+    PROPERTIES
+        OUTPUT_NAME "drako-builder"
+)
+target_link_libraries(drako-builder PRIVATE drako::devel)
 
 
 # === TESTING ===
 # work in progress...
 
 file(GLOB test_files LIST_DIRECTORIES false CONFIGURE_DEPENDS "test_*.cpp")
-
 foreach(file ${test_files})
     # Strip last extension from filename
     get_filename_component(file_without_ext ${file} NAME_WLE)
@@ -120,17 +124,12 @@ foreach(file ${test_files})
     )
 	set_tests_properties(${file_without_ext}
 		PROPERTIES
-		PASS_REGULAR_EXPRESSION "Test passed"
-    )
-	set_tests_properties(${file_without_ext}
-		PROPERTIES
-		FAIL_REGULAR_EXPRESSION "(Exception|Test failed)"
-    )
-	set_tests_properties(${file_without_ext}
-		PROPERTIES
-		TIMEOUT 120
+		    PASS_REGULAR_EXPRESSION "Test passed"
+		    FAIL_REGULAR_EXPRESSION "(Exception|Test failed)"
+		    TIMEOUT 120
     )
 endforeach()
+
 
 # === PACKAGING ===
 # work in progress...

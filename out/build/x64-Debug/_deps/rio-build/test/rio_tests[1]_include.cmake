@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test/rio_tests[1]_tests.cmake")
+  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test/rio_tests[1]_tests.cmake")
+else()
+  add_test(rio_tests_NOT_BUILT rio_tests_NOT_BUILT)
+endif()

@@ -1,7 +1,8 @@
 #include "drako/devel/project_types.hpp"
 
 #include "drako/devel/asset_bundle_manifest.hpp"
-#include "drako/file_formats/dson/dson.hpp"
+#include "drako/devel/mesh_importers.hpp"
+//#include "drako/file_formats/dson/dson.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -14,7 +15,7 @@ namespace drako::editor
 {
     namespace _fs = std::filesystem;
 
-    const dson::DOM& operator>>(const dson::DOM& dom, ProjectManifest& pm)
+    /*const dson::DOM& operator>>(const dson::DOM& dom, ProjectManifest& pm)
     {
         pm.editor_version = Version{ dom.get("editor_version") };
         pm.name           = dom.get("name");
@@ -30,7 +31,7 @@ namespace drako::editor
         dom.set("root", pm.root.string());
         dom.set("author", pm.author);
         return dom;
-    }
+    }*/
 
     const YAML::Node& operator>>(const YAML::Node& n, ProjectManifest& pm)
     {
@@ -41,7 +42,7 @@ namespace drako::editor
         return n;
     }
 
-    YAML::Node& operator<<(YAML::Node& n, ProjectManifest& pm)
+    YAML::Node& operator<<(YAML::Node& n, const ProjectManifest& pm)
     {
         n["editor_version"] = pm.editor_version.string();
         n["name"]           = pm.name;
@@ -93,9 +94,6 @@ namespace drako::editor
         _fs::create_directory(asset_directory());
         _fs::create_directory(cache_directory());
         _fs::create_directory(meta_directory());
-
-        const ProjectManifest info{ .name = "new_drako_project" };
-        _save_by_path(_root / "project.dkproj", info);
     }
 
 
@@ -132,6 +130,17 @@ namespace drako::editor
             throw;
         }
         return id;
+    }
+
+    void ProjectContext::compile(const AssetImportInfo& info)
+    {
+        const auto& ext = info.path.extension().string();
+        if (ext == ".obj")
+        {
+            throw std::runtime_error{ "Cannot import .obj file" };
+        }
+
+        throw std::runtime_error{ "Unsupported file extension " + ext };
     }
 
     [[nodiscard]] ProjectContext::AssetScanResult ProjectContext::scan_all_assets() const
@@ -199,7 +208,7 @@ namespace drako::editor
         }
     }
 
-    const dson::DOM& operator>>(const dson::DOM& is, AssetImportInfo& ext)
+    /*const dson::DOM& operator>>(const dson::DOM& is, AssetImportInfo& ext)
     {
         ext.id      = uuid::Uuid{ is.get("uuid") };
         ext.path    = is.get("path");
@@ -215,7 +224,7 @@ namespace drako::editor
         os.set("name", a.name);
         os.set("version", a.version.string());
         return os;
-    }
+    }*/
 
     const YAML::Node& operator>>(const YAML::Node& n, AssetImportInfo& a)
     {
@@ -226,9 +235,9 @@ namespace drako::editor
         return n;
     }
 
-    YAML::Node& operator<<(YAML::Node& n, AssetImportInfo& a)
+    YAML::Node& operator<<(YAML::Node& n, const AssetImportInfo& a)
     {
-        n["uuid"]    = a.id;
+        n["uuid"]    = a.id.string();
         n["path"]    = a.path.string();
         n["name"]    = a.name;
         n["version"] = a.version.string();

@@ -1,43 +1,29 @@
 #pragma once
-#ifndef DRAKO_BUILD_TYPES_HPP_
-#define DRAKO_BUILD_TYPES_HPP_
+#ifndef DRAKO_BUILD_TYPES_HPP
+#define DRAKO_BUILD_TYPES_HPP
 
 #include <cstdint>
+#include <vector>
 #include <exception>
 #include <filesystem>
 
 namespace drako
 {
-    namespace _fs = std::filesystem;
-
-
-    struct project_build_item
+    struct BuildJob
     {
-        std::uint32_t id;
-
-        size_t    inputs_count;
-        _fs::path inputs;
-
-        size_t     outputs_count;
-        _fs::path* outputs;
-
-        size_t transforms_count;
-        void*  transforms;
+        std::vector<std::filesystem::path> inputs;
+        std::vector<std::filesystem::path> outputs;
+        std::uint32_t                      id;
     };
 
-
-    enum class build_error_code
+    enum class BuildErrorCode
     {
     };
 
-    struct build_error : std::exception
-    {
-    };
-
-    struct packaging_result
+    struct BuildException : std::exception
     {
     };
 
 } // namespace drako
 
-#endif // !DRAKO_BUILD_TYPES_HPP_
+#endif // !DRAKO_BUILD_TYPES_HPP

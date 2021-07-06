@@ -2,13 +2,14 @@
 #ifndef DRAKO_ASSET_SYSTEM_HPP
 #define DRAKO_ASSET_SYSTEM_HPP
 
+#include "drako/concurrency/async_reader_pool.hpp"
 #include "drako/concurrency/lockfree_ringbuffer.hpp"
 #include "drako/core/memory/unsync_pool_allocator.hpp"
 #include "drako/devel/asset_types.hpp"
 #include "drako/devel/asset_utils.hpp"
 #include "drako/graphics/mesh_types.hpp"
-#include "drako/io/async_reader_pool.hpp"
-#include "drako/io/input_file_handle.hpp"
+
+#include <rio/input_file_handle.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -87,7 +88,7 @@ namespace drako::engine
 
         const ConfigArgs _config;
 
-        io::AsyncReaderPool _io_service;
+        AsyncReaderPool _io_service;
 
         // TODO: vvv those needs to be threadsafe vvv
         std::vector<AssetBundleID> _bundle_load_list; // load requests
@@ -124,17 +125,17 @@ namespace drako::engine
 
         struct _available_bundles_table
         {
-            std::vector<AssetBundleID>       ids;
-            std::vector<io::UniqueInputFile> sources;
-            std::vector<std::size_t>         sizes;
-            std::vector<std::string>         names;
+            std::vector<AssetBundleID>        ids;
+            std::vector<rio::UniqueInputFile> sources;
+            std::vector<std::size_t>          sizes;
+            std::vector<std::string>          names;
         } _available_bundles;
 
         struct _loaded_bundles_table
         {
-            std::vector<AssetBundleID> ids;
-            std::vector<AssetBundle>   bundles;
-            std::vector<std::uint16_t> refcount;
+            std::vector<AssetBundleID>       ids;
+            std::vector<AssetBundleManifest> manifests;
+            std::vector<std::uint16_t>       refcount;
         } _loaded_bundles;
 
         struct _loaded_assets_table

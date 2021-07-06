@@ -4,7 +4,7 @@
 
 #include "drako/core/drako_api_defs.hpp"
 #include "drako/devel/asset_types.hpp"
-#include "drako/file_formats/dson/dson.hpp"
+//#include "drako/file_formats/dson/dson.hpp"
 
 #include <uuid-cpp/uuid.hpp>
 #include <yaml-cpp/yaml.h>
@@ -36,8 +36,8 @@ namespace drako::editor
         Version               editor_version = current_api_version();
     };
 
-    const dson::DOM& operator>>(const dson::DOM&, ProjectManifest&);
-    dson::DOM&       operator<<(dson::DOM&, const ProjectManifest&);
+    //const dson::DOM& operator>>(const dson::DOM&, ProjectManifest&);
+    //dson::DOM&       operator<<(dson::DOM&, const ProjectManifest&);
 
     const YAML::Node& operator>>(const YAML::Node&, ProjectManifest&);
     YAML::Node&       operator<<(YAML::Node&, const ProjectManifest&);
@@ -58,8 +58,11 @@ namespace drako::editor
         [[nodiscard]] bool operator!=(const AssetImportInfo&) const = default;
     };
 
-    const dson::DOM& operator>>(const dson::DOM&, AssetImportInfo&);
-    dson::DOM&       operator<<(dson::DOM&, const AssetImportInfo&);
+    //const dson::DOM& operator>>(const dson::DOM&, AssetImportInfo&);
+    //dson::DOM&       operator<<(dson::DOM&, const AssetImportInfo&);
+
+    const YAML::Node& operator>>(const YAML::Node&, AssetImportInfo&);
+    YAML::Node&       operator<<(YAML::Node&, const AssetImportInfo&);
 
 
     struct AssetImportError
@@ -112,7 +115,28 @@ namespace drako::editor
         /// @brief Generates a new UUID.
         [[nodiscard]] uuid::Uuid generate_asset_uuid() const noexcept { return _engine(); }
 
-        uuid::Uuid import(const std::filesystem::path& asset);
+        /// @brief
+        /// @param asset
+        /// @return
+        uuid::Uuid track(const std::filesystem::path& asset);
+
+
+        /// @brief Make an asset available for the project.
+        /// @param[in] file Path of the asset.
+        /// @return Generated id for the asset.
+        ///
+        /// Import an asset into the project.
+        ///
+        uuid::Uuid import(const std::filesystem::path& file);
+
+
+        /// @brief Make an asset usable by the engine.
+        /// @param info Descriptor of the asset.
+        ///
+        /// Compile an asset into a format suitable for consumption by the engine.
+        ///
+        void compile(const AssetImportInfo& info);
+
 
         struct AssetScanResult
         {
@@ -130,18 +154,23 @@ namespace drako::editor
         template <typename T>
         static void _load_by_path(const std::filesystem::path& p, T& t)
         {
-            dson::DOM dom;
-            std::ifstream{ p } >> dom;
-            dom >> t;
+            //dson::DOM dom;
+            //std::ifstream{ p } >> dom;
+            //dom >> t;
+            const auto yaml = YAML::LoadFile(p.string());
+            yaml >> t;
         }
 
         // serialize through a common function
         template <typename T>
         static void _save_by_path(const std::filesystem::path& p, const T& t)
         {
-            dson::DOM dom;
-            dom << t;
-            std::ofstream{ p } << dom;
+            //dson::DOM dom;
+            //dom << t;
+            //std::ofstream{ p } << dom;
+            YAML::Node yaml{};
+            yaml << t;
+            std::ofstream{ p } << yaml;
         }
     };
 

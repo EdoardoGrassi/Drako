@@ -1,0 +1,5 @@
+add_test( Parser.KeyValuePairs C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson/dson_parser_test.exe [==[--gtest_filter=Parser.KeyValuePairs]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Parser.KeyValuePairs PROPERTIES WORKING_DIRECTORY C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( Parser.SerializationAndDeserialization C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson/dson_parser_test.exe [==[--gtest_filter=Parser.SerializationAndDeserialization]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Parser.SerializationAndDeserialization PROPERTIES WORKING_DIRECTORY C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set( dson_parser_test_TESTS Parser.KeyValuePairs Parser.SerializationAndDeserialization)

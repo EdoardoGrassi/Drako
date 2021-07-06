@@ -3,12 +3,12 @@
 #define DRAKO_MESH_IMPORTERS_HPP
 
 #include "drako/devel/project_types.hpp"
-#include "drako/file_formats/dson/dson.hpp"
 #include "drako/graphics/mesh_types.hpp"
 #include "drako/graphics/mesh_utils.hpp"
 
+#include <uuid-cpp/uuid.hpp>
+
 #include <filesystem>
-#include <fstream>
 
 namespace drako::editor
 {
@@ -19,8 +19,8 @@ namespace drako::editor
         std::filesystem::path path;
     };
 
-    const dson::DOM& operator>>(const dson::DOM&, MeshImportInfo&);
-    dson::DOM&       operator<<(dson::DOM&, const MeshImportInfo&);
+    //const dson::DOM& operator>>(const dson::DOM&, MeshImportInfo&);
+    //dson::DOM&       operator<<(dson::DOM&, const MeshImportInfo&);
 
 
     struct ObjImportConfig
@@ -29,15 +29,16 @@ namespace drako::editor
         std::vector<std::string>                         flags;
     };
 
-    /// @brief Import assets from .obj file.
+    /// @brief Import a mesh asset from an .obj file.
     ///
     /// Possible configuration settings:
     ///     --discard-normals   remove normals data from output
     ///     --discard-uvs       remove texture uvs data from output
     ///
-    [[nodiscard]] Mesh compile(const obj::MeshData& obj, const ObjImportConfig& config);
+    [[nodiscard]] Mesh compile(const obj::MeshData& md, const ObjImportConfig& config);
 
-    [[nodiscard]] Mesh compile(const obj::MeshData& md, bool discard_normals);
+    /// @brief Import a mesh asset from an .obj file.
+    [[nodiscard]] Mesh compile(const obj::MeshData& md);
 
 } // namespace drako::editor
 

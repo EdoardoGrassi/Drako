@@ -24,54 +24,6 @@ namespace drako::editor
 
     void _create_project_info_file(const _fs::path& where);
 
-    void save(const _fs::path& file, const ProjectManifest& info)
-    {
-        dson::DOM dom{};
-        dom << info;
-
-        // for the time being, no overwriting of existing files for safety
-        //const auto s = to_string(dom);
-        //io::UniqueOutputFile f{ file, io::Create::require_new };
-        //io::write_all(f, std::as_bytes(std::span{ std::data(s), std::size(s) }));
-
-        std::ofstream{ file } << dom;
-    }
-
-    void load(const _fs::path& file, ProjectManifest& info)
-    {
-        //const auto bytes = static_cast<std::size_t>(_fs::file_size(file));
-        //load(file, bytes, info);
-
-        dson::DOM dom{};
-        std::ifstream{ file } >> dom;
-        dom >> info;
-    }
-
-    void save(const _fs::path& file, const AssetImportInfo& info)
-    {
-        // serialize as dson object
-        dson::DOM dom{};
-        dom << info;
-
-        // for the time being, no overwriting of existing files for safety
-        //const auto s = to_string(dom);
-        //io::UniqueOutputFile f{ file, io::Create::require_new };
-        //io::write_all(f, std::as_bytes(std::span{ std::cbegin(s), std::cend(s) }));
-
-        std::ofstream{ file } << dom;
-    }
-
-    void load(const _fs::path& file, AssetImportInfo& info)
-    {
-        // TODO: remove narrowing conversion, check if the file is too big
-        //const auto bytes = static_cast<std::size_t>(_fs::file_size(file));
-        //load(file, bytes, info);
-
-        dson::DOM dom{};
-        std::ifstream{ file } >> dom;
-        dom >> info;
-    }
-
     /*
     void load_asset_index_cache(const ProjectDatabase& p)
     {
@@ -86,7 +38,8 @@ namespace drako::editor
     }
     */
 
-    void create_project_tree(const ProjectContext& ctx, std::string_view name)
+    
+    /* void create_project_tree(const ProjectContext& ctx, std::string_view name)
     {
         assert(!std::empty(name));
 
@@ -131,7 +84,7 @@ namespace drako::editor
             std::filesystem::remove(meta_file_path);
             throw;
         }
-    }
+    } */
 
 
     /* void load_all_assets(const ProjectContext& ctx, ProjectDatabase& db)

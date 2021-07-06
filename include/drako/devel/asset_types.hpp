@@ -26,10 +26,10 @@ namespace drako
     /// @brief Single item of an asset manifest.
     struct AssetManifestRecord
     {
-        AssetID       asset_guid;
+        AssetID       asset_id;
+        AssetBundleID bundle_id;
         std::uint32_t packed_size_bytes;
-        std::uint32_t unpacked_size_bytes;
-        AssetBundleID bundle_guid;
+        //std::uint32_t unpacked_size_bytes;
     };
 
 
@@ -49,17 +49,19 @@ namespace drako
     };
 
 
-    // Metadata descriptor related to storage settings.
+    /// @brief Metadata for the loading of an asset from a bundle.
     class AssetLoadInfo
     {
     public:
+        constexpr explicit AssetLoadInfo() = default;
+
         /// @brief Descriptor of an asset packaged uncompressed.
         ///
         /// @param[in] offset Offset inside the full package as bytes.
         /// @param[in] bytes  Size of the asset as bytes.
         ///
-        /// @return
-        explicit AssetLoadInfo(std::uint32_t offset, std::uint32_t bytes) noexcept
+        constexpr explicit AssetLoadInfo(
+            std::uint32_t offset, std::uint32_t bytes) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ bytes }
             , _unpacked_size_bytes{ bytes }
@@ -74,7 +76,8 @@ namespace drako
         /// @param[in] s        Storage options.
         /// @param[in] f        Format options.
         ///
-        explicit AssetLoadInfo(std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
+        constexpr explicit AssetLoadInfo(
+            std::uint32_t offset, std::uint32_t packed, std::uint32_t unpacked,
             AssetStorageFlags s, AssetFormatFlags f) noexcept
             : _package_offset{ offset }
             , _packed_size_bytes{ packed }
@@ -114,7 +117,6 @@ namespace drako
 
 
 
-
     /// @brief Metadata descriptor of an asset bundle.
     struct AssetBundleMeta
     {
@@ -131,16 +133,9 @@ namespace drako
         std::uint64_t offset;
     };
 
+    std::istream& operator>>(std::istream&, AssetBundleMeta&);
+    std::ostream& operator<<(std::ostream&, const AssetBundleMeta&);
 
-
-    struct AssetBundle
-    {
-
-    public:
-        void load_from_file();
-
-        void save_to_file();
-    };
 
 
     /// @brief Manifest file name of an asset bundle.

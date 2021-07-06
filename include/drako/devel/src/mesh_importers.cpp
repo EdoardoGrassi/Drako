@@ -6,7 +6,7 @@
 
 namespace drako::editor
 {
-    const dson::DOM& operator>>(const dson::DOM& dom, MeshImportInfo& info)
+    /*const dson::DOM& operator>>(const dson::DOM& dom, MeshImportInfo& info)
     {
         info.guid = uuid::Uuid{ dom.get("guid") };
         info.name = dom.get("name");
@@ -20,12 +20,12 @@ namespace drako::editor
         dom.set("name", info.name);
         dom.set("path", info.path.string());
         return dom;
-    }
+    }*/
 
 
     //[[nodiscard]] Mesh compile(const obj::MeshData& md, const ObjImportConfig& config)
 
-    [[nodiscard]] Mesh compile(const obj::MeshData& md, bool discard_normals)
+    [[nodiscard]] Mesh compile(const obj::MeshData& md)
     {
         std::vector<std::byte> verts_data;
         verts_data.resize(std::size(md.v) * sizeof(float) * 3);
@@ -53,9 +53,15 @@ namespace drako::editor
             }
         }
 
+        using _verts_count_t = decltype(MeshMetaInfo::vertex_count);
+        using _index_count_t = decltype(MeshMetaInfo::index_count);
         const MeshMetaInfo meta{
-            .vertex_count      = std::size(md.v),
-            .index_count       = std::size(md.faces),
+            .vertex_count      = (std::size(md.v) <= std::numeric_limits<_verts_count_t>::max())
+                                     ? static_cast<_verts_count_t>(std::size(md.v))
+                                     : throw std::runtime_error{ "Too many vertices" },
+            .index_count       = (std::size(md.v) * 3 <= std::numeric_limits<_index_count_t>::max())
+                                     ? static_cast<_index_count_t>(std::size(md.v) * 3)
+                                     : throw std::runtime_error{ "Too many indices" },
             .vertex_size_bytes = sizeof(float) * 3,
             .index_size_bytes  = sizeof(std::uint32_t),
             .topology          = MeshMetaInfo::Topology::triangle_list

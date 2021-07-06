@@ -25,7 +25,7 @@ add_library(drako-devel STATIC
     "src/mesh_importers.cpp")
 
 target_link_libraries(drako-devel
-    PRIVATE drako::dson obj-cpp uuid-cpp yaml-cpp
+    PUBLIC drako::dson obj-cpp uuid-cpp yaml-cpp
 )
 add_library(drako::devel ALIAS drako-devel)
 

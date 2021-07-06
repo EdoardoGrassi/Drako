@@ -1,11 +1,11 @@
+#include "drako/devel/build_utils.hpp"
+
 #include <cstddef>
 #include <filesystem>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "drako/devel/build_utils.hpp"
 
 namespace _fs = std::filesystem;
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     //const std::vector<_fs::path> metadata_files;
     //for (const auto& metadata : metadata_files) {}
 
-    const std::vector<drako::project_build_item> curr_build_items;
+    const std::vector<drako::BuildJob> curr_build_items;
     std::vector<_fs::path> curr_build_inputs;
 
     // TODO: load cache

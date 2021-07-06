@@ -5,11 +5,6 @@
 /// @brief   Lightweight runtime logging framework.
 /// @author  Grassi Edoardo
 
-#include <cstdio>
-#include <iomanip>
-#include <iostream>
-#include <string_view>
-
 #include "drako/core/compiler.hpp"
 #include "drako/core/platform.hpp"
 
@@ -19,6 +14,11 @@
 /* vvv include after vvv */
 #include <debugapi.h>
 #endif
+
+#include <cstdio>
+#include <iomanip>
+#include <iostream>
+#include <string_view>
 
 namespace drako
 {

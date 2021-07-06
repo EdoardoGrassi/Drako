@@ -46,7 +46,7 @@ build cmake_object_order_depends_target_drako-cli-editor: phony || cmake_object_
 build CMakeFiles\drako-cli-editor.dir\src\drako_cli_editor.cpp.obj: CXX_COMPILER__drako-cli-editor_Debug ..\..\..\src\drako_cli_editor.cpp || cmake_object_order_depends_target_drako-cli-editor
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = CMakeFiles\drako-cli-editor.dir
   OBJECT_FILE_DIR = CMakeFiles\drako-cli-editor.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\drako-cli-editor.dir\
@@ -85,12 +85,12 @@ build list_install_components: phony
 #############################################
 # Order-only phony target for drako-builder
 
-build cmake_object_order_depends_target_drako-builder: phony || CMakeFiles\drako-builder.dir
+build cmake_object_order_depends_target_drako-builder: phony || cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson cmake_object_order_depends_target_obj-cpp cmake_object_order_depends_target_uuid-cpp cmake_object_order_depends_target_yaml-cpp
 
 build CMakeFiles\drako-builder.dir\src\drako_resource_compiler.cpp.obj: CXX_COMPILER__drako-builder_Debug ..\..\..\src\drako_resource_compiler.cpp || cmake_object_order_depends_target_drako-builder
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = CMakeFiles\drako-builder.dir
   OBJECT_FILE_DIR = CMakeFiles\drako-builder.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\drako-builder.dir\
@@ -104,10 +104,10 @@ build CMakeFiles\drako-builder.dir\src\drako_resource_compiler.cpp.obj: CXX_COMP
 #############################################
 # Link the executable drako-builder.exe
 
-build drako-builder.exe: CXX_EXECUTABLE_LINKER__drako-builder_Debug CMakeFiles\drako-builder.dir\src\drako_resource_compiler.cpp.obj
+build drako-builder.exe: CXX_EXECUTABLE_LINKER__drako-builder_Debug CMakeFiles\drako-builder.dir\src\drako_resource_compiler.cpp.obj | include\drako\devel\drako-devel.lib include\drako\file_formats\dson\dson.lib _deps\obj-cpp-build\obj-cpp.lib _deps\uuid-cpp-build\uuid-cpp.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib _deps\yaml-cpp-build\libyaml-cppmdd.lib || _deps\obj-cpp-build\obj-cpp.lib _deps\uuid-cpp-build\uuid-cpp.lib _deps\yaml-cpp-build\libyaml-cppmdd.lib include\drako\devel\drako-devel.lib include\drako\file_formats\dson\dson.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\devel\drako-devel.lib  include\drako\file_formats\dson\dson.lib  _deps\obj-cpp-build\obj-cpp.lib  _deps\uuid-cpp-build\uuid-cpp.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\iphlpapi.lib"  _deps\yaml-cpp-build\libyaml-cppmdd.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\drako-builder.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -1497,7 +1497,7 @@ build cmake_object_order_depends_target_asset_tests: phony || cmake_object_order
 build include\drako\devel\CMakeFiles\asset_tests.dir\test\asset_tests.cpp.obj: CXX_COMPILER__asset_tests_Debug ..\..\..\include\drako\devel\test\asset_tests.cpp || cmake_object_order_depends_target_asset_tests
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
+  INCLUDES = -I..\..\..\include -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
   OBJECT_DIR = include\drako\devel\CMakeFiles\asset_tests.dir
   OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\asset_tests.dir\test
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\asset_tests.dir\
@@ -1535,7 +1535,7 @@ build cmake_object_order_depends_target_project_utils_test: phony || cmake_objec
 build include\drako\devel\CMakeFiles\project_utils_test.dir\test\project_utils_test.cpp.obj: CXX_COMPILER__project_utils_test_Debug ..\..\..\include\drako\devel\test\project_utils_test.cpp || cmake_object_order_depends_target_project_utils_test
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
+  INCLUDES = -I..\..\..\include -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
   OBJECT_DIR = include\drako\devel\CMakeFiles\project_utils_test.dir
   OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\project_utils_test.dir\test
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\project_utils_test.dir\
@@ -1573,7 +1573,7 @@ build cmake_object_order_depends_target_crc32_test: phony || cmake_object_order_
 build include\drako\devel\CMakeFiles\crc32_test.dir\test\crc32_tests.cpp.obj: CXX_COMPILER__crc32_test_Debug ..\..\..\include\drako\devel\test\crc32_tests.cpp || cmake_object_order_depends_target_crc32_test
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
+  INCLUDES = -I..\..\..\include -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
   OBJECT_DIR = include\drako\devel\CMakeFiles\crc32_test.dir
   OBJECT_FILE_DIR = include\drako\devel\CMakeFiles\crc32_test.dir\test
   TARGET_COMPILE_PDB = include\drako\devel\CMakeFiles\crc32_test.dir\
@@ -1953,12 +1953,12 @@ build _deps\uuid-cpp-build\list_install_components: phony
 #############################################
 # Order-only phony target for drako-runtime
 
-build cmake_object_order_depends_target_drako-runtime: phony || include\drako\engine\CMakeFiles\drako-runtime.dir
+build cmake_object_order_depends_target_drako-runtime: phony || cmake_object_order_depends_target_drako-devel cmake_object_order_depends_target_dson cmake_object_order_depends_target_obj-cpp cmake_object_order_depends_target_rio cmake_object_order_depends_target_uuid-cpp cmake_object_order_depends_target_yaml-cpp
 
 build include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_system.cpp.obj: CXX_COMPILER__drako-runtime_Debug ..\..\..\include\drako\engine\src\asset_system.cpp || cmake_object_order_depends_target_drako-runtime
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include -I_deps\glm-src\glm\..
+  INCLUDES = -I..\..\..\include -I_deps\glm-src\glm\.. -I_deps\obj-cpp-src\include -I_deps\uuid-cpp-src\include -I_deps\yaml-cpp-src\include -I_deps\rio-src\include
   OBJECT_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir
   OBJECT_FILE_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir\src
   TARGET_COMPILE_PDB = include\drako\engine\CMakeFiles\drako-runtime.dir\drako-runtime.pdb
@@ -1972,7 +1972,7 @@ build include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_system.cpp.obj
 #############################################
 # Link the static library include\drako\engine\drako-runtime.lib
 
-build include\drako\engine\drako-runtime.lib: CXX_STATIC_LIBRARY_LINKER__drako-runtime_Debug include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_system.cpp.obj
+build include\drako\engine\drako-runtime.lib: CXX_STATIC_LIBRARY_LINKER__drako-runtime_Debug include\drako\engine\CMakeFiles\drako-runtime.dir\src\asset_system.cpp.obj || _deps\obj-cpp-build\obj-cpp.lib _deps\rio-build\rio.lib _deps\uuid-cpp-build\uuid-cpp.lib _deps\yaml-cpp-build\libyaml-cppmdd.lib include\drako\devel\drako-devel.lib include\drako\file_formats\dson\dson.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\engine\CMakeFiles\drako-runtime.dir
@@ -2046,6 +2046,239 @@ build include\drako\engine\edit_cache: phony include\drako\engine\CMakeFiles\edi
 # Utility command for list_install_components
 
 build include\drako\engine\list_install_components: phony
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/edo18/source/repos/EdoardoGrassi/Draco/include/drako/engine/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target rio
+
+
+#############################################
+# Order-only phony target for rio
+
+build cmake_object_order_depends_target_rio: phony || _deps\rio-build\CMakeFiles\rio.dir
+
+build _deps\rio-build\CMakeFiles\rio.dir\src\async_file_handle.cpp.obj: CXX_COMPILER__rio_Debug _deps\rio-src\src\async_file_handle.cpp || cmake_object_order_depends_target_rio
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -I_deps\rio-src\include
+  OBJECT_DIR = _deps\rio-build\CMakeFiles\rio.dir
+  OBJECT_FILE_DIR = _deps\rio-build\CMakeFiles\rio.dir\src
+  TARGET_COMPILE_PDB = _deps\rio-build\CMakeFiles\rio.dir\rio.pdb
+  TARGET_PDB = _deps\rio-build\rio.pdb
+
+build _deps\rio-build\CMakeFiles\rio.dir\src\vio_file_handle.cpp.obj: CXX_COMPILER__rio_Debug _deps\rio-src\src\vio_file_handle.cpp || cmake_object_order_depends_target_rio
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -I_deps\rio-src\include
+  OBJECT_DIR = _deps\rio-build\CMakeFiles\rio.dir
+  OBJECT_FILE_DIR = _deps\rio-build\CMakeFiles\rio.dir\src
+  TARGET_COMPILE_PDB = _deps\rio-build\CMakeFiles\rio.dir\rio.pdb
+  TARGET_PDB = _deps\rio-build\rio.pdb
+
+build _deps\rio-build\CMakeFiles\rio.dir\src\core_win32.cpp.obj: CXX_COMPILER__rio_Debug _deps\rio-src\src\core_win32.cpp || cmake_object_order_depends_target_rio
+  DEFINES = -DNOMINMAX -DSTRICT -DUNICODE -DWIN32_LEAN_AND_MEAN -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -I_deps\rio-src\include
+  OBJECT_DIR = _deps\rio-build\CMakeFiles\rio.dir
+  OBJECT_FILE_DIR = _deps\rio-build\CMakeFiles\rio.dir\src
+  TARGET_COMPILE_PDB = _deps\rio-build\CMakeFiles\rio.dir\rio.pdb
+  TARGET_PDB = _deps\rio-build\rio.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target rio
+
+
+#############################################
+# Link the static library _deps\rio-build\rio.lib
+
+build _deps\rio-build\rio.lib: CXX_STATIC_LIBRARY_LINKER__rio_Debug _deps\rio-build\CMakeFiles\rio.dir\src\async_file_handle.cpp.obj _deps\rio-build\CMakeFiles\rio.dir\src\vio_file_handle.cpp.obj _deps\rio-build\CMakeFiles\rio.dir\src\core_win32.cpp.obj
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = _deps\rio-build\CMakeFiles\rio.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = _deps\rio-build\CMakeFiles\rio.dir\rio.pdb
+  TARGET_FILE = _deps\rio-build\rio.lib
+  TARGET_PDB = _deps\rio-build\rio.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build _deps\rio-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -SC:\Users\edo18\source\repos\EdoardoGrassi\Draco -BC:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\rebuild_cache: phony _deps\rio-build\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build _deps\rio-build\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\test: phony _deps\rio-build\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for install/local
+
+build _deps\rio-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\rio-build\all
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\install\local: phony _deps\rio-build\CMakeFiles\install\local.util
+
+
+#############################################
+# Utility command for install
+
+build _deps\rio-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\rio-build\all
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\install: phony _deps\rio-build\CMakeFiles\install.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build _deps\rio-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build _deps\rio-build\edit_cache: phony _deps\rio-build\CMakeFiles\edit_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build _deps\rio-build\list_install_components: phony
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-src/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for EXECUTABLE target rio_tests
+
+
+#############################################
+# Order-only phony target for rio_tests
+
+build cmake_object_order_depends_target_rio_tests: phony || cmake_object_order_depends_target_gtest cmake_object_order_depends_target_gtest_main cmake_object_order_depends_target_rio
+
+build _deps\rio-build\test\CMakeFiles\rio_tests.dir\input_output_test.cpp.obj: CXX_COMPILER__rio_tests_Debug _deps\rio-src\test\input_output_test.cpp || cmake_object_order_depends_target_rio_tests
+  DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
+  INCLUDES = -I..\..\..\include -I_deps\rio-src\include -I_deps\googletest-src\googletest\include -I_deps\googletest-src\googletest
+  OBJECT_DIR = _deps\rio-build\test\CMakeFiles\rio_tests.dir
+  OBJECT_FILE_DIR = _deps\rio-build\test\CMakeFiles\rio_tests.dir
+  TARGET_COMPILE_PDB = _deps\rio-build\test\CMakeFiles\rio_tests.dir\
+  TARGET_PDB = _deps\rio-build\test\rio_tests.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target rio_tests
+
+
+#############################################
+# Link the executable _deps\rio-build\test\rio_tests.exe
+
+build _deps\rio-build\test\rio_tests.exe _deps\rio-build\test\rio_tests[1]_tests.cmake: CXX_EXECUTABLE_LINKER__rio_tests_Debug _deps\rio-build\test\CMakeFiles\rio_tests.dir\input_output_test.cpp.obj | _deps\rio-build\rio.lib lib\gtest_maind.lib lib\gtestd.lib || _deps\rio-build\rio.lib lib\gtest_maind.lib lib\gtestd.lib
+  FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = _deps\rio-build\rio.lib  lib\gtest_maind.lib  lib\gtestd.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = _deps\rio-build\test\CMakeFiles\rio_tests.dir
+  POST_BUILD = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -D TEST_TARGET=rio_tests -D TEST_EXECUTABLE=C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test/rio_tests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=rio_tests_TESTS -D CTEST_FILE=C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test/rio_tests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.20/Modules/GoogleTestAddTests.cmake""
+  PRE_LINK = cd .
+  RESTAT = 1
+  TARGET_COMPILE_PDB = _deps\rio-build\test\CMakeFiles\rio_tests.dir\
+  TARGET_FILE = _deps\rio-build\test\rio_tests.exe
+  TARGET_IMPLIB = _deps\rio-build\test\rio_tests.lib
+  TARGET_PDB = _deps\rio-build\test\rio_tests.pdb
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build _deps\rio-build\test\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -SC:\Users\edo18\source\repos\EdoardoGrassi\Draco -BC:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\test\rebuild_cache: phony _deps\rio-build\test\CMakeFiles\rebuild_cache.util
+
+
+#############################################
+# Utility command for test
+
+build _deps\rio-build\test\CMakeFiles\test.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  DESC = Running tests...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\test\test: phony _deps\rio-build\test\CMakeFiles\test.util
+
+
+#############################################
+# Utility command for install/local
+
+build _deps\rio-build\test\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\rio-build\test\all
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\test\install\local: phony _deps\rio-build\test\CMakeFiles\install\local.util
+
+
+#############################################
+# Utility command for install
+
+build _deps\rio-build\test\CMakeFiles\install.util: CUSTOM_COMMAND _deps\rio-build\test\all
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build _deps\rio-build\test\install: phony _deps\rio-build\test\CMakeFiles\install.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build _deps\rio-build\test\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\_deps\rio-build\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build _deps\rio-build\test\edit_cache: phony _deps\rio-build\test\CMakeFiles\edit_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build _deps\rio-build\test\list_install_components: phony
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -2714,12 +2947,12 @@ build include\drako\graphics\list_install_components: phony
 #############################################
 # Order-only phony target for input-system
 
-build cmake_object_order_depends_target_input-system: phony || cmake_object_order_depends_target_device-system
+build cmake_object_order_depends_target_input-system: phony || cmake_object_order_depends_target_device-system cmake_object_order_depends_target_yaml-cpp
 
 build include\drako\input\CMakeFiles\input-system.dir\src\input_system.cpp.obj: CXX_COMPILER__input-system_Debug ..\..\..\include\drako\input\src\input_system.cpp || cmake_object_order_depends_target_input-system
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = include\drako\input\CMakeFiles\input-system.dir
   OBJECT_FILE_DIR = include\drako\input\CMakeFiles\input-system.dir\src
   TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-system.dir\input-system.pdb
@@ -2728,7 +2961,7 @@ build include\drako\input\CMakeFiles\input-system.dir\src\input_system.cpp.obj: 
 build include\drako\input\CMakeFiles\input-system.dir\src\input_system_types.cpp.obj: CXX_COMPILER__input-system_Debug ..\..\..\include\drako\input\src\input_system_types.cpp || cmake_object_order_depends_target_input-system
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = include\drako\input\CMakeFiles\input-system.dir
   OBJECT_FILE_DIR = include\drako\input\CMakeFiles\input-system.dir\src
   TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input-system.dir\input-system.pdb
@@ -2742,7 +2975,7 @@ build include\drako\input\CMakeFiles\input-system.dir\src\input_system_types.cpp
 #############################################
 # Link the static library include\drako\input\input-system.lib
 
-build include\drako\input\input-system.lib: CXX_STATIC_LIBRARY_LINKER__input-system_Debug include\drako\input\CMakeFiles\input-system.dir\src\input_system.cpp.obj include\drako\input\CMakeFiles\input-system.dir\src\input_system_types.cpp.obj || include\drako\input\device-system.lib
+build include\drako\input\input-system.lib: CXX_STATIC_LIBRARY_LINKER__input-system_Debug include\drako\input\CMakeFiles\input-system.dir\src\input_system.cpp.obj include\drako\input\CMakeFiles\input-system.dir\src\input_system_types.cpp.obj || _deps\yaml-cpp-build\libyaml-cppmdd.lib include\drako\input\device-system.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = include\drako\input\CMakeFiles\input-system.dir
@@ -2795,12 +3028,12 @@ build include\drako\input\device-system.lib: CXX_STATIC_LIBRARY_LINKER__device-s
 #############################################
 # Order-only phony target for input_system_testrun
 
-build cmake_object_order_depends_target_input_system_testrun: phony || cmake_object_order_depends_target_device-system cmake_object_order_depends_target_input-system
+build cmake_object_order_depends_target_input_system_testrun: phony || cmake_object_order_depends_target_device-system cmake_object_order_depends_target_input-system cmake_object_order_depends_target_yaml-cpp
 
 build include\drako\input\CMakeFiles\input_system_testrun.dir\test\input_system_testrun.cpp.obj: CXX_COMPILER__input_system_testrun_Debug ..\..\..\include\drako\input\test\input_system_testrun.cpp || cmake_object_order_depends_target_input_system_testrun
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = include\drako\input\CMakeFiles\input_system_testrun.dir
   OBJECT_FILE_DIR = include\drako\input\CMakeFiles\input_system_testrun.dir\test
   TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\input_system_testrun.dir\
@@ -2814,10 +3047,10 @@ build include\drako\input\CMakeFiles\input_system_testrun.dir\test\input_system_
 #############################################
 # Link the executable include\drako\input\input_system_testrun.exe
 
-build include\drako\input\input_system_testrun.exe: CXX_EXECUTABLE_LINKER__input_system_testrun_Debug include\drako\input\CMakeFiles\input_system_testrun.dir\test\input_system_testrun.cpp.obj | include\drako\input\input-system.lib include\drako\input\device-system.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib || include\drako\input\device-system.lib include\drako\input\input-system.lib
+build include\drako\input\input_system_testrun.exe: CXX_EXECUTABLE_LINKER__input_system_testrun_Debug include\drako\input\CMakeFiles\input_system_testrun.dir\test\input_system_testrun.cpp.obj | include\drako\input\input-system.lib include\drako\input\device-system.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib _deps\yaml-cpp-build\libyaml-cppmdd.lib || _deps\yaml-cpp-build\libyaml-cppmdd.lib include\drako\input\device-system.lib include\drako\input\input-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\input\input-system.lib  include\drako\input\device-system.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\input\input-system.lib  include\drako\input\device-system.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib"  _deps\yaml-cpp-build\libyaml-cppmdd.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = include\drako\input\CMakeFiles\input_system_testrun.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -2833,12 +3066,12 @@ build include\drako\input\input_system_testrun.exe: CXX_EXECUTABLE_LINKER__input
 #############################################
 # Order-only phony target for device_system_testrun
 
-build cmake_object_order_depends_target_device_system_testrun: phony || cmake_object_order_depends_target_device-system cmake_object_order_depends_target_input-system
+build cmake_object_order_depends_target_device_system_testrun: phony || cmake_object_order_depends_target_device-system cmake_object_order_depends_target_input-system cmake_object_order_depends_target_yaml-cpp
 
 build include\drako\input\CMakeFiles\device_system_testrun.dir\test\device_system_testrun.cpp.obj: CXX_COMPILER__device_system_testrun_Debug ..\..\..\include\drako\input\test\device_system_testrun.cpp || cmake_object_order_depends_target_device_system_testrun
   DEFINES = -DNOMINMAX -D_ENABLE_EXTENDED_ALIGNED_STORAGE
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /WX -std:c++latest
-  INCLUDES = -I..\..\..\include
+  INCLUDES = -I..\..\..\include -I_deps\yaml-cpp-src\include
   OBJECT_DIR = include\drako\input\CMakeFiles\device_system_testrun.dir
   OBJECT_FILE_DIR = include\drako\input\CMakeFiles\device_system_testrun.dir\test
   TARGET_COMPILE_PDB = include\drako\input\CMakeFiles\device_system_testrun.dir\
@@ -2852,10 +3085,10 @@ build include\drako\input\CMakeFiles\device_system_testrun.dir\test\device_syste
 #############################################
 # Link the executable include\drako\input\device_system_testrun.exe
 
-build include\drako\input\device_system_testrun.exe: CXX_EXECUTABLE_LINKER__device_system_testrun_Debug include\drako\input\CMakeFiles\device_system_testrun.dir\test\device_system_testrun.cpp.obj | include\drako\input\device-system.lib include\drako\input\input-system.lib include\drako\input\device-system.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib || include\drako\input\device-system.lib include\drako\input\input-system.lib
+build include\drako\input\device_system_testrun.exe: CXX_EXECUTABLE_LINKER__device_system_testrun_Debug include\drako\input\CMakeFiles\device_system_testrun.dir\test\device_system_testrun.cpp.obj | include\drako\input\device-system.lib include\drako\input\input-system.lib include\drako\input\device-system.lib C$:\Program$ Files$ (x86)\Windows$ Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib _deps\yaml-cpp-build\libyaml-cppmdd.lib || _deps\yaml-cpp-build\libyaml-cppmdd.lib include\drako\input\device-system.lib include\drako\input\input-system.lib
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = include\drako\input\device-system.lib  include\drako\input\input-system.lib  include\drako\input\device-system.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = include\drako\input\device-system.lib  include\drako\input\input-system.lib  include\drako\input\device-system.lib  "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\xinput.lib"  _deps\yaml-cpp-build\libyaml-cppmdd.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = include\drako\input\CMakeFiles\device_system_testrun.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -3623,6 +3856,14 @@ build project_utils_test: phony include\drako\devel\project_utils_test.exe
 
 build project_utils_test.exe: phony include\drako\devel\project_utils_test.exe
 
+build rio: phony _deps\rio-build\rio.lib
+
+build rio.lib: phony _deps\rio-build\rio.lib
+
+build rio_tests: phony _deps\rio-build\test\rio_tests.exe
+
+build rio_tests.exe: phony _deps\rio-build\test\rio_tests.exe
+
 build thread-test-001: phony include\drako\system\thread-test-001.exe
 
 build thread-test-001.exe: phony include\drako\system\thread-test-001.exe
@@ -3700,6 +3941,20 @@ build _deps\obj-cpp-build\all: phony _deps\obj-cpp-build\obj-cpp.lib _deps\obj-c
 # =============================================================================
 
 #############################################
+# Folder: C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build
+
+build _deps\rio-build\all: phony _deps\rio-build\rio.lib _deps\rio-build\test\all
+
+# =============================================================================
+
+#############################################
+# Folder: C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/rio-build/test
+
+build _deps\rio-build\test\all: phony _deps\rio-build\test\rio_tests.exe
+
+# =============================================================================
+
+#############################################
 # Folder: C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/uuid-cpp-build
 
 build _deps\uuid-cpp-build\all: phony _deps\uuid-cpp-build\uuid-cpp.lib
@@ -3744,7 +3999,7 @@ build include\drako\devel\all: phony include\drako\devel\drako-devel.lib include
 #############################################
 # Folder: C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/engine
 
-build include\drako\engine\all: phony include\drako\engine\drako-runtime.lib
+build include\drako\engine\all: phony include\drako\engine\drako-runtime.lib _deps\rio-build\all
 
 # =============================================================================
 
@@ -3837,14 +4092,14 @@ build C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMake
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\dson\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\jobs\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt ..\..\..\include\drako\vm\CMakeLists.txt C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeDependentOption.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent\CMakeLists.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGit.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPythonInterp.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindThreads.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GoogleTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.20.21032501-MSVC_2\CMakeCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeSystem.cmake _deps\glm-src\CMakeLists.txt _deps\glm-src\glm\CMakeLists.txt _deps\googletest-src\CMakeLists.txt _deps\googletest-src\googlemock\CMakeLists.txt _deps\googletest-src\googlemock\cmake\gmock.pc.in _deps\googletest-src\googlemock\cmake\gmock_main.pc.in _deps\googletest-src\googletest\CMakeLists.txt _deps\googletest-src\googletest\cmake\Config.cmake.in _deps\googletest-src\googletest\cmake\gtest.pc.in _deps\googletest-src\googletest\cmake\gtest_main.pc.in _deps\googletest-src\googletest\cmake\internal_utils.cmake _deps\obj-cpp-src\CMakeLists.txt _deps\uuid-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\yaml-cpp-config-version.cmake.in _deps\yaml-cpp-src\yaml-cpp-config.cmake.in
+build build.ninja: RERUN_CMAKE C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\dson\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\jobs\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt ..\..\..\include\drako\vm\CMakeLists.txt C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeDependentOption.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent\CMakeLists.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGit.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPythonInterp.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindThreads.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GoogleTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.20.21032501-MSVC_2\CMakeCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeSystem.cmake _deps\glm-src\CMakeLists.txt _deps\glm-src\glm\CMakeLists.txt _deps\googletest-src\CMakeLists.txt _deps\googletest-src\googlemock\CMakeLists.txt _deps\googletest-src\googlemock\cmake\gmock.pc.in _deps\googletest-src\googlemock\cmake\gmock_main.pc.in _deps\googletest-src\googletest\CMakeLists.txt _deps\googletest-src\googletest\cmake\Config.cmake.in _deps\googletest-src\googletest\cmake\gtest.pc.in _deps\googletest-src\googletest\cmake\gtest_main.pc.in _deps\googletest-src\googletest\cmake\internal_utils.cmake _deps\obj-cpp-src\CMakeLists.txt _deps\rio-src\CMakeLists.txt _deps\rio-src\test\CMakeLists.txt _deps\uuid-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\yaml-cpp-config-version.cmake.in _deps\yaml-cpp-src\yaml-cpp-config.cmake.in
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\dson\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\jobs\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt ..\..\..\include\drako\vm\CMakeLists.txt C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeDependentOption.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent\CMakeLists.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGit.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPythonInterp.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindThreads.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GoogleTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.20.21032501-MSVC_2\CMakeCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeSystem.cmake _deps\glm-src\CMakeLists.txt _deps\glm-src\glm\CMakeLists.txt _deps\googletest-src\CMakeLists.txt _deps\googletest-src\googlemock\CMakeLists.txt _deps\googletest-src\googlemock\cmake\gmock.pc.in _deps\googletest-src\googlemock\cmake\gmock_main.pc.in _deps\googletest-src\googletest\CMakeLists.txt _deps\googletest-src\googletest\cmake\Config.cmake.in _deps\googletest-src\googletest\cmake\gtest.pc.in _deps\googletest-src\googletest\cmake\gtest_main.pc.in _deps\googletest-src\googletest\cmake\internal_utils.cmake _deps\obj-cpp-src\CMakeLists.txt _deps\uuid-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\yaml-cpp-config-version.cmake.in _deps\yaml-cpp-src\yaml-cpp-config.cmake.in: phony
+build ..\..\..\CMakeLists.txt ..\..\..\include\drako\audio\CMakeLists.txt ..\..\..\include\drako\concurrency\CMakeLists.txt ..\..\..\include\drako\core\CMakeLists.txt ..\..\..\include\drako\core\drako_api_defs.hpp ..\..\..\include\drako\devel\CMakeLists.txt ..\..\..\include\drako\engine\CMakeLists.txt ..\..\..\include\drako\file_formats\CMakeLists.txt ..\..\..\include\drako\file_formats\dson\CMakeLists.txt ..\..\..\include\drako\file_formats\png\CMakeLists.txt ..\..\..\include\drako\file_formats\wave\CMakeLists.txt ..\..\..\include\drako\graphics\CMakeLists.txt ..\..\..\include\drako\input\CMakeLists.txt ..\..\..\include\drako\jobs\CMakeLists.txt ..\..\..\include\drako\physics\CMakeLists.txt ..\..\..\include\drako\system\CMakeLists.txt ..\..\..\include\drako\vm\CMakeLists.txt C$:\Users\edo18\source\repos\EdoardoGrassi\Draco\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeDependentOption.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckCXXSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckIncludeFile.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\CheckLibraryExists.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FetchContent\CMakeLists.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindGit.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPackageMessage.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindPythonInterp.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindThreads.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\FindVulkan.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\GoogleTest.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckCompilerFlag.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.20.21032501-MSVC_2\CMakeCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.20.21032501-MSVC_2\CMakeSystem.cmake _deps\glm-src\CMakeLists.txt _deps\glm-src\glm\CMakeLists.txt _deps\googletest-src\CMakeLists.txt _deps\googletest-src\googlemock\CMakeLists.txt _deps\googletest-src\googlemock\cmake\gmock.pc.in _deps\googletest-src\googlemock\cmake\gmock_main.pc.in _deps\googletest-src\googletest\CMakeLists.txt _deps\googletest-src\googletest\cmake\Config.cmake.in _deps\googletest-src\googletest\cmake\gtest.pc.in _deps\googletest-src\googletest\cmake\gtest_main.pc.in _deps\googletest-src\googletest\cmake\internal_utils.cmake _deps\obj-cpp-src\CMakeLists.txt _deps\rio-src\CMakeLists.txt _deps\rio-src\test\CMakeLists.txt _deps\uuid-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\CMakeLists.txt _deps\yaml-cpp-src\yaml-cpp-config-version.cmake.in _deps\yaml-cpp-src\yaml-cpp-config.cmake.in: phony
 
 
 #############################################

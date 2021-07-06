@@ -6,7 +6,7 @@
 #include "drako/file_formats/dson/dson.hpp"
 #include "drako/input/device_system_types.hpp"
 
-#include <yaml-cpp/yaml.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include <array>
 #include <bitset>

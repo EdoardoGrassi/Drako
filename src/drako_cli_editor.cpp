@@ -1,19 +1,17 @@
 #include "drako/core/compiler.hpp"
-#include "drako/devel/build_utils.hpp"
-#include "drako/devel/mesh_importers.hpp"
 #include "drako/devel/project_utils.hpp"
-#include "drako/graphics/mesh_types.hpp"
-#include "drako/graphics/mesh_utils.hpp"
 
+#include <cassert>
 #include <filesystem>
-#include <fstream>
 #include <functional>
-#include <iostream> // std::cout, std::cerr, std::clog
+#include <iostream>
+#include <map>
+#include <regex>
+#include <span>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-
+using namespace drako;
 namespace _fs = std::filesystem;
 
 const auto PROGRAM_HEADER = "[DRAKO] Project manager console"
@@ -24,108 +22,83 @@ const auto PROGRAM_HELPER = "Usage: [COMMAND] [ARGS]...\n"
                             "\tcreate <name> <where>\t\tCreate a new project <name> located at <where>.\n";
 
 
-struct _tokenize_line_result
+
+[[nodiscard]] std::vector<std::string> tokenize(const std::string_view line)
 {
-    std::string_view              command;
-    std::vector<std::string_view> args;
-};
-
-[[nodiscard]] _tokenize_line_result lex_cmd_line(const std::string_view line)
-{
-    std::vector<std::string_view> tokens;
-
-    const auto begin = std::cbegin(line);
-    const auto end   = std::cend(line);
-
-    for (auto c = 0; c < std::size(line);)
-    {
-        const auto token_begin = line.find_first_not_of(' ', c);
-        const auto token_end   = line.find_first_not_of(' ', token_begin);
-
-        tokens.push_back(line.substr(token_begin, token_end - token_begin));
-        c = token_end + 1;
-    }
-    if (std::empty(tokens))
-        throw std::runtime_error("Empty command line");
-
-    _tokenize_line_result result;
-    result.command = tokens.front();
-    result.args    = std::vector<std::string_view>(std::next(tokens.begin()), tokens.end());
-    return result;
+    const std::regex               re{ "\\s+" };
+    const std::vector<std::string> tokens = {
+        std::regex_token_iterator(std::cbegin(line), std::cend(line), re, -1),
+        {}
+    };
+    return tokens;
 }
 
-struct CmdArgs
+
+using CmdArgs = std::span<const std::string>;
+
+struct CmdContext
 {
-    std::vector<std::string_view> args;
+    std::unique_ptr<editor::ProjectContext> project;
 };
 
-void cli_exit(const CmdArgs params)
+using CmdFunction = std::function<void(const CmdArgs&, CmdContext&)>;
+
+/// @brief Command for the CLI editor.
+struct Command
+{
+    std::string              name;
+    std::string              info;
+    std::vector<std::string> args;
+    CmdFunction              call;
+};
+
+
+void cli_exit(const CmdArgs&, const CmdContext&)
 {
     std::exit(EXIT_SUCCESS);
 }
 
-void cli_create_project(const CmdArgs params)
+void cli_create_project(const CmdArgs& a, CmdContext& c)
 {
     using namespace drako::editor;
 
-    const auto& name  = params.args[0];
-    const auto& where = params.args[1];
+    if (std::size(a) != 1)
+        throw std::runtime_error{ "Invalid arguments" };
 
-    const ProjectContext ctx{ where };
-    std::cout << "Creating project " << name << " at " << where << '\n';
-    try
-    {
-        create_project_tree(ctx, where);
-        std::cout << "Project created\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "Error: " << e.what() << '\n';
-        std::cout << "Project creation failed\n";
-    }
+    //const auto& name = a[0];
+    const auto& root = a[0];
+
+    std::cout << "Creating new project at " << root << '\n';
+
+    if (!_fs::create_directories(root))
+        throw std::runtime_error{ "Directory does not exist" };
+    c.project = std::make_unique<ProjectContext>(root);
+
+    std::cout << "root:" << c.project->root() << '\n';
 }
 
-void cli_open_project(const std::filesystem::path& dir)
+void cli_open_project(const CmdArgs& a, CmdContext& c)
 {
     using namespace drako::editor;
 
-    const ProjectContext ctx{ dir };
-    try
-    {
-        ProjectManifest proj_info;
-        std::cout << "Name: " << proj_info.name << '\n';
+    if (std::size(a) != 1)
+        throw std::runtime_error{ "Invalid arguments" };
 
-        ProjectDatabase db{ ctx };
-        //load_all_assets(ctx, db);
-        //std::cout << "Located assets count: " << std::size(db.assets.ids) << '\n';
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "Error: " << e.what() << '\n';
-    }
+    const auto& root = a[0];
+    std::cout << "Opening project at " << root << '\n';
 
-    /*
-    for (std::string input;;)
-    {
-        std::cin >> input;
-        try
-        {
-            const auto [cmd, args] = _tokenize_command_line(input);
-            if (const auto it = commands.find(cmd); it != std::cend(commands))
-            {
-                std::invoke(it->second, CmdArgs{ args });
-            }
-            else
-            {
-                std::cout << "Command " << cmd << " not found!\n";
-            }
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << e.what() << '\n';
-        }
-    }
-    */
+    if (!_fs::exists(root))
+        throw std::runtime_error{ "Directory does not exist" };
+    c.project = std::make_unique<ProjectContext>(root);
+
+    std::cout << "root:" << c.project->root() << '\n';
+}
+
+void cli_import_asset(const CmdArgs& args, const CmdContext& ctx)
+{
+    const auto& file = args[0];
+    const auto  id   = ctx.project->import(file);
+    std::cout << "Imported file with ID " << id.string();
 }
 
 void cli_scan_assets(const std::filesystem::path& dir)
@@ -148,43 +121,92 @@ void cli_scan_assets(const std::filesystem::path& dir)
     std::cout << "# errors:\n";
     for (const auto& e : scan.errors)
         std::cout << "path: " << e.asset << '\n'
-                  << "info: " << e.message << '\n\n';
+                  << "info: " << e.message << "\n\n";
 }
 
 
 int main(const int argc, const char* argv[])
 {
-    using CmdFunction = std::function<void(const CmdArgs)>;
+    using namespace drako;
 
-    /*
-    const std::unordered_map<std::string_view, drako::editor::asset_import_function> importers{
-        { ".obj", drako::editor::import_obj_file }
+    const std::vector<Command> commands = {
+        {
+            .name = "create",
+            .info = "create a new project",
+            .args = { "path-to-dir" },
+            .call = cli_create_project,
+        },
+        {
+            .name = "exit",
+            .info = "close the editor",
+            .args = {},
+            .call = cli_exit,
+        },
+        {
+            .name = "import",
+            .info = "import an asset in the project",
+            .args = { "path-to-file" },
+            .call = cli_import_asset,
+        },
+        {
+            .name = "open",
+            .info = "open an existing project",
+            .args = { "path-to-dir" },
+            .call = cli_open_project,
+        },
     };
-    */
 
-    const std::unordered_map<std::string_view, CmdFunction> commands = {
-        { "create", cli_create_project }
-    };
-
-    if (argc == 1)
-    {
-        std::cout << PROGRAM_HEADER << '\n';
-        std::exit(EXIT_SUCCESS);
-    }
-
+    std::cout << PROGRAM_HEADER << "\n\n";
     if (argc == 2 && argv[1] == "--help")
     { // print program help
-        std::cout << PROGRAM_HELPER << '\n';
+        std::cout << PROGRAM_HELPER << "\n\n";
         std::exit(EXIT_SUCCESS);
     }
 
-    if (argc == 4 && argv[1] == "create")
+    std::cout << "commands:\n\n";
+    for (const auto& c : commands)
     {
-        cli_create_project({ .args = { argv[2], argv[3] } });
+        std::cout << "cmd: " << c.name;
+        for (const auto& a : c.args)
+            std::cout << " <" << a << '>';
+        std::cout << '\n';
+        std::cout << '\"' << c.info << "\"\n\n";
     }
 
-    if (argc == 3 && argv[1] == "open")
+    std::map<std::string_view, CmdFunction> mappings{};
+    for (const auto& c : commands)
+        mappings[c.name] = c.call;
+
+    //std::unique_ptr<editor::ProjectContext> project;
+    CmdContext context;
+    for (std::string line; std::getline(std::cin, line);)
     {
-        cli_open_project(argv[2]);
+        const std::vector<std::string> tokens = tokenize(line);
+        //for (std::string s; std::cin >> s;)
+        //    tokens.push_back(s);
+
+        if (std::empty(tokens))
+            continue;
+
+        const auto& cmd = tokens.front();
+        if (cmd == "exit")
+            break;
+
+        try
+        {
+            if (const auto it = mappings.find(cmd); it != std::cend(mappings))
+            {
+                const CmdArgs args{ std::next(std::cbegin(tokens)), std::cend(tokens) };
+                std::invoke(it->second, args, context);
+            }
+            else
+            {
+                std::cout << "Command " << cmd << " not found!\n";
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "Error: " << e.what() << '\n';
+        }
     }
 }

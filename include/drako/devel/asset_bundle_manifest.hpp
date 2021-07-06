@@ -42,6 +42,11 @@ namespace drako
 
     class AssetBundleManifest
     {
+        static_assert(std::is_trivially_copyable_v<AssetID>,
+            "Required for direct serialization in memory.");
+        static_assert(std::is_trivially_copyable_v<AssetLoadInfo>,
+            "Required for direct serialization in memory.");
+
     public:
         explicit AssetBundleManifest() = default;
         explicit AssetBundleManifest(std::span<const std::byte> data);
@@ -49,56 +54,57 @@ namespace drako
         //AssetBundleManifest(const AssetBundleManifest&) = delete;
         //AssetBundleManifest& operator=(const AssetBundleManifest&) = delete;
 
-        friend std::istream& operator>>(std::istream& is, AssetBundleManifest& a);
+        friend std::istream& operator>>(std::istream&, AssetBundleManifest&);
         friend std::ostream& operator<<(std::ostream&, const AssetBundleManifest&);
+
+        std::vector<AssetID>       ids;
+        std::vector<AssetLoadInfo> infos;
 
     private:
         /// @brief Header section of an asset manifest
         struct Header
         {
             Version       version = current_api_version();
-            std::uint32_t crc;
+            //std::uint32_t crc;
             std::uint32_t items_count;
         };
         static_assert(std::is_trivially_copyable_v<Header>,
             "Required for direct serialization in memory.");
 
-
-        Header                    _header;
-        std::vector<AssetID>       _ids;
-        std::vector<AssetLoadInfo> _infos;
+        //Header _header;
     };
-    static_assert(std::is_trivially_copyable_v<AssetID>,
-        "Required for direct serialization in memory.");
-    static_assert(std::is_trivially_copyable_v<AssetLoadInfo>,
-        "Required for direct serialization in memory.");
 
 
     inline std::istream& operator>>(std::istream& is, AssetBundleManifest& a)
     {
-        is.read(reinterpret_cast<char*>(&a._header), sizeof(a._header));
+        AssetBundleManifest::Header header;
+        is.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-        a._ids.resize(a._header.items_count);
-        is.read(reinterpret_cast<char*>(std::data(a._ids)), std::size(a._ids) * sizeof(AssetID));
+        a.ids.resize(header.items_count);
+        is.read(reinterpret_cast<char*>(std::data(a.ids)), std::size(a.ids) * sizeof(AssetID));
 
-        a._infos.resize(a._header.items_count);
-        is.read(reinterpret_cast<char*>(std::data(a._infos)), std::size(a._infos) * sizeof(AssetLoadInfo));
+        a.infos.resize(header.items_count);
+        is.read(reinterpret_cast<char*>(std::data(a.infos)), std::size(a.infos) * sizeof(AssetLoadInfo));
+        return is;
     }
 
     std::ostream& operator<<(std::ostream& os, const AssetBundleManifest& a)
     {
+        AssetBundleManifest::Header header;
+        header.items_count = std::size(a.ids);
         {
-            const auto bytes = std::as_bytes(std::span{ &a._header, 1 });
+            const auto bytes = std::as_bytes(std::span{ &header, 1 });
             os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
         }
         {
-            const auto bytes = std::as_bytes(std::span{ a._ids });
+            const auto bytes = std::as_bytes(std::span{ a.ids });
             os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
         }
         {
-            const auto bytes = std::as_bytes(std::span{ a._infos });
+            const auto bytes = std::as_bytes(std::span{ a.infos });
             os.write(reinterpret_cast<const char*>(std::data(bytes)), std::size(bytes));
         }
+        return os;
     }
 
 

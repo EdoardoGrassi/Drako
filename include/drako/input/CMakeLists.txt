@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 add_library(device-system STATIC)
 if(WIN32)
     target_sources(device-system PRIVATE "src/device_system_win32.cpp")
@@ -22,7 +18,10 @@ add_library(drako::devices ALIAS device-system)
 add_library(input-system STATIC
     "src/input_system.cpp"
     "src/input_system_types.cpp")
-target_link_libraries(input-system PRIVATE drako::devices)
+target_link_libraries(input-system
+    PRIVATE drako::devices
+    PUBLIC yaml-cpp
+)
 add_library(drako::input ALIAS input-system)
 
 

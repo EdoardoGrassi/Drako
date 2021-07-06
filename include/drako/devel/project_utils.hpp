@@ -13,28 +13,7 @@
 
 namespace drako::editor
 {
-    /// @brief Serialize project metadata,
-    //void save(const std::filesystem::path&, const ProjectMetaInfo&);
-
-    /// @brief Deserialize project metadata.
-    //void load(const std::filesystem::path&, ProjectMetaInfo&);
-    //void load(const std::filesystem::path&, std::size_t, ProjectMetaInfo&);
-
-    /// @brief Serialize project data.
-    //void save(const std::filesystem::path&, const ProjectDatabase&);
-
-    /// @brief Deserialize project data.
-    //void load(const std::filesystem::path&, ProjectDatabase&);
-
-    /// @brief Serialize asset metadata.
-    //void save(const std::filesystem::path&, const AssetImportInfo&);
-
-    /// @brief Deserialize asset metadata.
-    //void load(const std::filesystem::path&, AssetImportInfo&);
-    //void load(const std::filesystem::path&, std::size_t, AssetImportInfo&);
-
-
-    inline void load_by_path(const std::filesystem::path& file, AssetImportInfo& info)
+    /*inline void load_by_path(const std::filesystem::path& file, AssetImportInfo& info)
     {
         std::ifstream ifs{ file };
         dson::DOM     dom{};
@@ -48,10 +27,7 @@ namespace drako::editor
         dson::DOM     dom{};
         dom << info;
         ofs << dom;
-    }
-
-
-    //void load_asset_index_cache(const Project& p);
+    }*/
 
 
     /// @brief Creates the filesystem tree for a new project.
@@ -71,6 +47,10 @@ namespace drako::editor
     //void import_asset(const ProjectContext& ctx, const Uuid&);
 
     //void load_all_assets(const ProjectContext& ctx, ProjectDatabase& db);
+
+    //void compile_as_native(const ProjectContext& ctx, );
+
+    void import(const ProjectContext& ctx, const AssetImportInfo& info);
 
 } // namespace drako::editor
 

@@ -7,7 +7,7 @@
 
 namespace drako
 {
-    [[nodiscard]] AssetManifestRecord build_asset_descriptor(const Uuid& id);
+    //[[nodiscard]] AssetManifestRecord build_asset_descriptor(const Uuid& id);
 
     //[[nodiscard]] std::variant<asset_manifest, build_error>
     //build_asset_manifest(const fs::path& build_folder);

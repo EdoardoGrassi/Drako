@@ -4,7 +4,6 @@
 
 #include "drako/core/platform.hpp"
 #include "drako/core/typed_handle.hpp"
-#include "drako/devel/logging.hpp"
 #include "drako/input/device_system_types.hpp"
 
 #if defined(DRAKO_PLT_WIN32)

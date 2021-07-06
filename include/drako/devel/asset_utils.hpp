@@ -27,7 +27,7 @@ namespace drako
     */
 
 
-
+    /*
     void write_bundle_metadata(const std::filesystem::path& dst);
 
     [[nodiscard]] inline std::vector<AssetBundleID>
@@ -49,6 +49,7 @@ namespace drako
 
         return result;
     }
+    */
 
     /*
     [[nodiscard]] std::tuple<bool, std::size_t> find_asset_index(const asset_bundle& b, asset_id a)
