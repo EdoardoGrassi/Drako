@@ -17,7 +17,27 @@
 
 namespace drako
 {
-    class AsyncReaderPool
+    class AsyncReaderPoolInterface
+    {
+    public:
+        struct Request
+        {
+            /// @brief Source open handle of the file
+            rio::Handle src;
+
+            /// @brief Destination memory buffer
+            std::span<std::byte> dst;
+
+            /// @brief Bytes offset from the start of the file
+            std::size_t offset;
+        };
+
+        virtual bool submit(const Request*) noexcept;
+        virtual bool retrive(Request*) noexcept;
+    };
+
+
+    class AsyncReaderPool : AsyncReaderPoolInterface
     {
     public:
         struct Args
@@ -32,13 +52,6 @@ namespace drako
             std::size_t output_queue_size;
         };
 
-        struct Request
-        {
-            rio::Handle           src;
-            std::span<std::byte> dst;
-            std::size_t          offset;
-        };
-
         explicit AsyncReaderPool(const Args& args) //std::size_t workers, std::size_t capacity)
         {
             assert(args.workers > 0);
@@ -46,16 +59,17 @@ namespace drako
             assert(args.output_queue_size > 0);
 
             for (auto i = 0; i < args.workers; ++i)
-                _submit.emplace_back(args.submit_queue_size);
+                _submit_queues.emplace_back(args.submit_queue_size);
 
             for (auto i = 0; i < args.workers; ++i)
-                _output.emplace_back(args.output_queue_size);
+                _output_queues.emplace_back(args.output_queue_size);
 
             // create background threads
             _workers.reserve(args.workers);
             for (auto i = 0; i < args.workers; ++i)
                 _workers.push_back(std::thread{
-                    _run, std::ref(_done), std::ref(_submit[i]), std::ref(_output[i]) });
+                    _run, std::ref(_done),
+                    std::ref(_submit_queues[i]), std::ref(_output_queues[i]) });
         }
 
         ~AsyncReaderPool() noexcept
@@ -85,20 +99,22 @@ namespace drako
         }
         */
 
-        [[nodiscard]] bool submit(std::size_t worker, const Request* r)
+        [[nodiscard]] bool submit(const Request* r) noexcept
         {
-            assert(worker < std::size(_workers)); // invalid worker index
-
-            return _submit[worker].push(r);
+            //static thread_local std::size_t worker = 0; 
+            //return _submit(worker++ % std::size(_workers), r);
+            return _submit(0, r);
         }
 
-        [[nodiscard]] bool retrive(std::size_t worker, Request* r)
+        [[nodiscard]] bool retrieve(Request* r) noexcept
         {
+            //static thread_local std::size_t worker = 0;
+            //return _retrive(worker++ % std::size(_workers), r);
+            return _retrive(0, r);
         }
+
 
     private:
-        using _handle = rio::Handle;
-
         /*
         struct _packet
         {
@@ -122,8 +138,8 @@ namespace drako
 
         using _queue = drako::lockfree::RingBuffer<const Request*>;
 
-        StaticVector<_queue, 4>  _submit;
-        StaticVector<_queue, 4>  _output;
+        StaticVector<_queue, 4>  _submit_queues;
+        StaticVector<_queue, 4>  _output_queues;
         std::vector<std::thread> _workers;
         std::atomic_flag         _done; // since c++20 is initialized to clear state
 
@@ -147,6 +163,29 @@ namespace drako
                 std::this_thread::yield();
             }
         }
+
+        [[nodiscard]] bool _submit(const std::size_t worker, const Request* r)
+        {
+            assert(worker < std::size(_workers));
+            assert(r);
+
+            return _submit_queues[worker].push(r);
+        }
+
+        [[nodiscard]] bool _retrive(const std::size_t worker, const Request* r)
+        {
+            assert(worker < std::size(_workers));
+            assert(r);
+
+            if (auto result = _output_queues[worker].pop(); result)
+                *r = *result.value();
+        }
+    };
+
+
+    /// @brief Mock class for testing without actual I/O operations
+    class AsyncReaderPoolMock : AsyncReaderPoolInterface
+    {
     };
 
 } // namespace drako

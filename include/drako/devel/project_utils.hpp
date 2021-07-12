@@ -2,7 +2,8 @@
 #ifndef DRAKO_PROJECT_UTILS_HPP
 #define DRAKO_PROJECT_UTILS_HPP
 
-#include "drako/devel/project_types.hpp"
+//#include "drako/devel/project_types.hpp"
+#include "drako/devel/asset_types.hpp"
 
 #include <uuid-cpp/uuid.hpp>
 
@@ -30,6 +31,21 @@ namespace drako::editor
     }*/
 
 
+    // Retrive an asset metafile path from its guid.
+    [[nodiscard]] inline std::filesystem::path guid_to_metafile(const AssetID& id)
+    {
+        assert(id);
+        return to_string(id) + ".dkmeta";
+    }
+
+    // Retrive an asset datafile path from its guid.
+    [[nodiscard]] inline std::filesystem::path guid_to_datafile(const AssetID& id)
+    {
+        assert(id);
+        return to_string(id) + ".dkdata";
+    }
+
+
     /// @brief Creates the filesystem tree for a new project.
     ///
     /// Generates the project structure on the filesystem,
@@ -38,7 +54,7 @@ namespace drako::editor
     /// @param[in] ctx  Project context.
     /// @param[in] name Name of the project.
     ///
-    void create_project_tree(const ProjectContext& ctx, std::string_view name);
+    //void create_project_tree(const ProjectContext& ctx, std::string_view name);
 
     /// @brief Create and import a new asset.
     //void create_asset(const ProjectContext&, ProjectDatabase&, const std::filesystem::path&, const AssetImportInfo&);
@@ -50,7 +66,7 @@ namespace drako::editor
 
     //void compile_as_native(const ProjectContext& ctx, );
 
-    void import(const ProjectContext& ctx, const AssetImportInfo& info);
+    //void import(const ProjectContext& ctx, const AssetImportInfo& info);
 
 } // namespace drako::editor
 

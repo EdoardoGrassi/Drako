@@ -1,0 +1,3 @@
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-subbuild/CMakeFiles/obj-cpp-populate.dir
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-subbuild/CMakeFiles/edit_cache.dir
+C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-subbuild/CMakeFiles/rebuild_cache.dir

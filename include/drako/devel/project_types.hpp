@@ -11,22 +11,12 @@
 
 #include <filesystem>
 #include <fstream>
-#include <iosfwd>
 #include <string>
 #include <unordered_map>
 
 
 namespace drako::editor
 {
-    const std::filesystem::path project_asset_dir{ "/assets" };
-    const std::filesystem::path project_cache_dir{ "/cache" };
-    const std::filesystem::path project_meta_dir{ "/meta" };
-
-    //
-    // Main project file located at the root of the project tree.
-    //
-    const std::filesystem::path project_config_file = "project_config.drako.proj";
-
     /// @brief Metadata of a project.
     struct ProjectManifest
     {
@@ -107,10 +97,10 @@ namespace drako::editor
         [[nodiscard]] std::filesystem::path meta_directory() const { return _root / "meta"; }
 
         /// @brief Map an asset id to the corresponding datafile path.
-        [[nodiscard]] std::filesystem::path guid_to_datafile(const uuid::Uuid&) const;
+        [[nodiscard]] std::filesystem::path guid_to_datafile(const AssetID&) const;
 
         /// @brief Map an asset id to the corresponding metafile path.
-        [[nodiscard]] std::filesystem::path guid_to_metafile(const uuid::Uuid&) const;
+        [[nodiscard]] std::filesystem::path guid_to_metafile(const AssetID&) const;
 
         /// @brief Generates a new UUID.
         [[nodiscard]] uuid::Uuid generate_asset_uuid() const noexcept { return _engine(); }

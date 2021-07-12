@@ -8,13 +8,13 @@ FetchContent_Declare(
     obj-cpp
     GIT_REPOSITORY https://github.com/EdoardoGrassi/obj-cpp.git
 )
-set(OBJCPP_BUILD_TESTS OFF)
+set(OBJCPP_BUILD_TESTS OFF CACHE BOOL "exclude tests")
 
 FetchContent_Declare(
     uuid-cpp
     GIT_REPOSITORY https://github.com/EdoardoGrassi/uuid-cpp.git
 )
-set(UUID_BUILD_TESTS OFF)
+set(UUID_CPP_BUILD_TESTS OFF CACHE BOOL "exclude tests")
 
 FetchContent_MakeAvailable(obj-cpp uuid-cpp)
 
@@ -30,16 +30,22 @@ target_link_libraries(drako-devel
 add_library(drako::devel ALIAS drako-devel)
 
 # vvv test executables vvv
-#find_package(GTest)
 
-add_executable(crc32_test "test/crc32_tests.cpp")
-target_link_libraries(crc32_test PRIVATE drako::devel gtest_main)
-#gtest_discover_tests(crc32_test)
+find_package(GTest)
+add_executable(drako-devel-tests
+    "test/crc32_tests.cpp"
+    "test/project_utils_test.cpp"
+    "test/asset_tests.cpp"
+)
+target_link_libraries(drako-devel-tests PRIVATE drako::devel gtest_main)
+gtest_discover_tests(drako-devel-tests)
 
-add_executable(project_utils_test "test/project_utils_test.cpp")
-target_link_libraries(project_utils_test PRIVATE drako::devel gtest_main)
+#target_link_libraries(crc32_test PRIVATE drako::devel gtest_main)
+
+#add_executable(project_utils_test )
+#target_link_libraries(project_utils_test PRIVATE drako::devel gtest_main)
 #gtest_discover_tests(project_utils_test)
 
-add_executable(asset_tests "test/asset_tests.cpp")
-target_link_libraries(asset_tests PRIVATE drako::devel gtest_main)
+#add_executable(asset_tests )
+#target_link_libraries(asset_tests PRIVATE drako::devel gtest_main)
 #gtest_discover_tests(asset_tests)

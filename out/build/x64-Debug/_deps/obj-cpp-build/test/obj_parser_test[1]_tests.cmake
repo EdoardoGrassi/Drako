@@ -1,0 +1,7 @@
+add_test( Parser.Comments C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test/obj_parser_test.exe [==[--gtest_filter=Parser.Comments]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Parser.Comments PROPERTIES WORKING_DIRECTORY C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( Parser.Vertices C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test/obj_parser_test.exe [==[--gtest_filter=Parser.Vertices]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Parser.Vertices PROPERTIES WORKING_DIRECTORY C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( Parser.Normals C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test/obj_parser_test.exe [==[--gtest_filter=Parser.Normals]==] --gtest_also_run_disabled_tests)
+set_tests_properties( Parser.Normals PROPERTIES WORKING_DIRECTORY C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/_deps/obj-cpp-build/test SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set( obj_parser_test_TESTS Parser.Comments Parser.Vertices Parser.Normals)

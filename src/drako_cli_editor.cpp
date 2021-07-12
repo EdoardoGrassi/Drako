@@ -1,4 +1,5 @@
 #include "drako/core/compiler.hpp"
+#include "drako/devel/project_types.hpp"
 #include "drako/devel/project_utils.hpp"
 
 #include <cassert>

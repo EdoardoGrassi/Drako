@@ -11,13 +11,11 @@
 #include <atomic>
 #include <cassert>
 
-#define QUEUE_SIZE 100
-
 namespace drako::lockfree
 {
     /// @brief Thread-safe lockfree queue
     template <typename T>
-    class array_queue final
+    class array_queue
     {
     public:
         explicit array_queue(const std::size_t count) noexcept;

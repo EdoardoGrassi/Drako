@@ -2,8 +2,9 @@
 
 #include "drako/devel/asset_bundle_manifest.hpp"
 #include "drako/devel/mesh_importers.hpp"
-//#include "drako/file_formats/dson/dson.hpp"
+#include "drako/devel/project_utils.hpp"
 
+#include <uuid-cpp/uuid.hpp>
 #include <yaml-cpp/yaml.h>
 
 #include <exception>
@@ -100,15 +101,15 @@ namespace drako::editor
 
 
     // Retrive an asset metafile path from its guid.
-    [[nodiscard]] _fs::path ProjectContext::guid_to_metafile(const uuid::Uuid& id) const
+    [[nodiscard]] _fs::path ProjectContext::guid_to_metafile(const AssetID& id) const
     {
-        return meta_directory() / (to_string(id) + ".dkmeta");
+        return meta_directory() / editor::guid_to_metafile(id);
     }
 
     // Retrive an asset datafile path from its guid.
-    [[nodiscard]] _fs::path ProjectContext::guid_to_datafile(const uuid::Uuid& id) const
+    [[nodiscard]] _fs::path ProjectContext::guid_to_datafile(const AssetID& id) const
     {
-        return cache_directory() / (to_string(id) + ".dkdata");
+        return cache_directory() / editor::guid_to_datafile(id);
     }
 
     uuid::Uuid ProjectContext::import(const _fs::path& asset)

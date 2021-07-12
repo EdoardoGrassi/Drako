@@ -1,14 +1,14 @@
 #include "drako/io/async_reader_pool.hpp"
 #include "drako/io/output_file_handle.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <rio/input_file_handle.hpp>
 
 #include <filesystem>
 #include <fstream>
 #include <string>
 #include <thread>
 
-using namespace drako::io;
 using namespace std::chrono_literals;
 
 GTEST_TEST(AsyncReaderPool, ConcurrentExecution)

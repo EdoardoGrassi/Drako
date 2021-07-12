@@ -9,10 +9,12 @@ FetchContent_Declare(
 set(RIO_BUILD_TESTS OFF CACHE BOOL "not include tests")
 FetchContent_MakeAvailable(rio)
 
+find_package(OpenMP REQUIRED)
+
 add_library(drako-runtime STATIC
     "src/asset_system.cpp"
 )
-target_link_libraries(drako-runtime PRIVATE glm drako::devel rio)
+target_link_libraries(drako-runtime PRIVATE glm drako::devel rio OpenMP::OpenMP_CXX)
 add_library(drako::runtime ALIAS drako-runtime)
 
 #[[

@@ -88,7 +88,7 @@ namespace drako
         return is;
     }
 
-    std::ostream& operator<<(std::ostream& os, const AssetBundleManifest& a)
+    inline std::ostream& operator<<(std::ostream& os, const AssetBundleManifest& a)
     {
         AssetBundleManifest::Header header;
         header.items_count = std::size(a.ids);

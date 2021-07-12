@@ -114,11 +114,6 @@ namespace drako::editor
         }
     }*/
 
-    void save(const ProjectContext& ctx, const ProjectDatabase& p)
-    {
-        throw std::runtime_error{ "Not implemented yet!" };
-    }
-
     // build_error build_devel_project(const ProjectManifest& p);
 
 } // namespace drako::editor

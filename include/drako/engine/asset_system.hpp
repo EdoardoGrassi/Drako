@@ -1,20 +1,20 @@
 #pragma once
 #ifndef DRAKO_ASSET_SYSTEM_HPP
-#define DRAKO_ASSET_SYSTEM_HPP
+#    define DRAKO_ASSET_SYSTEM_HPP
 
-#include "drako/concurrency/async_reader_pool.hpp"
-#include "drako/concurrency/lockfree_ringbuffer.hpp"
-#include "drako/core/memory/unsync_pool_allocator.hpp"
-#include "drako/devel/asset_types.hpp"
-#include "drako/devel/asset_utils.hpp"
-#include "drako/graphics/mesh_types.hpp"
+#    include "drako/concurrency/async_reader_pool.hpp"
+#    include "drako/concurrency/lockfree_ringbuffer.hpp"
+#    include "drako/core/memory/unsync_pool_allocator.hpp"
+#    include "drako/devel/asset_types.hpp"
+#    include "drako/devel/asset_utils.hpp"
+#    include "drako/graphics/mesh_types.hpp"
 
-#include <rio/input_file_handle.hpp>
+#    include <rio/input_file_handle.hpp>
 
-#include <cassert>
-#include <filesystem>
-#include <functional>
-#include <vector>
+#    include <cassert>
+#    include <filesystem>
+#    include <functional>
+#    include <vector>
 
 namespace drako::engine
 {
@@ -37,11 +37,14 @@ namespace drako::engine
 
         struct ConfigArgs
         {
-            /// @brief Directory where asset bundles manifests are located.
-            std::filesystem::path bundle_manifest_directory;
+            /// @brief Directory where asset data files are located.
+            std::filesystem::path asset_data_directory;
 
             /// @brief Directory where asset bundles data archives are located.
             std::filesystem::path bundle_data_directory;
+
+            /// @brief Directory where asset bundles manifests are located.
+            std::filesystem::path bundle_meta_directory;
         };
 
         //using bundle_loaded_callback = void(*)();
@@ -70,8 +73,9 @@ namespace drako::engine
         //void unload_asset(std::span<const AssetID>) noexcept;
 
         /// @brief Executes pending asynchronous requests.
-        void update() noexcept;
+        void update();
 
+#    if !defined(DRAKO_RUNTIME_ONLY)
         /// @brief Prints a table of currently registered bundles.
         void debug_print_registered_bundles();
 
@@ -81,14 +85,19 @@ namespace drako::engine
         /// @brief Print a table of loaded assets.
         void debug_print_assets();
 
+        /// @brief Asserts whether some assets are currently loaded
+        [[nodiscard]] bool debug_check_asset_loaded(std::span<const AssetID>) noexcept;
+
+        /// @brief Asserts whether some bundles are currently loaded
+        [[nodiscard]] bool debug_check_bundle_loaded(std::span<const AssetBundleID>) noexcept;
+#    endif
+
     private:
-        using _aid        = AssetID;
-        using _bid        = AssetBundleID;
         using _request_id = std::uint32_t;
 
         const ConfigArgs _config;
 
-        AsyncReaderPool _io_service;
+        //AsyncReaderPool _io_service;
 
         // TODO: vvv those needs to be threadsafe vvv
         std::vector<AssetBundleID> _bundle_load_list; // load requests
@@ -96,8 +105,9 @@ namespace drako::engine
         // TODO: ^^^ those needs to be threadsafe ^^^
 
         // TODO: vvv those needs to be threadsafe vvv
-        std::vector<AssetID> _asset_load_list; // load requests
-        std::vector<AssetID> _asset_dump_list; // unload requests
+        std::vector<AssetID>          _asset_load_list; // load requests
+        std::vector<AssetID>          _asset_dump_list; // unload requests
+        std::vector<AssetLoadRequest> _asset_load_requests;
         // TODO: ^^^ those needs to be threadsafe ^^^
 
         struct _pending_bundle_request
@@ -108,8 +118,8 @@ namespace drako::engine
             std::uint32_t        refcount; // active references to the bundle
         };
 
-        std::vector<AssetBundleID>            _load_in_flight; // loading operation in flight
-        std::vector<_pending_bundle_request*> _load_requests;  // associated request
+        //std::vector<AssetBundleID>            _load_in_flight; // loading operation in flight
+        //std::vector<_pending_bundle_request*> _load_requests;  // associated request
 
         struct _pending_asset_request
         {
@@ -119,9 +129,21 @@ namespace drako::engine
             std::uint32_t        refcount;
         };
 
-        Pool<_pending_asset_request>  _asset_requests_pool;
-        Pool<_pending_bundle_request> _bundle_requests_pool; // local allocator for requests
+        struct _pending_assets_table
+        {
+            std::vector<AssetID>                ids;
+            std::vector<_pending_asset_request> requests;
+        } _pending_assets;
 
+        struct _batch_request_handle
+        {
+            std::function<void()>               callback;
+            std::uint32_t                       counter;
+            std::vector<_pending_asset_request> handles;
+        };
+
+        //Pool<_batch_request_handle>   _batch_handles_pool;   // local allocator
+        //Pool<_pending_bundle_request> _bundle_requests_pool; // local allocator for requests
 
         struct _available_bundles_table
         {
@@ -145,17 +167,26 @@ namespace drako::engine
             std::vector<std::uint16_t>                refcount;
         } _loaded_assets;
 
-        struct _find_result
+        struct _available_assets_table
         {
-            bool        found;
-            std::size_t index;
-        };
-        [[nodiscard]] _find_result _available_bundle_index(const _bid) noexcept;
-        [[nodiscard]] _find_result _loaded_asset_index(const _aid) noexcept;
-        [[nodiscard]] _find_result _loaded_bundle_index(const _bid) noexcept;
+            std::vector<AssetID>                      ids;
+            std::vector<std::unique_ptr<std::byte[]>> data;
+            std::vector<std::uint32_t>                refcount;
+            std::vector<AssetLoadInfo>                meta;
+        } _assets;
 
-        void _handle_bundle_requests() noexcept;
-        void _handle_asset_requests() noexcept;
+        void _handle_bundle_requests();
+        void _handle_asset_requests();
+
+        // check whether an asset is in memory
+        [[nodiscard]] bool _loaded(const AssetID) noexcept;
+
+        // check whether an asset is scheduled for a load operation
+        [[nodiscard]] bool _pending(const AssetID) noexcept;
+
+        void _inc_ref_count(const AssetID) noexcept;
+
+        void _dec_ref_count(const AssetID) noexcept;
     };
 
     /*
@@ -182,6 +213,14 @@ namespace drako::engine
     {
         assert(a);
         _asset_dump_list.push_back(a);
+    }
+
+    inline void AssetSystemRuntime::load_asset(const AssetLoadRequest& r) noexcept
+    {
+        for (const auto& a : r.assets)
+            assert(a);
+
+        _asset_load_requests.push_back(r);
     }
 
 } // namespace drako::engine

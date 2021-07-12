@@ -1,7 +1,9 @@
+#include "drako/devel/project_types.hpp"
 #include "drako/devel/project_utils.hpp"
 
-#include "uuid-cpp/uuid.hpp"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <uuid-cpp/uuid.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include <filesystem>
 #include <random>
@@ -12,6 +14,19 @@ namespace fs = std::filesystem;
 [[nodiscard]] fs::path temp_project_directory()
 {
     return fs::temp_directory_path() / ("drako_project_" + std::to_string(std::random_device()()));
+}
+
+GTEST_TEST(Project, AssetImportInfoSerialization)
+{
+    YAML::Node yaml{};
+
+    const AssetImportInfo before{};
+    yaml << before;
+
+    AssetImportInfo after{};
+    yaml >> after;
+
+    ASSERT_EQ(before, after);
 }
 
 /*
@@ -36,19 +51,6 @@ GTEST_TEST(ProjectDevel, AssetImportSerializationCycle)
     ASSERT_EQ(before, after);
 }
 */
-
-GTEST_TEST(Project, AssetImportInfoSerialization)
-{
-    YAML::Node yaml{};
-
-    const AssetImportInfo before{};
-    yaml << before;
-
-    AssetImportInfo after{};
-    yaml >> after;
-
-    ASSERT_EQ(before, after);
-}
 
 /*GTEST_TEST(ProjectDevel, AssetScan)
 {

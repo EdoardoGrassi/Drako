@@ -1,7 +1,9 @@
 #include "drako/engine/asset_system.hpp"
 
 #include "drako/devel/asset_bundle_manifest.hpp"
-#include "drako/devel/logging.hpp"
+#include "drako/devel/project_utils.hpp"
+
+#include <rio/input_file_handle.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -9,41 +11,45 @@
 
 namespace drako::engine
 {
-    [[nodiscard]] AssetSystemRuntime::_find_result
-    AssetSystemRuntime::_available_bundle_index(const _bid id) noexcept
+    // convert a list of IDs to a list of indices
+    [[nodiscard]] std::vector<std::size_t> _id_to_index(
+        const std::vector<AssetID>& table, const std::vector<AssetID>& assets)
     {
-        const auto& t = _available_bundles;
-        if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), id);
-            it != std::cend(t.ids))
-            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
-        else
-            return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
-    }
+        std::vector<std::size_t> indices;
+        indices.reserve(std::size(assets));
 
-    [[nodiscard]] AssetSystemRuntime::_find_result
-    AssetSystemRuntime::_loaded_asset_index(const _aid id) noexcept
-    {
-        const auto& t = _loaded_assets;
-        if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), id);
-            it != std::cend(t.ids))
-            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
-        else
-            return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
-    }
-
-    [[nodiscard]] AssetSystemRuntime::_find_result
-    AssetSystemRuntime::_loaded_bundle_index(const _bid b) noexcept
-    {
-        const auto& t = _loaded_bundles;
-        if (const auto it = std::find(std::cbegin(t.ids), std::cend(t.ids), b);
-            it != std::cend(t.ids))
-            return { true, static_cast<std::size_t>(std::distance(std::cbegin(t.ids), it)) };
-        else
-            return { false, std::numeric_limits<decltype(_find_result::index)>::max() };
+        for (const auto& a : assets)
+        {
+            const auto it = std::find(std::cbegin(table), std::cend(table), a);
+            assert(it != std::cend(table));
+            indices.push_back(std::distance(std::cbegin(table), it));
+        }
+        return indices;
     }
 
 
-    void AssetSystemRuntime::_handle_bundle_requests() noexcept
+    bool AssetSystemRuntime::_loaded(const AssetID id) noexcept
+    {
+        const auto& t = _loaded_assets.ids;
+        return std::find(std::cbegin(t), std::cend(t), id) != std::cend(t);
+    }
+
+    bool AssetSystemRuntime::_pending(const AssetID id) noexcept
+    {
+        const auto& t = _pending_assets.ids;
+        return std::find(std::cbegin(t), std::cend(t), id) != std::cend(t);
+    }
+
+    void AssetSystemRuntime::_inc_ref_count(const AssetID id) noexcept
+    {
+        auto&      t     = _loaded_assets;
+        const auto it    = std::find(std::cbegin(t.ids), std::cend(t.ids), id);
+        const auto index = std::distance(std::cbegin(t.ids), it);
+        ++t.refcount[index];
+    }
+
+
+    void AssetSystemRuntime::_handle_bundle_requests()
     {
         /*
         // gather completed loads
@@ -107,16 +113,59 @@ namespace drako::engine
         */
     }
 
-    void AssetSystemRuntime::_handle_asset_requests() noexcept
+    void AssetSystemRuntime::_handle_asset_requests()
     {
+        for (const auto& request : _asset_load_requests)
+        {
+            std::vector<AssetID> assets_to_load;
+            for (const auto& asset : request.assets)
+            {
+                if (_loaded(asset))
+                    _inc_ref_count(asset);
+                else
+                {
+                    if (_pending(asset))
+                        _inc_ref_count(asset);
+                    else
+                        assets_to_load.push_back(asset);
+                }
+            }
 
+            if (!std::empty(assets_to_load))
+            {
+                // set up a batch handle
+                //auto batch      = _batch_handles_pool.allocate(1);
+                //batch->callback = request.callback;
+                //batch->counter  = std::size(assets_to_load);
+                //batch->handles.reserve(std::size(assets_to_load));
+
+                const auto indices = _id_to_index(_loaded_assets.ids, assets_to_load);
+
+                for (const auto& i : indices)
+                    assert(!_assets.data[i]); // asset is not loaded
+
+//#pragma omp parallel for
+                for (const auto& i : indices)
+                {
+                    const auto& path = _config.asset_data_directory /
+                                       editor::guid_to_datafile(_assets.ids[i]);
+                    rio::UniqueInputFile file{ path };
+
+                    const auto& meta = _assets.meta[i];
+                    _assets.data[i]  = std::make_unique_for_overwrite<std::byte[]>(meta.packed_size_bytes());
+
+                    rio::read_exact(file, { _assets.data[i].get(), meta.packed_size_bytes() });
+                    _assets.refcount[i] = 1;
+                }
+            }
+        }
     }
 
     AssetSystemRuntime::AssetSystemRuntime(const BundlesArgs& bundles, const ConfigArgs& config)
         : _config{ config }
-        , _io_service{ { .workers = 4, .submit_queue_size = 100, .output_queue_size = 100 } }
-        , _asset_requests_pool{ 100 }
-        , _bundle_requests_pool{ 100 }
+    //, _io_service{ { .workers = 4, .submit_queue_size = 100, .output_queue_size = 100 } }
+    //, _asset_requests_pool{ 100 }
+    //, _bundle_requests_pool{ 100 }
     {
         namespace _fs = std::filesystem;
 
@@ -124,8 +173,9 @@ namespace drako::engine
         assert(!std::empty(bundles.names));
         assert(std::size(bundles.ids) == std::size(bundles.names));
 
-        assert(_fs::is_directory(config.bundle_manifest_directory));
+        assert(_fs::is_directory(config.asset_data_directory));
         assert(_fs::is_directory(config.bundle_data_directory));
+        assert(_fs::is_directory(config.bundle_meta_directory));
 
         /*
         { // load serialized bundle list
@@ -157,7 +207,7 @@ namespace drako::engine
         //_available_bundles.sizes.shrink_to_fit();
     }
 
-    void AssetSystemRuntime::update() noexcept
+    void AssetSystemRuntime::update()
     {
         _handle_bundle_requests();
         _handle_asset_requests();
@@ -188,6 +238,24 @@ namespace drako::engine
         const auto& t = _loaded_assets;
         for (auto i = 0; i < std::size(t.ids); ++i)
             std::cout << t.ids[i] << ' ' << t.refcount[i] << '\n';
+    }
+
+    [[nodiscard]] bool AssetSystemRuntime::debug_check_asset_loaded(std::span<const AssetID> s) noexcept
+    {
+        const auto& ids = _loaded_assets.ids;
+        for (const auto& asset : s)
+            if (std::find(std::cbegin(ids), std::cend(ids), asset) == std::cend(ids))
+                return false;
+        return true;
+    }
+
+    [[nodiscard]] bool AssetSystemRuntime::debug_check_bundle_loaded(std::span<const AssetBundleID> s) noexcept
+    {
+        const auto& ids = _loaded_bundles.ids;
+        for (const auto& bundle : s)
+            if (std::find(std::cbegin(ids), std::cend(ids), bundle) == std::cend(ids))
+                return false;
+        return true;
     }
 
 } // namespace drako::engine
