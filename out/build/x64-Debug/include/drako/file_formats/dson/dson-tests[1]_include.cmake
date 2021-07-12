@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson/dson-tests[1]_tests.cmake")
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/dson/dson-tests[1]_tests.cmake")
-else()
-  add_test(dson-tests_NOT_BUILT dson-tests_NOT_BUILT)
-endif()

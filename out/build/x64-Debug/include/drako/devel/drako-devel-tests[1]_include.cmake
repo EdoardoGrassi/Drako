@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/devel/drako-devel-tests[1]_tests.cmake")
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/devel/drako-devel-tests[1]_tests.cmake")
-else()
-  add_test(drako-devel-tests_NOT_BUILT drako-devel-tests_NOT_BUILT)
-endif()
