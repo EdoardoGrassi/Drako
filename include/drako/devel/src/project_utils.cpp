@@ -1,7 +1,6 @@
 #include "drako/devel/project_utils.hpp"
 
 #include "drako/devel/project_types.hpp"
-#include "drako/file_formats/dson/dson.hpp"
 
 #include <uuid-cpp/uuid.hpp>
 
@@ -16,104 +15,83 @@ namespace _fs = std::filesystem;
 
 namespace drako::editor
 {
-
-    [[nodiscard]] _fs::path _external_asset_to_metafile(const _fs::path& source)
+    void create_asset_meta(const ProjectContext& pc, const AssetImportInfo& i)
     {
-        return _fs::path{ source }.append(".dkmeta");
+        save_text_format(asset_meta_path(pc, i.guid), i);
     }
 
-    void _create_project_info_file(const _fs::path& where);
-
-    /*
-    void load_asset_index_cache(const ProjectDatabase& p)
+    void destroy_asset_meta(const ProjectContext& pc, const AssetImportInfo& i)
     {
-        std::ifstream f{ p.cache_directory() / "asset_index" };
-        f.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-
-        while (f)
-        {
-            _fs::path path;
-            f >> path;
-        }
-    }
-    */
-
-    
-    /* void create_project_tree(const ProjectContext& ctx, std::string_view name)
-    {
-        assert(!std::empty(name));
-
-        if (!_fs::exists(ctx.root().parent_path()))
-            throw std::runtime_error{ "editor : parent directory does not exists." };
-        if (!_fs::create_directory(ctx.root()))
-            throw std::runtime_error{ "editor : project directory already exists." };
-
-        try
-        {
-            _fs::create_directory(ctx.asset_directory());
-            _fs::create_directory(ctx.cache_directory());
-            _fs::create_directory(ctx.meta_directory());
-
-            const ProjectManifest info{
-                .name = std::string{ name }
-            };
-            save(ctx.root() / "project.dkproj", info);
-        }
-        catch (const _fs::filesystem_error&)
-        {
-            _fs::remove_all(ctx.root());
-            throw;
-        }
+        _fs::remove(asset_meta_path(pc, i.guid));
     }
 
-    void create_asset(const ProjectContext& ctx, ProjectDatabase& db, const _fs::path& p, const AssetImportInfo& info)
+    void destroy_asset_data(const ProjectContext& pc, const AssetImportInfo& i)
     {
-        const auto guid           = ctx.generate_asset_uuid();
-        const auto meta_file_path = ctx.guid_to_metafile(guid);
-        try
-        {
-            // generate asset metafile on disk
-            save(meta_file_path, info);
+        _fs::remove(asset_data_path(pc, i.guid));
+    }
 
-            // add asset in memory database
-            db.insert_asset(p, info);
-        }
-        catch (const std::system_error& e)
-        {
-            std::cout << "Asset " << p << " creation failed: " << e.what() << '\n';
-            std::filesystem::remove(meta_file_path);
-            throw;
-        }
-    } */
-
-
-    /* void load_all_assets(const ProjectContext& ctx, ProjectDatabase& db)
+    void import_asset_data(
+        const ProjectContext& c, const AssetImportFunction& f, const AssetImportInfo& i)
     {
-        // scan the whole meta folder for metafiles
-        for (const auto& f : _fs::directory_iterator{ ctx.meta_directory() })
+        if (!_fs::exists(i.path))
+            throw std::runtime_error{ "asset file does not exist" };
+
+        std::invoke(f, c, i, AssetImportContext{});
+    }
+
+
+    [[nodiscard]] AssetScanResult scan_all_assets(const ProjectContext& pc)
+    {
+        AssetScanResult sr{};
+        for (const auto& f : _fs::directory_iterator{ asset_meta_directory(pc) })
         {
             try
             {
-                if (_fs::is_regular_file(f) && f.path().extension() == ".dkmeta")
+                if (_fs::is_regular_file(f))
                 {
                     AssetImportInfo info;
-                    load(f, info);
-
-                    _fs::path asset_file{ f.path() };
-                    asset_file.replace_extension(); // remove .dkmeta
-                    insert(db, asset_file, info);
+                    load_text_format(f.path(), info);
+                    sr.assets.push_back(info);
                 }
             }
             catch (const _fs::filesystem_error& e)
             {
-                std::cout << "Error occurred while loading an asset metafile:\n"
-                          << '\t' << e.what() << '\n'
-                          << "\twith path1: " << e.path1() << '\n'
-                          << "\twith path2: " << e.path2() << '\n';
+                sr.errors.push_back({ .file = f.path(), .message = e.what() });
             }
         }
-    }*/
+        return sr;
+    }
 
-    // build_error build_devel_project(const ProjectManifest& p);
+    [[nodiscard]] BundleScanResult scan_all_bundles(const ProjectContext& pc)
+    {
+        BundleScanResult sr{};
+        for (const auto& f : _fs::directory_iterator{ bundle_meta_directory(pc) })
+        {
+            try
+            {
+                if (_fs::is_regular_file(f))
+                {
+                    AssetBundleInfo info;
+                    load_text_format(f.path(), info);
+                    sr.bundles.push_back(info);
+                }
+            }
+            catch (const _fs::filesystem_error& e)
+            {
+                sr.errors.push_back({ .file = f.path(), .message = e.what() });
+            }
+        }
+        return sr;
+    }
+
+    AssetBundleManifest package_as_single(
+        const ProjectContext& pc, const ProjectDatabase& pd)
+    {
+        AssetBundleManifest a;
+        a.header.name = "__main";
+        a.header.uuid = uuid::SystemEngine{}();
+        a.guids       = pd.assets.guids;
+        return a;
+    }
 
 } // namespace drako::editor

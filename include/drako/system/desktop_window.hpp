@@ -3,7 +3,6 @@
 #define DRAKO_DESKTOP_WINDOW_HPP
 
 #include "drako/core/platform.hpp"
-#include "drako/devel/assertion.hpp"
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Windows.h>
@@ -22,7 +21,7 @@ namespace drako::sys
         using native_handle_type  = HWND;
         using native_context_type = HINSTANCE;
 #endif
-
+        explicit UniqueDesktopWindow();
         explicit UniqueDesktopWindow(std::wstring_view title);
         ~UniqueDesktopWindow() noexcept;
 

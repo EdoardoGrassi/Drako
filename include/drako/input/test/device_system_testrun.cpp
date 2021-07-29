@@ -6,7 +6,7 @@
 #include <thread>
 #include <vector>
 
-using namespace drako;
+using namespace input;
 using namespace std::chrono_literals;
 
 
@@ -27,7 +27,7 @@ void fire2() noexcept { std::cout << "[INPUT] Fire 2!\n"; }
 int main()
 {
     DeviceSystem       ds{ { .devices_poll_rate = 5s } };
-    input::InputSystemRuntime is;
+    InputSystemRuntime is;
 
     /*
     engine::input_device_layout controller;
@@ -49,22 +49,22 @@ int main()
     };
     */
 
-    const std::vector<input::Gesture> presses = {
-        { .name = "jump-pressed", .control = input::BooleanControlID{ 1 }, .event = input::EventID{ 1 } }
+    const std::vector<Gesture> presses = {
+        { .name = "jump-pressed", .control = BooleanControlID{ 1 }, .event = EventID{ 1 } }
         //{ "fire-pressed", VKey::xbox_b, EventID{ 1 } }
     };
     for (const auto& gesture : presses)
         is.create_press_gesture(gesture);
 
-    const std::vector<input::Gesture> releases = {
-        { .name = "jump-released", .control = input::BooleanControlID{ 1 }, .event = input::EventID{ 2 } }
+    const std::vector<Gesture> releases = {
+        { .name = "jump-released", .control = BooleanControlID{ 1 }, .event = EventID{ 2 } }
         //{ "fire-released", VKey::xbox_y }
     };
     for (const auto& gesture : releases)
         is.create_release_gesture(gesture);
 
-    const std::vector<input::GamepadButtonBinding> bindings = {
-        { .name = "a1", .id = {}, .button = GamepadButtonID{ 1 }, .control = input::BooleanControlID{ 0 } }
+    const std::vector<GamepadButtonBinding> bindings = {
+        { .name = "a1", .id = {}, .button = GamepadButtonID{ 1 }, .control = BooleanControlID{ 0 } }
     };
     for (const auto& binding : bindings)
         is.create(binding);
@@ -74,11 +74,11 @@ int main()
 
 
 
-    const std::vector<input::Action> actions = {
-        { "fire-pressed", fire1, input::Action::ID{ 1 } },
-        { "fire-released", fire2, input::Action::ID{ 2 } },
-        { "jump-pressed", jump1, input::Action::ID{ 3 } },
-        { "jump-released", jump2, input::Action::ID{ 4 } },
+    const std::vector<Action> actions = {
+        { "fire-pressed", fire1, Action::ID{ 1 } },
+        { "fire-released", fire2, Action::ID{ 2 } },
+        { "jump-pressed", jump1, Action::ID{ 3 } },
+        { "jump-released", jump2, Action::ID{ 4 } },
     };
     for (const auto& a : actions)
         is.create(a);

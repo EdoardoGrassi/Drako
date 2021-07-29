@@ -2,8 +2,8 @@
 #ifndef DRAKO_ASSET_TYPES_HPP
 #define DRAKO_ASSET_TYPES_HPP
 
-#include "drako/core/drako_api_defs.hpp"
 #include "drako/core/typed_handle.hpp"
+#include "drako/devel/version.hpp"
 
 #include <uuid-cpp/uuid.hpp>
 
@@ -135,20 +135,6 @@ namespace drako
 
     std::istream& operator>>(std::istream&, AssetBundleMeta&);
     std::ostream& operator<<(std::ostream&, const AssetBundleMeta&);
-
-
-
-    /// @brief Manifest file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path manifest_filename(const AssetBundleID& b)
-    {
-        return "bundle_" + std::to_string(b) + ".manifest.drako";
-    }
-
-    /// @brief Storage file name of an asset bundle.
-    [[nodiscard]] inline std::filesystem::path storage_filename(const AssetBundleID& b)
-    {
-        return "bundle_" + std::to_string(b) + ".storage.drako";
-    }
 
 } // namespace drako
 

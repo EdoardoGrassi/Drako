@@ -1,8 +1,6 @@
 #include "drako/input/device_system.hpp"
 #include "drako/input/input_system.hpp"
 
-#include "drako/file_formats/dson/dson.hpp"
-
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -16,7 +14,7 @@ void fire2() noexcept { std::cout << "[INPUT] Fire 2!\n"; }
 
 int main()
 {
-    using namespace drako::input;
+    using namespace input;
     using namespace std::chrono_literals;
 
     InputSystemRuntime is;

@@ -1,12 +1,12 @@
 #pragma once
-#ifndef DRAKO_DEVICE_SYSTEM_HPP
-#define DRAKO_DEVICE_SYSTEM_HPP
+#ifndef DEVICE_SYSTEM_HPP
+#define DEVICE_SYSTEM_HPP
 
 #include "drako/core/platform.hpp"
 #include "drako/core/typed_handle.hpp"
-#include "drako/input/device_system_types.hpp"
+#include "drako/input/device_types.hpp"
 
-#if defined(DRAKO_PLT_WIN32)
+#if defined(_WIN32)
 #include <Xinput.h>
 #endif
 
@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace drako
+namespace input
 {
     /// @brief List of currently connected devices.
     [[nodiscard]] std::vector<DeviceInstanceInfo> query_active_devices() noexcept;
@@ -35,7 +35,7 @@ namespace drako
     {
         std::vector<NativeGamepadControlID> pressed;
         std::vector<NativeGamepadControlID> released;
-        std::error_code                ec;
+        std::error_code                     ec;
     };
     /// @brief Read the events generated from a device.
     [[nodiscard]] DeviceEventsResult query_gamepad_events(GamepadPlayerPort) noexcept;
@@ -47,7 +47,8 @@ namespace drako
     class DeviceSystem
     {
     public:
-        DRAKO_DEFINE_TYPED_ID(HandlerID, std::uint32_t);
+        //DRAKO_DEFINE_TYPED_ID(HandlerID, std::uint32_t);
+        using HandlerID = std::uint32_t;
 
         using DeviceChangeCallback = void (*)(const DeviceChangeEvent&) noexcept;
         using DeviceStateCallback  = void (*)(const DeviceInputState&) noexcept;
@@ -136,6 +137,6 @@ namespace drako
         } _dev_removal;
     };
 
-} // namespace drako
+} // namespace input
 
-#endif // !DRAKO_DEVICE_SYSTEM_HPP
+#endif // !DEVICE_SYSTEM_HPP

@@ -1,44 +1,42 @@
+#pragma once
+#ifndef DRAKO_LOCKFREE_PRIORITY_QUEUE
+#define DRAKO_LOCKFREE_PRIORITY_QUEUE
+
 /// @file
 /// @brief   Thread-safe priority queue templates.
 /// @author  Grassi Edoardo
 /// @date    Last edited on 15/05/2019
 
-#pragma once
-#ifndef DRAKO_LOCKFREE_PRIORITY_QUEUE
-#define DRAKO_LOCKFREE_PRIORITY_QUEUE
+#include "drako/concurrency/lockfree_pool_allocator.hpp"
 
 #include <atomic>
 #include <optional>
 
-#include "drako/core/compiler.hpp"
-#include "drako/concurrency/lockfree_pool_allocator.hpp"
-
-namespace drako::concurrency::lockfree
+namespace drako::lockfree
 {
     template <typename T, typename TPriority>
-    class priority_queue final
+    class PriorityQueue final
     {
     public:
-
-        DRAKO_NODISCARD bool push(const T& in, const TPriority p) noexcept
+        [[nodiscard]] bool enque(const T& in, const TPriority p) noexcept
         {
-            queue_node* new_node = this->pool_allocator.construct(in, p);
+            queue_node* new_node = _pool.construct(in, p);
             if (new_node == nullptr)
             {
                 return false;
             }
             for (;;)
             {
-                auto old_node = this->index[p].load();
+                auto old_node  = _index[p].load();
                 new_node->next = old_node->next.load();
-                if (this->index[p].compare_exchange_strong(old_node, new_node))
+                if (_index[p].compare_exchange_strong(old_node, new_node))
                 {
                     return true;
                 }
             }
         }
 
-        DRAKO_NODISCARD bool pop(T& out) noexcept
+        [[nodiscard]] bool deque(T& out) noexcept
         {
             for (queue_node* old_head;;)
             {
@@ -61,11 +59,10 @@ namespace drako::concurrency::lockfree
         }
 
     private:
-
         struct queue_node final
         {
-            const T value;
-            const TPriority priority;
+            const T                  value;
+            const TPriority          priority;
             std::atomic<queue_node*> next = nullptr;
 
             explicit queue_node(const T& value, const TPriority priority) noexcept
@@ -73,10 +70,10 @@ namespace drako::concurrency::lockfree
             {}
         };
 
-        std::atomic<queue_node*> index[10];
-        std::atomic<queue_node*> head_node = nullptr;
-        lockfree_pool_allocator pool_allocator;
+        lockfree::StaticPool<T>  _pool;
+        std::atomic<queue_node*> _index[10];
+        std::atomic<queue_node*> _head_node = nullptr;
     };
-}
+} // namespace drako::lockfree
 
 #endif // !DRAKO_LOCKFREE_PRIORITY_QUEUE

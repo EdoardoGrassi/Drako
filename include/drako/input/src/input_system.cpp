@@ -1,12 +1,12 @@
 #include "drako/input/input_system.hpp"
 
 #include "drako/devel/logging.hpp"
-#include "drako/input/device_system_types.hpp"
+#include "drako/input/device_types.hpp"
 
 #include <cassert>
 #include <iostream>
 
-namespace drako::input
+namespace input
 {
     void InputSystemRuntime::create(const Action& a)
     {
@@ -222,4 +222,4 @@ namespace drako::input
                       << std::endl;
     }
 
-} // namespace drako::input
+} // namespace input

@@ -9,11 +9,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Set output folders for binaries, executables and libraries.
-#set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
-
 
 if(MSVC)
     # max warnings
@@ -42,7 +37,6 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(gtest_build_gmock OFF)
 FetchContent_MakeAvailable(googletest)
-#add_subdirectory(${gtest_SOURCE_DIR})
 
 
 # get yaml-cpp library
@@ -67,19 +61,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 
-
-add_subdirectory("include/drako/audio")
+add_subdirectory("include/drako/cli-editor")
 add_subdirectory("include/drako/core")
 add_subdirectory("include/drako/concurrency")
 add_subdirectory("include/drako/devel")
 add_subdirectory("include/drako/engine")
-add_subdirectory("include/drako/file_formats")
 add_subdirectory("include/drako/graphics")
 add_subdirectory("include/drako/input")
-add_subdirectory("include/drako/jobs")
-add_subdirectory("include/drako/physics")
 add_subdirectory("include/drako/system")
-add_subdirectory("include/drako/vm")
+
 
 #[[
 # Experimental Drako engine with forward renderer
@@ -89,16 +79,6 @@ target_link_libraries(drako-engine PRIVATE
     drako::system
     drako::runtime)
 #]]
-
-
-# Console interface for Drako projects
-add_executable(drako-cli-editor "./src/drako_cli_editor.cpp")
-set_target_properties(drako-cli-editor
-    PROPERTIES
-        OUTPUT_NAME "drako-cli-editor"
-        #RUNTIME_OUTPUT_DIRECTORY "D:/Desktop/drako_test_zone/projects"
-)
-target_link_libraries(drako-cli-editor PRIVATE drako::devel)
 
 
 # Compiler for runtime resources consumed by the Drako engine
@@ -113,28 +93,9 @@ target_link_libraries(drako-builder PRIVATE drako::devel)
 # === TESTING ===
 # work in progress...
 
-file(GLOB test_files LIST_DIRECTORIES false CONFIGURE_DEPENDS "test_*.cpp")
-foreach(file ${test_files})
-    # Strip last extension from filename
-    get_filename_component(file_without_ext ${file} NAME_WLE)
-	add_executable(${file_without_ext} ${file})
-	target_link_libraries(${file_without_ext} ${PROJECT_LIBS})
-	add_test(NAME ${file_without_ext}
-        COMMAND ${CMAKE_CTEST_COMMAND}
-    )
-	set_tests_properties(${file_without_ext}
-		PROPERTIES
-		    PASS_REGULAR_EXPRESSION "Test passed"
-		    FAIL_REGULAR_EXPRESSION "(Exception|Test failed)"
-		    TIMEOUT 120
-    )
-endforeach()
-
 
 # === PACKAGING ===
 # work in progress...
-
-
 
 
 # === FORMATTING ===

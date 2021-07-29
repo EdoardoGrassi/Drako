@@ -1,10 +1,10 @@
 #include "drako/devel/crc.hpp"
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
-//#include <string>
-//#include <tuple>
+#include <string>
 
+using namespace drako;
 
 GTEST_TEST(Crc32c, UnalignedBuffer)
 {
@@ -23,13 +23,13 @@ GTEST_TEST(Crc32c, UnalignedBuffer)
     //const std::string c = "Weeks of programming can save you hours of planning";
     //EXPECT_EQ(drako::crc32c(c), 0xE94A5429);
 
-    EXPECT_EQ(drako::crc32c("WA"), 0xF8CE17AD);
-    EXPECT_EQ(drako::crc32c("dead"), 0x671AC5FD);
-    EXPECT_EQ(drako::crc32c("deadbeef"), 0xDCCF39C7);
-    EXPECT_EQ(drako::crc32c("deadbeefdeadbeef"), 0x8809AA9A);
-    EXPECT_EQ(drako::crc32c("I tried so hard"), 0x205DD030);
-    EXPECT_EQ(drako::crc32c("Weeks of programming can save you hours of planning"), 0x5757814D);
-    EXPECT_EQ(drako::crc32c("The computer was born to solve problems that did not exist before"), 0x2F7D02E5);
+    EXPECT_EQ(crc32c("WA"), 0xF8CE17AD);
+    EXPECT_EQ(crc32c("dead"), 0x671AC5FD);
+    EXPECT_EQ(crc32c("deadbeef"), 0xDCCF39C7);
+    EXPECT_EQ(crc32c("deadbeefdeadbeef"), 0x8809AA9A);
+    EXPECT_EQ(crc32c("I tried so hard"), 0x205DD030);
+    EXPECT_EQ(crc32c("Weeks of programming can save you hours of planning"), 0x5757814D);
+    EXPECT_EQ(crc32c("The computer was born to solve problems that did not exist before"), 0x2F7D02E5);
 
     //for (const auto& [s, expected] : samples)
     //    EXPECT_EQ(drako::crc32c(s), expected);

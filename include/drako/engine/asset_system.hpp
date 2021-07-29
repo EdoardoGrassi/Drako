@@ -1,20 +1,19 @@
 #pragma once
 #ifndef DRAKO_ASSET_SYSTEM_HPP
-#    define DRAKO_ASSET_SYSTEM_HPP
+#define DRAKO_ASSET_SYSTEM_HPP
 
-#    include "drako/concurrency/async_reader_pool.hpp"
-#    include "drako/concurrency/lockfree_ringbuffer.hpp"
-#    include "drako/core/memory/unsync_pool_allocator.hpp"
-#    include "drako/devel/asset_types.hpp"
-#    include "drako/devel/asset_utils.hpp"
-#    include "drako/graphics/mesh_types.hpp"
+#include "drako/concurrency/async_reader_pool.hpp"
+#include "drako/concurrency/lockfree_ringbuffer.hpp"
+#include "drako/devel/asset_types.hpp"
+#include "drako/devel/asset_utils.hpp"
+#include "drako/graphics/mesh_types.hpp"
 
-#    include <rio/input_file_handle.hpp>
+#include <rio/input_file_handle.hpp>
 
-#    include <cassert>
-#    include <filesystem>
-#    include <functional>
-#    include <vector>
+#include <cassert>
+#include <filesystem>
+#include <functional>
+#include <vector>
 
 namespace drako::engine
 {
@@ -58,24 +57,24 @@ namespace drako::engine
         /// @brief Submit a request.
         /// @param id Bundle to load.
         ///
-        //void load_bundle(const AssetBundleID id) noexcept;
+        //void acquire_bundle(const AssetBundleID id) noexcept;
 
         /// @brief Unloads the bundle.
         ///
         /// Notify that a bundle is no longer required.
         ///
-        //void unload_bundle(const AssetBundleID id) noexcept;
+        //void release_bundle(const AssetBundleID id) noexcept;
 
-        void load_asset(const AssetID) noexcept;
-        void load_asset(const AssetLoadRequest&) noexcept;
+        void acquire_asset(const AssetID) noexcept;
+        void acquire_asset(const AssetLoadRequest&) noexcept;
 
-        void unload_asset(const AssetID) noexcept;
-        //void unload_asset(std::span<const AssetID>) noexcept;
+        void release_asset(const AssetID) noexcept;
+        //void release_asset(std::span<const AssetID>) noexcept;
 
         /// @brief Executes pending asynchronous requests.
         void update();
 
-#    if !defined(DRAKO_RUNTIME_ONLY)
+#if !defined(DRAKO_RUNTIME_ONLY)
         /// @brief Prints a table of currently registered bundles.
         void debug_print_registered_bundles();
 
@@ -90,7 +89,7 @@ namespace drako::engine
 
         /// @brief Asserts whether some bundles are currently loaded
         [[nodiscard]] bool debug_check_bundle_loaded(std::span<const AssetBundleID>) noexcept;
-#    endif
+#endif
 
     private:
         using _request_id = std::uint32_t;
@@ -203,24 +202,24 @@ namespace drako::engine
     }
     */
 
-    inline void AssetSystemRuntime::load_asset(const AssetID a) noexcept
+    inline void AssetSystemRuntime::acquire_asset(const AssetID a) noexcept
     {
         assert(a);
         _asset_load_list.push_back(a);
     }
 
-    inline void AssetSystemRuntime::unload_asset(const AssetID a) noexcept
-    {
-        assert(a);
-        _asset_dump_list.push_back(a);
-    }
-
-    inline void AssetSystemRuntime::load_asset(const AssetLoadRequest& r) noexcept
+    inline void AssetSystemRuntime::acquire_asset(const AssetLoadRequest& r) noexcept
     {
         for (const auto& a : r.assets)
             assert(a);
 
         _asset_load_requests.push_back(r);
+    }
+
+    inline void AssetSystemRuntime::release_asset(const AssetID a) noexcept
+    {
+        assert(a);
+        _asset_dump_list.push_back(a);
     }
 
 } // namespace drako::engine

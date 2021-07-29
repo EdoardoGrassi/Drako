@@ -2,7 +2,7 @@
 #include "drako/system/keyboard_device.hpp"
 
 #include <chrono>
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <thread>
 

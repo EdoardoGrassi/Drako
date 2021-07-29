@@ -10,6 +10,7 @@
 #include <atomic>
 #include <cassert>
 #include <iostream>
+#include <optional>
 #include <span>
 #include <thread>
 #include <type_traits>
@@ -101,7 +102,7 @@ namespace drako
 
         [[nodiscard]] bool submit(const Request* r) noexcept
         {
-            //static thread_local std::size_t worker = 0; 
+            //static thread_local std::size_t worker = 0;
             //return _submit(worker++ % std::size(_workers), r);
             return _submit(0, r);
         }
@@ -110,7 +111,7 @@ namespace drako
         {
             //static thread_local std::size_t worker = 0;
             //return _retrive(worker++ % std::size(_workers), r);
-            return _retrive(0, r);
+            //return _retrive(0, r);
         }
 
 
@@ -147,15 +148,14 @@ namespace drako
         {
             while (!done.test(std::memory_order::acquire))
             {
-                while (const auto result = in.pop())
+                for (const Request* request; in.deque(request);)
                 {
-                    const auto& request = result.value();
                     //packet.src.read(packet.dst, packet.bytes);
                     std::clog << "Thread " << std::this_thread::get_id()
                               << ": read " << request->dst.size_bytes() << " bytes.\n";
 
                     //std::invoke(request.callback);
-                    assert(out.push(request));
+                    assert(out.enque(request));
                 }
 
                 // TODO: this should be supported in c++20 to avoid busy wait
@@ -169,7 +169,7 @@ namespace drako
             assert(worker < std::size(_workers));
             assert(r);
 
-            return _submit_queues[worker].push(r);
+            return _submit_queues[worker].enque(r);
         }
 
         [[nodiscard]] bool _retrive(const std::size_t worker, const Request* r)
@@ -177,8 +177,7 @@ namespace drako
             assert(worker < std::size(_workers));
             assert(r);
 
-            if (auto result = _output_queues[worker].pop(); result)
-                *r = *result.value();
+            return _output_queues[worker].deque(r);
         }
     };
 

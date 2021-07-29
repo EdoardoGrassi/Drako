@@ -2,7 +2,7 @@
 #ifndef DRAKO_ASSET_UTILS_HPP
 #define DRAKO_ASSET_UTILS_HPP
 
-#include "drako/devel/asset_bundle_manifest.hpp"
+#include "drako/devel/asset_bundle_types.hpp"
 #include "drako/devel/asset_types.hpp"
 
 #include <limits>

@@ -11,7 +11,13 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "intelliSenseMode": "windows-msvc-x64",
-      "variables": []
+      "variables": [
+        {
+          "name": "LOCKFREE_BUILD_TESTS",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }

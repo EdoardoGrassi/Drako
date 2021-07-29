@@ -35,7 +35,7 @@ namespace drako
 
     /// @brief Defines a strongly typed handle with name Type and storage Integer.
 #define DRAKO_DEFINE_TYPED_HANDLE(Type, Integer)                 \
-    class Type : public BasicTypedHandle<Type, Integer>          \
+    class Type : public drako::BasicTypedHandle<Type, Integer>   \
     {                                                            \
         using BasicTypedHandle<Type, Integer>::BasicTypedHandle; \
     };                                                           \
@@ -73,7 +73,7 @@ namespace drako
 
     /// @brief Defines a strongly typed id with name Type and storage Integer.
 #define DRAKO_DEFINE_TYPED_ID(Type, Integer)                  \
-    class Type : public BasicTypedID<Integer>                 \
+    class Type : public drako::BasicTypedID<Integer>          \
     {                                                         \
         using BasicTypedID<Integer>::BasicTypedID;            \
     };                                                        \
@@ -133,7 +133,7 @@ namespace drako
 
     /// @brief Defines a weakly typed id with name T and storage S.
 #define DRAKO_DEFINE_UNTYPED_ID(type, representation)         \
-    class type : public BasicUntypedID<representation>        \
+    class type : public drako::BasicUntypedID<representation> \
     {                                                         \
         using BasicUntypedID::BasicUntypedID                  \
     };                                                        \

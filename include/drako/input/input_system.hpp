@@ -1,11 +1,11 @@
 #pragma once
-#ifndef DRAKO_INPUT_SYSTEM_HPP
-#define DRAKO_INPUT_SYSTEM_HPP
+#ifndef INPUT_SYSTEM_HPP
+#define INPUT_SYSTEM_HPP
 
 #include "drako/core/typed_handle.hpp"
 #include "drako/input/device_system.hpp"
-#include "drako/input/device_system_types.hpp"
-#include "drako/input/input_system_types.hpp"
+#include "drako/input/device_types.hpp"
+#include "drako/input/input_types.hpp"
 
 #include <cassert>
 #include <functional>
@@ -14,7 +14,7 @@
 #include <string_view>
 #include <vector>
 
-namespace drako::input
+namespace input
 {
     struct Action
     {
@@ -98,8 +98,9 @@ namespace drako::input
         std::vector<EventID>          _temp_event_buffer;
         std::vector<Action::Callback> _temp_invoke_buffer;
 
-#if defined(DRAKO_PLT_WIN32) || defined(DRAKO_PLT_LINUX) || defined(DRAKO_PLT_MACOS)
+#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
         /*vvv Include bindings for the system main keyboard vvv*/
+
         struct _keyboard_keys_bindings_table
         {
             std::vector<BindingID>        binding; // unique id of the binding
@@ -178,6 +179,6 @@ namespace drako::input
         } _actions;
     };
 
-} // namespace drako::input
+} // namespace input
 
-#endif // !DRAKO_INPUT_SYSTEM_HPP
+#endif // !INPUT_SYSTEM_HPP

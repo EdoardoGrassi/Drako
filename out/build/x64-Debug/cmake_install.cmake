@@ -49,7 +49,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/audio/cmake_install.cmake")
+  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/cli-editor/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
@@ -74,11 +74,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/file_formats/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/graphics/cmake_install.cmake")
 endif()
 
@@ -89,22 +84,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/jobs/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/physics/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/system/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/edo18/source/repos/EdoardoGrassi/Draco/out/build/x64-Debug/include/drako/vm/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

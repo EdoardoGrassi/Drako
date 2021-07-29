@@ -2,7 +2,7 @@
 
 #include "drako/core/platform.hpp"
 #include "drako/devel/logging.hpp"
-#include "drako/input/input_system_utils.hpp"
+#include "drako/input/input_utils.hpp"
 
 #include <Xinput.h>
 
@@ -10,7 +10,7 @@
 #include <iostream>
 #include <vector>
 
-namespace drako
+namespace input
 {
     [[nodiscard]] bool _xinput_valid_port(GamepadPlayerPort port)
     {
@@ -376,7 +376,7 @@ namespace drako
         }
     }
 
-#if !defined(DRAKO_API_RELEASE)
+#if !defined(NDEBUG)
     void DeviceSystem::debug_print_handlers() const
     {
         std::cout << "[INFO] Device System [subscribed state listeners]:\n";
@@ -390,4 +390,4 @@ namespace drako
     }
 #endif
 
-} // namespace drako
+} // namespace input

@@ -27,11 +27,25 @@ namespace drako
         return crc32c(std::as_bytes(span));
     }
 
+
     class Crc32c
     {
     public:
+        explicit constexpr Crc32c() noexcept;
 
+        explicit constexpr Crc32c(const std::uint32_t init) noexcept
+            : _crc{ init }
+        {
+        }
+
+        constexpr Crc32c(const Crc32c&) noexcept = default;
+        constexpr Crc32c& operator=(const Crc32c&) noexcept = default;
+
+        /// @brief Reset the accumulated value.
         void reset() noexcept { _crc = 0xffffffff; }
+
+        /// @brief Extract the accumulated CRC value.
+        [[nodiscard]] std::uint32_t value() const noexcept { return _crc; }
 
     private:
         std::uint32_t _crc = 0xffffffff;

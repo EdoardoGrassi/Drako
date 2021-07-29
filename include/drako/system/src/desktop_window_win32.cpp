@@ -1,7 +1,5 @@
 #include "drako/system/desktop_window.hpp"
 
-#include "drako/devel/logging.hpp"
-
 #include <cassert>
 #include <string>
 #include <string_view>
@@ -50,6 +48,12 @@ namespace drako::sys
         return ERROR_SUCCESS;
     }
 
+    UniqueDesktopWindow::UniqueDesktopWindow()
+        : _instance(::GetModuleHandleW(nullptr))
+        , _window(NULL)
+    {
+    }
+
     UniqueDesktopWindow::UniqueDesktopWindow(std::wstring_view title)
         : _instance(::GetModuleHandleW(nullptr))
     {
@@ -81,14 +85,16 @@ namespace drako::sys
             nullptr    // additional application data
         );
         if (_window == NULL)
-            [[unlikely]] throw std::system_error(::GetLastError(), std::system_category());
+            [[unlikely]]
+            throw std::system_error(::GetLastError(), std::system_category());
     }
 
     UniqueDesktopWindow::~UniqueDesktopWindow() noexcept
     {
         if (_window != NULL)
             if (!::DestroyWindow(_window))
-                [[unlikely]] std::terminate();
+                [[unlikely]]
+                std::terminate();
     }
 
     UniqueDesktopWindow::UniqueDesktopWindow(UniqueDesktopWindow&& other) noexcept

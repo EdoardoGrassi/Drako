@@ -3,8 +3,8 @@
 
 #include "drako/core/compiler.hpp"
 #include "drako/core/platform.hpp"
-#include "drako/devel/assertion.hpp"
 
+#include <cassert>
 #include <cstddef>
 
 // #include <WinBase.h>
@@ -31,7 +31,7 @@ namespace drako::sys
 
         SYSTEM_INFO sys_info = {};
         ::GetSystemInfo(&sys_info);
-        DRAKO_ASSERT(sys_info.dwNumberOfProcessors > 0);
+        assert(sys_info.dwNumberOfProcessors > 0);
         return sys_info.dwNumberOfProcessors;
 
 #elif defined(DRAKO_PLT_LINUX)
@@ -71,16 +71,14 @@ namespace drako::sys
 #endif
     }
 
-    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core core) noexcept
+    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core core)
     {
 #if defined(DRAKO_PLT_WIN32)
 
         USHORT numa_node = {};
         if (::GetNumaProcessorNodeEx(&core.cpu_number, &numa_node) == 0)
-        {
-            // error
-            std::exit(EXIT_FAILURE);
-        }
+            throw std::system_error(::GetLastError(), std::system_category());
+
         return native_numa_node{ numa_node };
 
 #else

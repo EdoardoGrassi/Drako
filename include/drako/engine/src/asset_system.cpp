@@ -1,6 +1,6 @@
 #include "drako/engine/asset_system.hpp"
 
-#include "drako/devel/asset_bundle_manifest.hpp"
+#include "drako/devel/asset_bundle_types.hpp"
 #include "drako/devel/project_utils.hpp"
 
 #include <rio/input_file_handle.hpp>
@@ -198,7 +198,7 @@ namespace drako::engine
         //_available_bundles.sources.reserve(std::size(bundles.ids));
         for (const auto& id : bundles.ids)
         {
-            const auto path = manifest_filename(id);
+            const auto path = bundle_meta_filename(id);
             const auto size = static_cast<std::size_t>(_fs::file_size(path));
             _available_bundles.sources.emplace_back(path);
             _available_bundles.sizes.push_back(size);

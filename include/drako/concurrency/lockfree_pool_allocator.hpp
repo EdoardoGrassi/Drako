@@ -1,18 +1,18 @@
+#pragma once
+#ifndef DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
+#define DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
+
 /// @file
 /// @brief  Threadsafe lockfree implementation of an object pool.
 /// @author Grassi Edoardo
 /// @date   Last update: 03-09-2019
 
-#pragma once
-#ifndef DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
-#define DRAKO_LOCKFREE_POOL_ALLOCATOR_HPP
-
 #include "drako/core/compiler.hpp"
-#include "drako/core/memory/memory_core.hpp"
 
 #include <atomic>
 #include <bit>
 #include <cassert>
+#include <memory>
 #include <new>     // std::bad_alloc
 #include <numeric> // std::iota
 #include <type_traits>
@@ -110,7 +110,7 @@ namespace drako::lockfree
         }
 
 #if defined(DRKAPI_DEBUG)
-        std::atomic<std::size_t> debug_allocated_blocks_count;
+        std::atomic<std::size_t> _debug_allocated_blocks_count;
 #endif
     };
 

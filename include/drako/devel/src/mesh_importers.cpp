@@ -1,5 +1,7 @@
 #include "drako/devel/mesh_importers.hpp"
 
+#include "drako/devel/project_types.hpp"
+
 #include <obj-cpp/obj.hpp>
 
 #include <vector>
@@ -58,10 +60,10 @@ namespace drako::editor
         const MeshMetaInfo meta{
             .vertex_count      = (std::size(md.v) <= std::numeric_limits<_verts_count_t>::max())
                                      ? static_cast<_verts_count_t>(std::size(md.v))
-                                     : throw std::runtime_error{ "Too many vertices" },
+                                     : throw std::runtime_error{ "too many vertices" },
             .index_count       = (std::size(md.v) * 3 <= std::numeric_limits<_index_count_t>::max())
                                      ? static_cast<_index_count_t>(std::size(md.v) * 3)
-                                     : throw std::runtime_error{ "Too many indices" },
+                                     : throw std::runtime_error{ "too many indices" },
             .vertex_size_bytes = sizeof(float) * 3,
             .index_size_bytes  = sizeof(std::uint32_t),
             .topology          = MeshMetaInfo::Topology::triangle_list
@@ -69,6 +71,18 @@ namespace drako::editor
 
         return Mesh{ meta, std::move(verts_data), std::move(index_data) };
         //throw std::runtime_error{ "Not implemented" };
+    }
+
+
+    void import_asset_obj(
+        const ProjectContext& pc, const AssetImportInfo& i, const AssetImportContext& ac)
+    {
+        std::ifstream fi{ i.path };
+        std::string  text{ std::istreambuf_iterator{ fi }, {} };
+
+        const auto mesh = compile(obj::parse(text, {}).data);
+        
+        std::ofstream fo{ };
     }
 
 } // namespace drako::editor

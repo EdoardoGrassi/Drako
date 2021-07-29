@@ -6,7 +6,7 @@ AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
 AlignConsecutiveMacros: true
-AlignOperands: true
+AlignOperands: AlignAfterOperator
 AllowShortBlocksOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
@@ -29,6 +29,7 @@ BraceWrapping:
   SplitEmptyNamespace: false
   SplitEmptyRecord: true
 BreakBeforeBraces: Custom
+BreakBeforeBinaryOperators: All
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 ColumnLimit: 0

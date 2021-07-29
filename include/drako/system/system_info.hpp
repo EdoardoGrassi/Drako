@@ -2,9 +2,10 @@
 #ifndef DRAKO_SYSTEM_INFO_HPP
 #define DRAKO_SYSTEM_INFO_HPP
 
-#include <cstdint>
-
 #include "drako/core/platform.hpp"
+
+#include <cstdint>
+#include <system_error>
 
 #if defined(DRAKO_PLT_WIN32)
 #include <Windows.h>
@@ -71,7 +72,9 @@ namespace drako::sys
 
     // Returns the numa node of a logical processor.
     //
-    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core core) noexcept;
+    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core);
+    [[nodiscard]] native_numa_node cpu_numa_node(native_cpu_core, std::error_code&) noexcept;
+
 } // namespace drako::sys
 
 #endif // !DRAKO_SYSTEM_INFO_HPP
